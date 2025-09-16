@@ -1,7 +1,7 @@
 import React from "react";
 import { useEditorContext } from "../../../context/useEditorContext";
 import type { WidgetUpdate } from "../../../types/widgets";
-import { EDIT_MODE, FLEX_ALIGN_MAP, RUNTIME_MODE } from "../../../constants/constants";
+import { EDIT_MODE, FLEX_ALIGN_MAP } from "../../../constants/constants";
 import ActionButton from "ReactAutomationStudio/components/BaseComponents/ActionButton";
 
 const ActionButtonComp: React.FC<WidgetUpdate> = ({ data }) => {
@@ -39,7 +39,7 @@ const ActionButtonComp: React.FC<WidgetUpdate> = ({ data }) => {
         disabled: p.disabled!.value,
         variant: "contained",
       }}
-    ></ActionButton>
+    />
   );
 };
 

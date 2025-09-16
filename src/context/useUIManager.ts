@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef, useCallback } from "react";
-import usePvaPyWS from "./usePvaPyWS";
 import { EDIT_MODE, GRID_ID, type Mode } from "../constants/constants";
 import { useWidgetManager } from "./useWidgetManager";
 import type { ExportedWidget } from "../types/widgets";
@@ -23,9 +22,6 @@ import type { ExportedWidget } from "../types/widgets";
  * @returns An object containing UI state, setters, and mode updater.
  */
 export default function useUIManager(
-  ws: ReturnType<typeof usePvaPyWS>["ws"],
-  startNewSession: ReturnType<typeof usePvaPyWS>["startNewSession"],
-  clearPVData: ReturnType<typeof useWidgetManager>["clearPVData"],
   editorWidgets: ReturnType<typeof useWidgetManager>["editorWidgets"],
   setSelectedWidgetIDs: ReturnType<typeof useWidgetManager>["setSelectedWidgetIDs"],
   updateWidgetProperties: ReturnType<typeof useWidgetManager>["updateWidgetProperties"],
@@ -56,18 +52,20 @@ export default function useUIManager(
     (newMode: Mode) => {
       const isEdit = newMode == EDIT_MODE;
       if (isEdit) {
-        ws.current?.close();
-        ws.current = null;
-        clearPVData();
+        /* TODO: disconnect from pvserver - see
+         * https://github.com/React-Automation-Studio/React-Automation-Studio/issues/144
+         */
       } else {
         setSelectedWidgetIDs([]);
         setWdgSelectorOpen(false);
-        startNewSession();
+        /* TODO: connect to pvserver - see
+         * https://github.com/React-Automation-Studio/React-Automation-Studio/issues/144
+         */
       }
       updateWidgetProperties(GRID_ID, { gridLineVisible: isEdit }, false);
       setMode(newMode);
     },
-    [updateWidgetProperties, clearPVData, setSelectedWidgetIDs, startNewSession, ws]
+    [updateWidgetProperties, setSelectedWidgetIDs]
   );
 
   /**

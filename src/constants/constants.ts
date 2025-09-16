@@ -49,9 +49,6 @@ export const EDIT_MODE = "edit";
 /** Runtime mode string (connected to PVs) */
 export const RUNTIME_MODE = "runtime";
 
-/** WebSocket server URL for PV communication */
-export const WS_URL = "ws://localhost:8080";
-
 /** Union type for valid app modes */
 export type Mode = typeof EDIT_MODE | typeof RUNTIME_MODE;
 

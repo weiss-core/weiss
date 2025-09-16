@@ -11,7 +11,6 @@ import type {
 import { GridZone } from "../components/GridZone";
 import { GRID_ID, MAX_HISTORY } from "../constants/constants";
 import WidgetRegistry from "../components/WidgetRegistry/WidgetRegistry";
-import type { MultiPvData, PVData } from "../types/pvaPyWS";
 
 /**
  * Deep clone a list of widgets.
@@ -599,73 +598,6 @@ export function useWidgetManager() {
   );
 
   /**
-   * Update a widget's PV data (single or multi-PV).
-   * @param newPVData Updated PV data
-   */
-  const updatePVData = useCallback(
-    (newPVData: PVData) => {
-      updateEditorWidgetList(
-        (prev) =>
-          prev.map((w) => {
-            // single PV case
-            if (w.editableProperties.pvName?.value === newPVData.pv) {
-              return {
-                ...w,
-                pvData: {
-                  ...w.pvData,
-                  ...newPVData,
-                  value: newPVData.value ?? w.pvData?.value,
-                },
-              };
-            }
-
-            // multi PV case
-            if (w.editableProperties.pvNames) {
-              const updatedMultiPvData: MultiPvData = { ...w.multiPvData };
-
-              for (const pv of Object.values(w.editableProperties.pvNames.value)) {
-                if (pv === newPVData.pv) {
-                  updatedMultiPvData[pv] = {
-                    ...w.multiPvData?.[pv],
-                    ...newPVData,
-                    value: newPVData.value ?? w.multiPvData?.[pv]?.value,
-                  };
-                }
-              }
-
-              return {
-                ...w,
-                multiPvData: updatedMultiPvData,
-              };
-            }
-
-            return w;
-          }),
-        false
-      );
-    },
-    [updateEditorWidgetList]
-  );
-
-  /**
-   * Clear/reset all PV data from widgets.
-   */
-  const clearPVData = useCallback(() => {
-    updateEditorWidgetList(
-      (prev) =>
-        prev.map((w) => {
-          if (w.pvData) {
-            return { ...w, pvData: {} as PVData };
-          } else if (w.multiPvData) {
-            return { ...w, multiPvData: {} as Record<string, PVData> };
-          }
-          return w;
-        }),
-      false
-    );
-  }, [updateEditorWidgetList]);
-
-  /**
    * List of all PVs held by widgets.
    */
   const PVList = useMemo(() => {
@@ -717,8 +649,6 @@ export function useWidgetManager() {
     distributeVertical,
     downloadWidgets,
     loadWidgets,
-    updatePVData,
-    clearPVData,
     PVList,
   };
 }

@@ -1,15 +1,12 @@
 import React from "react";
 import { EditorContext } from "./useEditorContext";
 import { useWidgetManager } from "./useWidgetManager";
-import usePvaPyWS from "./usePvaPyWS";
 import useUIManager from "./useUIManager";
 
 /**
  * The full editor context type.
  */
-export type EditorContextType = ReturnType<typeof useWidgetManager> &
-  ReturnType<typeof usePvaPyWS> &
-  ReturnType<typeof useUIManager>;
+export type EditorContextType = ReturnType<typeof useWidgetManager> & ReturnType<typeof useUIManager>;
 
 /**
  * EditorProvider component.
@@ -25,11 +22,8 @@ export type EditorContextType = ReturnType<typeof useWidgetManager> &
  */
 export const EditorProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const widgetManager = useWidgetManager();
-  const ws = usePvaPyWS(widgetManager.PVList, widgetManager.updatePVData);
   const ui = useUIManager(
-    ws.ws,
-    ws.startNewSession,
-    widgetManager.clearPVData,
+    // TODO: pass reference to pvserver connection
     widgetManager.editorWidgets,
     widgetManager.setSelectedWidgetIDs,
     widgetManager.updateWidgetProperties,
@@ -40,10 +34,9 @@ export const EditorProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const value = React.useMemo<EditorContextType>(
     () => ({
       ...widgetManager,
-      ...ws,
       ...ui,
     }),
-    [widgetManager, ws, ui]
+    [widgetManager, ui]
   );
 
   return <EditorContext.Provider value={value}>{children}</EditorContext.Provider>;

@@ -3,7 +3,6 @@ import { COLORS } from "../../../constants/constants";
 import type { Widget } from "../../../types/widgets";
 import InputIcon from "@mui/icons-material/Input";
 import { PROPERTY_SCHEMAS, COMMON_PROPS, TEXT_PROPS } from "../../../types/widgetProperties";
-import type { PVData } from "../../../types/pvaPyWS";
 
 export const InputField: Widget = {
   id: "__InputField__",
@@ -12,7 +11,6 @@ export const InputField: Widget = {
   widgetIcon: InputIcon,
   widgetLabel: "Input Field",
   category: "Controls",
-  pvData: {} as PVData,
   editableProperties: {
     ...COMMON_PROPS,
     ...TEXT_PROPS,
