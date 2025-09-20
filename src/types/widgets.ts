@@ -9,13 +9,22 @@ import { PROPERTY_SCHEMAS } from "./widgetProperties";
  * - "boolean": checkbox
  * - "colorSelector": color picker
  * - "select": dropdown selection
- * - "pvList": list of PVs (text input)
+ * - "strList": list of string entries
+ * - "strRecord": string-string record (key-value pairs)
  * - "none": no selector (property not displayed)
  */
-export type PropertySelectorType = "text" | "number" | "boolean" | "colorSelector" | "select" | "strList" | "none";
+export type PropertySelectorType =
+  | "text"
+  | "number"
+  | "boolean"
+  | "colorSelector"
+  | "select"
+  | "strList"
+  | "strRecord"
+  | "none";
 
 /** Allowed values for a widget property: string, number, boolean, or string dictionary */
-export type PropertyValue = string | number | boolean | string[];
+export type PropertyValue = string | number | boolean | string[] | Record<string, string>;
 
 /**
  * Represents a single widget property.

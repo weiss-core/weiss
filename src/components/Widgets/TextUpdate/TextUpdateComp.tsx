@@ -6,7 +6,7 @@ import TextUpdate from "ReactAutomationStudio/components/BaseComponents/TextUpda
 
 const TextUpdateComp: React.FC<WidgetUpdate> = ({ data }) => {
   const p = data.editableProperties;
-  const { mode } = useEditorContext();
+  const { mode, macros } = useEditorContext();
 
   if (!p.visible?.value) return null;
 
@@ -37,6 +37,7 @@ const TextUpdateComp: React.FC<WidgetUpdate> = ({ data }) => {
       <div style={{ width: "100%" }}>
         <TextUpdate
           pv={p.pvName?.value}
+          macros={macros}
           usePvPrecision={true}
           usePvUnits={true}
           alarmSensitive={true}

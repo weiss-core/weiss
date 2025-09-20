@@ -5,7 +5,7 @@ import { EDIT_MODE, RUNTIME_MODE } from "../../../constants/constants";
 import TextInput from "ReactAutomationStudio/components/BaseComponents/TextInput";
 
 const InputFieldComp: React.FC<WidgetUpdate> = ({ data }) => {
-  const { mode } = useEditorContext();
+  const { mode, macros } = useEditorContext();
 
   const p = data.editableProperties;
   const isEditMode = mode === EDIT_MODE;
@@ -14,7 +14,7 @@ const InputFieldComp: React.FC<WidgetUpdate> = ({ data }) => {
     <div style={{ position: "relative", width: "100%", height: "100%" }}>
       <TextInput
         pv={p.pvName?.value}
-        // macros={{ "$(device)": "testIOC", "$(id)": "2" }}
+        macros={macros}
         alarmSensitive={p.alarmBorder?.value}
         usePvPrecision={p.precisionFromPV?.value}
         usePvUnits={p.unitsFromPV?.value}

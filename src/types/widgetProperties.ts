@@ -20,6 +20,7 @@ function defineProp<T extends PropertyValue>(prop: WidgetProperty<T>): WidgetPro
 export const PROPERTY_SCHEMAS = {
   // Shared Properties
   disabled:        defineProp({ selType: "boolean", label: "Disabled", value: false as boolean, category: "Other" }),
+  macros:          defineProp({ selType: "strRecord", label: "Macro", value: {} as Record<string, string>, category: "EPICS" }),
   // Layout
   x:               defineProp({ selType: "number", label: "X", value: 100 as number, category: "Layout" }),
   y:               defineProp({ selType: "number", label: "Y", value: 100 as number, category: "Layout" }),
@@ -50,7 +51,7 @@ export const PROPERTY_SCHEMAS = {
   centerVisible:   defineProp({ selType: "boolean", label: "Center mark visible", value: true as boolean, category: "Grid" }),
   // EPICS
   pvName:          defineProp({ selType: "text", label: "PV Name", value: "" as string, category: "EPICS" }),
-  pvNames:         defineProp({ selType: "strList", label: "PV Names", value: [] as string[], category: "EPICS" }),
+  pvNames:         defineProp({ selType: "strList", label: "PV Name", value: [] as string[], category: "EPICS" }),
   precisionFromPV: defineProp({ selType: "boolean", label: "Precision from PV", value: true as boolean, category: "EPICS" }),
   precision:       defineProp({ selType: "number", label: "Precision", value: -1 as number, category: "EPICS" }),
   unitsFromPV:     defineProp({ selType: "boolean", label: "Units from PV", value: true as boolean, category: "EPICS" }),

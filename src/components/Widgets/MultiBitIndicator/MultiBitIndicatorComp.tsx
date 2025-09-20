@@ -6,14 +6,14 @@ import LightPanel from "ReactAutomationStudio/components/BaseComponents/LightPan
 
 const MultiBitIndicatorComp: React.FC<WidgetUpdate> = ({ data }) => {
   const p = data.editableProperties;
-  const { mode } = useEditorContext();
+  const { mode, macros } = useEditorContext();
 
   if (!p.visible?.value) return null;
 
   return (
     <LightPanel
       pv={p.pvName?.value ?? ""}
-      // macros={{ "$(device)": "testIOC", "$(id)": "2" }}
+      macros={macros}
       onColor={p.onColor?.value}
       offColor={p.offColor?.value}
       tooltip={p.tooltip?.value}

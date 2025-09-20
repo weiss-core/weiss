@@ -6,7 +6,7 @@ import ToggleButton from "ReactAutomationStudio/components/BaseComponents/Toggle
 import PowerSettingsNewIcon from "@mui/icons-material/PowerSettingsNew";
 
 const ToggleButtonComp: React.FC<WidgetUpdate> = ({ data }) => {
-  const { mode } = useEditorContext();
+  const { mode, macros } = useEditorContext();
   const p = data.editableProperties;
 
   if (!p.visible?.value) return null;
@@ -16,6 +16,7 @@ const ToggleButtonComp: React.FC<WidgetUpdate> = ({ data }) => {
       pv={p.pvName?.value ?? ""}
       tooltip={p.tooltip?.value}
       showTooltip={true}
+      macros={macros}
       // for now those only accept MUI keywords like primary/secondary etc
       // onColor={p.onColor?.value}
       // offColor={p.offColor?.value}

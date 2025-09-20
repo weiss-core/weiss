@@ -17,5 +17,6 @@ export const GridZone: Widget = {
     gridLineVisible: PROPERTY_SCHEMAS.gridLineVisible,
     snapToGrid: PROPERTY_SCHEMAS.snapToGrid,
     centerVisible: PROPERTY_SCHEMAS.centerVisible,
+    macros: PROPERTY_SCHEMAS.macros,
   },
 } as const;

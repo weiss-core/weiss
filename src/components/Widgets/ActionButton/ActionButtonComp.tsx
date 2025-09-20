@@ -5,7 +5,7 @@ import { EDIT_MODE, FLEX_ALIGN_MAP } from "../../../constants/constants";
 import ActionButton from "ReactAutomationStudio/components/BaseComponents/ActionButton";
 
 const ActionButtonComp: React.FC<WidgetUpdate> = ({ data }) => {
-  const { mode } = useEditorContext();
+  const { mode, macros } = useEditorContext();
   const p = data.editableProperties;
 
   if (!p.visible?.value) return null;
@@ -13,6 +13,7 @@ const ActionButtonComp: React.FC<WidgetUpdate> = ({ data }) => {
   return (
     <ActionButton
       pv={p.pvName?.value}
+      macros={macros}
       actionValue={p.actionValue?.value}
       actionString={p.label?.value}
       tooltip={p.tooltip?.value}

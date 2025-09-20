@@ -616,6 +616,11 @@ export function useWidgetManager() {
     return Array.from(set);
   }, [editorWidgets]);
 
+  /**
+   * Macros to be substituted on pv names.
+   */
+  const macros = getWidget(GRID_ID)?.editableProperties.macros?.value;
+
   return {
     editorWidgets,
     setEditorWidgets,
@@ -650,5 +655,6 @@ export function useWidgetManager() {
     downloadWidgets,
     loadWidgets,
     PVList,
+    macros,
   };
 }
