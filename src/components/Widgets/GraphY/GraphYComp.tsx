@@ -2,11 +2,13 @@ import React from "react";
 import type { WidgetUpdate } from "../../../types/widgets";
 import { useEditorContext } from "../../../context/useEditorContext";
 import GraphY from "ReactAutomationStudio/components/BaseComponents/GraphY";
+import { EDIT_MODE } from "../../../constants/constants";
 
 const GraphYComp: React.FC<WidgetUpdate> = ({ data }) => {
   const { mode, macros } = useEditorContext();
   const p = data.editableProperties;
   const pvs = p.pvNames?.value ?? [];
+  const isEditMode = mode === EDIT_MODE;
 
   return (
     <div
@@ -21,6 +23,7 @@ const GraphYComp: React.FC<WidgetUpdate> = ({ data }) => {
       }}
     >
       <GraphY
+        key={mode}
         pvs={pvs}
         macros={macros}
         title={p.plotTitle?.value}
@@ -38,6 +41,9 @@ const GraphYComp: React.FC<WidgetUpdate> = ({ data }) => {
           width: "100%",
           height: "100%",
         }}
+        editMode={isEditMode}
+        disableContextMenu={isEditMode}
+        disableMobileStatic={isEditMode}
       />
     </div>
   );

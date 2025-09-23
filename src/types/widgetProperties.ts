@@ -68,7 +68,7 @@ export const PROPERTY_SCHEMAS = {
   invertBitOrder:  defineProp({ selType: "boolean", label: "Invert bit order", value: false as boolean, category: "Layout" }),
   onColor:         defineProp({ selType: "colorSel", label: "On Color", value: COLORS.onColor, category: "Style" }),
   offColor:        defineProp({ selType: "colorSel", label: "Off Color", value: COLORS.offColor, category: "Style" }),
-  showValues:      defineProp({ selType: "boolean", label: "Show values", value: false as boolean, category: "Style" }),
+  showValues:      defineProp({ selType: "boolean", label: "Show values", value: true as boolean, category: "Style" }),
   useStrValues:      defineProp({ selType: "boolean", label: "Use string values", value: true as boolean, category: "Style" }),
   // Graph
   lineColors:      defineProp({ selType: "colorSelList", label: "Line Color", value: [COLORS.graphLineColor] as string[], category: "Style" }),
@@ -79,6 +79,7 @@ export const PROPERTY_SCHEMAS = {
   showLegend:      defineProp({ selType: "boolean", label: "Show legend", value: true as boolean, category: "Layout" }),
   useTimestamp:    defineProp({ selType: "boolean", label: "Use timestamp", value: false as boolean, category: "Layout" }),
   plotBufferSize:  defineProp({ selType: "number", label: "Buffer size (if scalar PVs)", value: 80 as number, category: "Layout" }),
+  stepSize:        defineProp({ selType: "number", label: "Step size", value: 1 as number, category: "Layout" }),
 };
 
 /**

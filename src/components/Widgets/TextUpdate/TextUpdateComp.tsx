@@ -1,13 +1,13 @@
 import React from "react";
 import type { WidgetUpdate } from "../../../types/widgets";
-import { FLEX_ALIGN_MAP, RUNTIME_MODE } from "../../../constants/constants";
+import { EDIT_MODE, FLEX_ALIGN_MAP } from "../../../constants/constants";
 import { useEditorContext } from "../../../context/useEditorContext";
 import TextUpdate from "ReactAutomationStudio/components/BaseComponents/TextUpdate";
 
 const TextUpdateComp: React.FC<WidgetUpdate> = ({ data }) => {
   const p = data.editableProperties;
   const { mode, macros } = useEditorContext();
-
+  const isEditMode = mode == EDIT_MODE;
   if (!p.visible?.value) return null;
 
   return (
@@ -36,6 +36,8 @@ const TextUpdateComp: React.FC<WidgetUpdate> = ({ data }) => {
     >
       <div style={{ width: "100%" }}>
         <TextUpdate
+          key={mode}
+          editMode={isEditMode}
           pv={p.pvName?.value}
           macros={macros}
           usePvPrecision={true}

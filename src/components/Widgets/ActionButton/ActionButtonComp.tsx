@@ -7,11 +7,13 @@ import ActionButton from "ReactAutomationStudio/components/BaseComponents/Action
 const ActionButtonComp: React.FC<WidgetUpdate> = ({ data }) => {
   const { mode, macros } = useEditorContext();
   const p = data.editableProperties;
-
+  const isEditMode = mode == EDIT_MODE;
   if (!p.visible?.value) return null;
 
   return (
     <ActionButton
+      key={mode}
+      editMode={isEditMode}
       pv={p.pvName?.value}
       macros={macros}
       actionValue={p.actionValue?.value}
@@ -23,6 +25,7 @@ const ActionButtonComp: React.FC<WidgetUpdate> = ({ data }) => {
           width: "100%",
           height: "100%",
           display: "flex",
+          textTransform: "none",
           justifyContent: FLEX_ALIGN_MAP[p.textHAlign?.value ?? "left"],
           alignItems: FLEX_ALIGN_MAP[p.textVAlign?.value ?? "middle"],
           backgroundColor: p.backgroundColor?.value,

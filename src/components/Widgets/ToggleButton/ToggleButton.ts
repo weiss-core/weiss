@@ -17,7 +17,6 @@ export const ToggleButton: Widget = {
     label: { ...PROPERTY_SCHEMAS.label, value: "Toggle Button" },
     backgroundColor: { ...PROPERTY_SCHEMAS.backgroundColor, value: COLORS.buttonColor },
     pvName: PROPERTY_SCHEMAS.pvName,
-    actionValue: PROPERTY_SCHEMAS.actionValue,
     disabled: PROPERTY_SCHEMAS.disabled,
     alarmBorder: PROPERTY_SCHEMAS.alarmBorder,
     onColor: PROPERTY_SCHEMAS.onColor,

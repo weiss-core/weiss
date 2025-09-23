@@ -7,11 +7,14 @@ import LightPanel from "ReactAutomationStudio/components/BaseComponents/LightPan
 const LedIndicatorComp: React.FC<WidgetUpdate> = ({ data }) => {
   const p = data.editableProperties;
   const { mode, macros } = useEditorContext();
+  const isEditMode = mode === EDIT_MODE;
 
   if (!p.visible?.value) return null;
 
   return (
     <LightPanel
+      key={mode}
+      editMode={isEditMode}
       pv={p.pvName?.value ?? ""}
       macros={macros}
       align="center"

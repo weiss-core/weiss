@@ -15,8 +15,8 @@ export const LedIndicator: Widget = {
   editableProperties: {
     ...FILTERED_COMMON_PROPS,
     ...TEXT_PROPS,
-    width: { ...PROPERTY_SCHEMAS.width, value: 50 },
-    height: { ...PROPERTY_SCHEMAS.height, value: 50 },
+    width: { ...PROPERTY_SCHEMAS.width, value: 80 },
+    height: { ...PROPERTY_SCHEMAS.height, value: 60 },
     onColor: PROPERTY_SCHEMAS.onColor,
     offColor: PROPERTY_SCHEMAS.offColor,
     pvName: PROPERTY_SCHEMAS.pvName,

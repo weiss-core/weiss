@@ -9,15 +9,28 @@ record(calc, "test:seconds") {
 
 record(ao, "test:freq"){
   field(DESC, "sin frequency")
-  field(VAL, "0.1")
+  field(VAL, "0.5")
   field(DRVH, "1") # Limited freq due to 10Hz update on seconds
+  field(HOPR, "1")
   field(DRVL, "0")
+  field(LOPR, "0")
   field(EGU, "Hz")
 }
 
 record(ao, "test:ampl"){
   field(DESC, "sin amplitude")
-  field(VAL, "1")
+  field(VAL, "5000")
+  field(DRVH, "10000")
+  field(HOPR, "10000")
+  field(DRVL, "0")
+  field(LOPR, "0")
+}
+
+record(ai, "test:ampl-rb"){
+  field(DESC, "sin amplitude")
+  field(INP, "test:ampl CPP")
+  field(SCAN, ".1 second")
+  field(MDEL, "-1") #force monitor event for plotting
 }
 
 record(calc, "test:sin"){
@@ -68,26 +81,6 @@ record(bi, "test:bi") {
   field(ZNAM, "Off")
   field(ONAM, "On")
   field(PINI, "YES")
-}
-
-record(ao, "test:ao") {
-  field(DESC, "Analog output")
-  field(PREC, "3")
-  field(OUT, "test:ai PP")
-}
-
-record(ai, "test:ai") {
-  field(DESC, "Analog input")
-  field(PREC, "3")
-  field(VAL, "5")
-  field(HIHI, "10")
-  field(HIGH, "7")
-  field(LOW, "3")
-  field(LOLO, "0")
-  field(HHSV, "MAJOR")
-  field(HSV, "MINOR")
-  field(LSV, "MINOR")
-  field(LLSV, "MAJOR")
 }
 
 record(stringout, "test:strout") {

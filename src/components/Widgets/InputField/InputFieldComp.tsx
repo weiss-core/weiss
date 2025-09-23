@@ -1,7 +1,7 @@
 import React from "react";
 import type { WidgetUpdate } from "../../../types/widgets";
 import { useEditorContext } from "../../../context/useEditorContext";
-import { EDIT_MODE, RUNTIME_MODE } from "../../../constants/constants";
+import { EDIT_MODE } from "../../../constants/constants";
 import TextInput from "ReactAutomationStudio/components/BaseComponents/TextInput";
 
 const InputFieldComp: React.FC<WidgetUpdate> = ({ data }) => {
@@ -13,6 +13,8 @@ const InputFieldComp: React.FC<WidgetUpdate> = ({ data }) => {
   return (
     <div style={{ position: "relative", width: "100%", height: "100%" }}>
       <TextInput
+        key={mode}
+        editMode={isEditMode}
         pv={p.pvName?.value}
         macros={macros}
         alarmSensitive={p.alarmBorder?.value}
