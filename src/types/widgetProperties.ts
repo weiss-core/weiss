@@ -60,16 +60,16 @@ export const PROPERTY_SCHEMAS = {
   labelFromPV:     defineProp({ selType: "boolean", label: "Label(s) from PV", value: true as boolean, category: "EPICS" }),
   actionValue:     defineProp({ selType: "text", label: "Action Value", value: 1 as number | string, category: "EPICS" }),
   // Specific Properties
-  // BitIndicator
+  // BitIndicators
   horizontal:      defineProp({ selType: "boolean", label: "Horizontal", value: false as boolean, category: "Layout" }),
-  nBits:           defineProp({ selType: "number", label: "Number of bits", value: 1 as number, category: "Layout" }),
+  nBits:           defineProp({ selType: "number", label: "Number of bits", value: 8 as number, category: "Layout" }),
   bitLabels:       defineProp({ selType: "strList", label: "Bit labels", value: [] as string[], category: "EPICS" }),
   bitLabelPlcmnt:  defineProp({ selType: "select", label: "Bit label placement", value: "end" as string, options: ["top", "bottom", "end", "start"], category: "Layout" }),
   invertBitOrder:  defineProp({ selType: "boolean", label: "Invert bit order", value: false as boolean, category: "Layout" }),
   onColor:         defineProp({ selType: "colorSel", label: "On Color", value: COLORS.onColor, category: "Style" }),
   offColor:        defineProp({ selType: "colorSel", label: "Off Color", value: COLORS.offColor, category: "Style" }),
-  showValues:      defineProp({ selType: "boolean", label: "Show values", value: true as boolean, category: "Style" }),
-  useStrValues:      defineProp({ selType: "boolean", label: "Use string values", value: true as boolean, category: "Style" }),
+  showValue:       defineProp({ selType: "boolean", label: "Show value", value: true as boolean, category: "Layout" }),
+  useStrValue:     defineProp({ selType: "boolean", label: "Use string value", value: true as boolean, category: "Style" }),
   // Graph
   lineColors:      defineProp({ selType: "colorSelList", label: "Line Color", value: [COLORS.graphLineColor] as string[], category: "Style" }),
   plotTitle:       defineProp({ selType: "text", label: "Title", value: "Title" as string, category: "Layout" }),
@@ -80,6 +80,14 @@ export const PROPERTY_SCHEMAS = {
   useTimestamp:    defineProp({ selType: "boolean", label: "Use timestamp", value: false as boolean, category: "Layout" }),
   plotBufferSize:  defineProp({ selType: "number", label: "Buffer size (if scalar PVs)", value: 80 as number, category: "Layout" }),
   stepSize:        defineProp({ selType: "number", label: "Step size", value: 1 as number, category: "Layout" }),
+  //Gauge
+  ringWidth:       defineProp({ selType: "number", label: "Ring width", value: 40 as number, category: "Style" }),
+  //Other
+  valuePlcmnt:     defineProp({ selType: "select", label: "Value placement", value: "top" as string, options: ["top", "bottom", "end", "start"], category: "Layout" }),
+  limitsFromPV:    defineProp({ selType: "boolean", label: "Limits From PV", value: true as boolean, category: "EPICS" }),
+  min:             defineProp({ selType: "number", label: "Minimum value", value: 0 as number, category: "EPICS" }),
+  max:             defineProp({ selType: "number", label: "Maximum value", value: 0 as number, category: "EPICS" }),
+
 };
 
 /**

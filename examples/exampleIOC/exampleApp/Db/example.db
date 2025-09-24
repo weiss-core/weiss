@@ -30,7 +30,7 @@ record(ai, "test:ampl-rb"){
   field(DESC, "sin amplitude")
   field(INP, "test:ampl CPP")
   field(SCAN, ".1 second")
-  field(MDEL, "-1") #force monitor event for plotting
+  field(MDEL, "-1")
 }
 
 record(calc, "test:sin"){
@@ -42,6 +42,7 @@ record(calc, "test:sin"){
   field(PREC, "3")
   field(VAL, "0")
   field(EGU, "V")
+  field(MDEL, "-1")
 }
 
 record(compress, "test:sinArr"){
@@ -60,6 +61,7 @@ record(calc, "test:cos"){
   field(PREC, "3")
   field(VAL, "0")
   field(EGU, "V")
+  field(MDEL, "-1")
 }
 
 record(compress, "test:cosArr"){
@@ -80,6 +82,17 @@ record(bi, "test:bi") {
   field(DESC, "Binary input")
   field(ZNAM, "Off")
   field(ONAM, "On")
+  field(PINI, "YES")
+}
+
+record(ao, "test:ao") {
+  field(DESC, "Analog output")
+  field(OUT, "test:ai PP")
+}
+
+record(ai, "test:ai") {
+  field(DESC, "Analog input")
+  field(VAL, "0")
   field(PINI, "YES")
 }
 

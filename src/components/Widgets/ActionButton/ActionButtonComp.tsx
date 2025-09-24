@@ -7,19 +7,21 @@ import ActionButton from "ReactAutomationStudio/components/BaseComponents/Action
 const ActionButtonComp: React.FC<WidgetUpdate> = ({ data }) => {
   const { mode, macros } = useEditorContext();
   const p = data.editableProperties;
-  const isEditMode = mode == EDIT_MODE;
+  const inEditMode = mode == EDIT_MODE;
   if (!p.visible?.value) return null;
 
   return (
     <ActionButton
       key={mode}
-      editMode={isEditMode}
+      editMode={inEditMode}
       pv={p.pvName?.value}
       macros={macros}
       actionValue={p.actionValue?.value}
       actionString={p.label?.value}
       tooltip={p.tooltip?.value}
       showTooltip={true}
+      alarmSensitive={p.alarmBorder?.value}
+      disableContextMenu={inEditMode}
       muiButtonProps={{
         sx: {
           width: "100%",

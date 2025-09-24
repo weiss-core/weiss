@@ -211,6 +211,7 @@ const GridZoneComp: React.FC<WidgetUpdate> = ({ data }) => {
 
     const handleMouseUp = () => {
       gridGrabbed.current = false;
+      setIsPanning(false);
     };
 
     window.addEventListener("mousemove", handleMouseMove);
@@ -280,7 +281,12 @@ const GridZoneComp: React.FC<WidgetUpdate> = ({ data }) => {
           transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoom})`,
         }}
       >
-        <WidgetRenderer scale={zoom} ensureGridCoordinate={ensureGridCoordinate} setIsDragging={setIsDragging} isPanning={isPanning}/>
+        <WidgetRenderer
+          scale={zoom}
+          ensureGridCoordinate={ensureGridCoordinate}
+          setIsDragging={setIsDragging}
+          isPanning={isPanning}
+        />
       </div>
       {!disableSelecto && (
         <Selecto

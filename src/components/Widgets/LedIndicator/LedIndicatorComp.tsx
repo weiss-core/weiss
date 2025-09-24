@@ -7,14 +7,14 @@ import LightPanel from "ReactAutomationStudio/components/BaseComponents/LightPan
 const LedIndicatorComp: React.FC<WidgetUpdate> = ({ data }) => {
   const p = data.editableProperties;
   const { mode, macros } = useEditorContext();
-  const isEditMode = mode === EDIT_MODE;
+  const inEditMode = mode === EDIT_MODE;
 
   if (!p.visible?.value) return null;
 
   return (
     <LightPanel
       key={mode}
-      editMode={isEditMode}
+      editMode={inEditMode}
       pv={p.pvName?.value ?? ""}
       macros={macros}
       align="center"
@@ -24,7 +24,9 @@ const LedIndicatorComp: React.FC<WidgetUpdate> = ({ data }) => {
       }}
       tooltip={p.tooltip?.value}
       showTooltip={true}
-      useStringValue={p.useStrValues?.value}
+      useStringValue={p.useStrValue?.value}
+      alarmSensitive={p.alarmBorder?.value}
+      disableContextMenu={inEditMode}
       muiTypographyProps={{
         sx: {
           p: 0,
@@ -32,7 +34,7 @@ const LedIndicatorComp: React.FC<WidgetUpdate> = ({ data }) => {
           fontFamily: p.fontFamily?.value,
           fontWeight: p.fontBold?.value ? "bold" : "normal",
           fontStyle: p.fontItalic?.value ? "italic" : "normal",
-          color: p.showValues?.value ? p.textColor?.value : "transparent",
+          color: p.showValue?.value ? p.textColor?.value : "transparent",
         },
       }}
     />

@@ -19,8 +19,8 @@ const TextLabelComp: React.FC<WidgetUpdate> = ({ data }) => {
 
   if (!p.visible?.value) return null;
 
-  const isEditMode = mode === EDIT_MODE;
-  const showEditableInput = isEditMode && editing;
+  const inEditMode = mode === EDIT_MODE;
+  const showEditableInput = inEditMode && editing;
 
   return (
     <div
@@ -46,13 +46,13 @@ const TextLabelComp: React.FC<WidgetUpdate> = ({ data }) => {
         value={p.label?.value}
         readOnly={!showEditableInput}
         onDoubleClick={() => {
-          if (isEditMode) setEditing(true);
+          if (inEditMode) setEditing(true);
         }}
         onBlur={() => setEditing(false)}
         onChange={(e) => updateWidgetProperties(data.id, { label: e.target.value })}
         style={{
           textAlign: INPUT_TEXT_ALIGN_MAP[p.textHAlign?.value ?? "left"],
-          pointerEvents: isEditMode ? "auto" : "none",
+          pointerEvents: inEditMode ? "auto" : "none",
           fontSize: p.fontSize?.value,
           fontFamily: p.fontFamily?.value,
           fontWeight: p.fontBold?.value ? "bold" : "normal",

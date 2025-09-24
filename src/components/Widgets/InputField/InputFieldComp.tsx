@@ -8,13 +8,13 @@ const InputFieldComp: React.FC<WidgetUpdate> = ({ data }) => {
   const { mode, macros } = useEditorContext();
 
   const p = data.editableProperties;
-  const isEditMode = mode === EDIT_MODE;
+  const inEditMode = mode === EDIT_MODE;
 
   return (
     <div style={{ position: "relative", width: "100%", height: "100%" }}>
       <TextInput
         key={mode}
-        editMode={isEditMode}
+        editMode={inEditMode}
         pv={p.pvName?.value}
         macros={macros}
         alarmSensitive={p.alarmBorder?.value}

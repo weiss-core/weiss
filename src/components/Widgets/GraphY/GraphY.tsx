@@ -8,7 +8,7 @@ export const GraphY: Widget = {
   component: GraphYComp,
   widgetName: "GraphY",
   widgetIcon: ShowChartIcon,
-  widgetLabel: "Y axis plot",
+  widgetLabel: "Graph Y",
   category: "Monitoring",
   editableProperties: {
     ...COMMON_PROPS,

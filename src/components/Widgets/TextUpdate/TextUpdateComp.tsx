@@ -7,7 +7,7 @@ import TextUpdate from "ReactAutomationStudio/components/BaseComponents/TextUpda
 const TextUpdateComp: React.FC<WidgetUpdate> = ({ data }) => {
   const p = data.editableProperties;
   const { mode, macros } = useEditorContext();
-  const isEditMode = mode == EDIT_MODE;
+  const inEditMode = mode == EDIT_MODE;
   if (!p.visible?.value) return null;
 
   return (
@@ -37,13 +37,14 @@ const TextUpdateComp: React.FC<WidgetUpdate> = ({ data }) => {
       <div style={{ width: "100%" }}>
         <TextUpdate
           key={mode}
-          editMode={isEditMode}
+          editMode={inEditMode}
           pv={p.pvName?.value}
           macros={macros}
-          usePvPrecision={true}
-          usePvUnits={true}
-          alarmSensitive={true}
+          usePvPrecision={p.precisionFromPV?.value}
+          usePvUnits={p.unitsFromPV?.value}
+          alarmSensitive={p.alarmBorder?.value}
           align={p.textHAlign?.value ?? "left"}
+          disableContextMenu={inEditMode}
           muiTypographyProps={{
             sx: {
               fontSize: p.fontSize?.value,

@@ -1,23 +1,34 @@
 import React from "react";
 import type { WidgetUpdate } from "../../../types/widgets";
-import { EDIT_MODE, RUNTIME_MODE } from "../../../constants/constants";
+import { EDIT_MODE } from "../../../constants/constants";
 import { useEditorContext } from "../../../context/useEditorContext";
-import LightPanel from "ReactAutomationStudio/components/BaseComponents/LightPanel";
+import BitIndicators from "ReactAutomationStudio/components/BaseComponents/BitIndicators";
 
 const MultiBitIndicatorComp: React.FC<WidgetUpdate> = ({ data }) => {
   const p = data.editableProperties;
   const { mode, macros } = useEditorContext();
-
+  const inEditMode = mode == EDIT_MODE;
   if (!p.visible?.value) return null;
 
+  const bitLabels = p.bitLabels?.value.length ? p.bitLabels?.value : undefined;
+
   return (
-    <LightPanel
+    <BitIndicators
+      key={mode}
+      editMode={inEditMode}
       pv={p.pvName?.value ?? ""}
       macros={macros}
       onColor={p.onColor?.value}
       offColor={p.offColor?.value}
       tooltip={p.tooltip?.value}
       showTooltip={true}
+      numberOfBits={p.nBits?.value}
+      horizontal={p.horizontal?.value}
+      reverseBits={p.invertBitOrder?.value}
+      usePvBitLabels={p.labelFromPV?.value}
+      bitLabels={bitLabels}
+      alarmSensitive={p.alarmBorder?.value}
+      disableContextMenu={inEditMode}
     />
   );
 };

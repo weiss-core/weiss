@@ -22,8 +22,7 @@ export const LedIndicator: Widget = {
     pvName: PROPERTY_SCHEMAS.pvName,
     alarmBorder: PROPERTY_SCHEMAS.alarmBorder,
     labelFromPV: PROPERTY_SCHEMAS.labelFromPV,
-    bitLabels: PROPERTY_SCHEMAS.bitLabels,
-    showValues: PROPERTY_SCHEMAS.showValues,
-    useStrValues: PROPERTY_SCHEMAS.useStrValues,
+    showValue: PROPERTY_SCHEMAS.showValue,
+    useStrValue: PROPERTY_SCHEMAS.useStrValue,
   },
 } as const;

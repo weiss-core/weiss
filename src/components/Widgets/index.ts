@@ -1,7 +1,7 @@
 export { ActionButton } from "./ActionButton";
 export { ToggleButton } from "./ToggleButton";
 export { LedIndicator } from "./LedIndicator";
-// export { MultiBitIndicator } from "./MultiBitIndicator";
+export { MultiBitIndicator } from "./MultiBitIndicator";
 export { InputField } from "./InputField";
 export { TextUpdate } from "./TextUpdate";
 export { Ellipse } from "./Ellipse";
@@ -9,3 +9,4 @@ export { Rectangle } from "./Rectangle";
 export { TextLabel } from "./TextLabel";
 export { GraphY } from "./GraphY";
 export { Slider } from "./Slider";
+export { Gauge } from "./Gauge";

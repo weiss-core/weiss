@@ -8,7 +8,7 @@ const GraphYComp: React.FC<WidgetUpdate> = ({ data }) => {
   const { mode, macros } = useEditorContext();
   const p = data.editableProperties;
   const pvs = p.pvNames?.value ?? [];
-  const isEditMode = mode === EDIT_MODE;
+  const inEditMode = mode === EDIT_MODE;
 
   return (
     <div
@@ -41,9 +41,10 @@ const GraphYComp: React.FC<WidgetUpdate> = ({ data }) => {
           width: "100%",
           height: "100%",
         }}
-        editMode={isEditMode}
-        disableContextMenu={isEditMode}
-        disableMobileStatic={isEditMode}
+        editMode={inEditMode}
+        displayModeBar={!inEditMode}
+        disableContextMenu={inEditMode}
+        disableMobileStatic={inEditMode}
       />
     </div>
   );

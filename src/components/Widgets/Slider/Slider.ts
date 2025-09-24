@@ -20,5 +20,11 @@ export const Slider: Widget = {
     disabled: PROPERTY_SCHEMAS.disabled,
     alarmBorder: PROPERTY_SCHEMAS.alarmBorder,
     stepSize: PROPERTY_SCHEMAS.stepSize,
+    limitsFromPV: PROPERTY_SCHEMAS.limitsFromPV,
+    min: PROPERTY_SCHEMAS.min,
+    max: PROPERTY_SCHEMAS.max,
+    horizontal: { ...PROPERTY_SCHEMAS.horizontal, value: true },
+    showValue: PROPERTY_SCHEMAS.showValue,
+    valuePlcmnt: PROPERTY_SCHEMAS.valuePlcmnt,
   },
 } as const;

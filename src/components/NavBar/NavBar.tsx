@@ -18,7 +18,6 @@ import "./NavBar.css";
 import Switch from "@mui/material/Switch";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import GitHubIcon from "@mui/icons-material/GitHub";
-import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
 import HelpOverlay from "./HelpOverlay.tsx";
 
 interface StyledAppBarProps extends MuiAppBarProps {
@@ -91,7 +90,6 @@ const StyledAppBar = styled(MuiAppBar, {
 export default function NavBar() {
   const { mode, updateMode, wdgSelectorOpen, setWdgSelectorOpen, downloadWidgets, loadWidgets } = useEditorContext();
   const drawerWidth = WIDGET_SELECTOR_WIDTH;
-  const helpButtonRef = useRef<HTMLButtonElement>(null);
 
   const handleDownload = () => {
     void downloadWidgets();

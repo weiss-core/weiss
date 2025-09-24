@@ -8,17 +8,18 @@ import PowerSettingsNewIcon from "@mui/icons-material/PowerSettingsNew";
 const ToggleButtonComp: React.FC<WidgetUpdate> = ({ data }) => {
   const { mode, macros } = useEditorContext();
   const p = data.editableProperties;
-  const isEditMode = mode == EDIT_MODE;
+  const inEditMode = mode == EDIT_MODE;
   if (!p.visible?.value) return null;
 
   return (
     <ToggleButton
       key={mode}
-      editMode={isEditMode}
+      editMode={inEditMode}
       pv={p.pvName?.value ?? ""}
       tooltip={p.tooltip?.value}
       showTooltip={true}
       macros={macros}
+      disableContextMenu={inEditMode}
       // for now those only accept MUI keywords like primary/secondary etc
       // onColor={p.onColor?.value}
       // offColor={p.offColor?.value}
@@ -42,8 +43,8 @@ const ToggleButtonComp: React.FC<WidgetUpdate> = ({ data }) => {
           borderWidth: p.borderWidth?.value,
           borderColor: p.borderColor?.value,
         },
-        disableRipple: mode == EDIT_MODE,
-        disabled: p.disabled!.value,
+        disableRipple: inEditMode,
+        disabled: p.disabled?.value,
         variant: "contained",
       }}
     />
