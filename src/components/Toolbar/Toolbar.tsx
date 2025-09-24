@@ -16,6 +16,7 @@ import AlignHorizontalCenter from "@mui/icons-material/AlignHorizontalCenter";
 import DragIndicator from "@mui/icons-material/DragIndicator";
 import { EDIT_MODE } from "../../constants/constants";
 import { Rnd } from "react-rnd";
+import { grey } from "@mui/material/colors";
 import "./Toolbar.css";
 
 export interface ToolBarProps {
@@ -48,6 +49,13 @@ const ToolbarButtons: React.FC<ToolBarProps> = ({ onMouseEnter, onMouseLeave }) 
   const nothingToRedo = redoStack.length === 0;
   const nothingToUndo = undoStack.length === 0;
 
+  const iconSx = {
+    color: grey[600],
+    "&.Mui-disabled": {
+      color: grey[300],
+    },
+  };
+
   return (
     <Rnd
       className="toolBar"
@@ -56,78 +64,86 @@ const ToolbarButtons: React.FC<ToolBarProps> = ({ onMouseEnter, onMouseLeave }) 
       enableResizing={false}
       dragHandleClassName="dragHandle"
     >
-      <Box className="toolbarBox" onMouseEnter={() => onMouseEnter()} onMouseLeave={() => onMouseLeave()}>
+      <Box className="toolbarBox" onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave}>
         <Box className="dragHandle" sx={{ cursor: "move", px: 1, display: "flex", alignItems: "center" }}>
           <DragIndicator fontSize="small" />
         </Box>
 
-        {/* Buttons */}
         <Tooltip title="Undo">
           <span>
-            <IconButton size="small" onClick={handleUndo} disabled={nothingToUndo}>
+            <IconButton size="small" onClick={handleUndo} disabled={nothingToUndo} sx={iconSx}>
               <Undo fontSize="small" />
             </IconButton>
           </span>
         </Tooltip>
+
         <Tooltip title="Redo">
           <span>
-            <IconButton size="small" onClick={handleRedo} disabled={nothingToRedo}>
+            <IconButton size="small" onClick={handleRedo} disabled={nothingToRedo} sx={iconSx}>
               <Redo fontSize="small" />
             </IconButton>
           </span>
         </Tooltip>
+
         <Tooltip title="Bring to front">
           <span>
-            <IconButton size="small" onClick={() => bringToFront()} disabled={noneSelected}>
+            <IconButton size="small" onClick={bringToFront} disabled={noneSelected} sx={iconSx}>
               <FlipToFront fontSize="small" />
             </IconButton>
           </span>
         </Tooltip>
+
         <Tooltip title="Send to back">
           <span>
-            <IconButton size="small" onClick={() => sendToBack()} disabled={noneSelected}>
+            <IconButton size="small" onClick={sendToBack} disabled={noneSelected} sx={iconSx}>
               <FlipToBack fontSize="small" />
             </IconButton>
           </span>
         </Tooltip>
+
         <Tooltip title="Align left">
           <span>
-            <IconButton size="small" onClick={() => alignLeft()} disabled={lessThanTwoSelected}>
+            <IconButton size="small" onClick={alignLeft} disabled={lessThanTwoSelected} sx={iconSx}>
               <AlignHorizontalLeft fontSize="small" />
             </IconButton>
           </span>
         </Tooltip>
+
         <Tooltip title="Align right">
           <span>
-            <IconButton size="small" onClick={() => alignRight()} disabled={lessThanTwoSelected}>
+            <IconButton size="small" onClick={alignRight} disabled={lessThanTwoSelected} sx={iconSx}>
               <AlignHorizontalRight fontSize="small" />
             </IconButton>
           </span>
         </Tooltip>
+
         <Tooltip title="Align top">
           <span>
-            <IconButton size="small" onClick={() => alignTop()} disabled={lessThanTwoSelected}>
+            <IconButton size="small" onClick={alignTop} disabled={lessThanTwoSelected} sx={iconSx}>
               <AlignVerticalTop fontSize="small" />
             </IconButton>
           </span>
         </Tooltip>
+
         <Tooltip title="Align bottom">
           <span>
-            <IconButton size="small" onClick={() => alignBottom()} disabled={lessThanTwoSelected}>
+            <IconButton size="small" onClick={alignBottom} disabled={lessThanTwoSelected} sx={iconSx}>
               <AlignVerticalBottom fontSize="small" />
             </IconButton>
           </span>
         </Tooltip>
+
         <Tooltip title="Align vertical center">
           <span>
-            <IconButton size="small" onClick={() => alignVerticalCenter()} disabled={lessThanTwoSelected}>
+            <IconButton size="small" onClick={alignVerticalCenter} disabled={lessThanTwoSelected} sx={iconSx}>
               <AlignVerticalCenter fontSize="small" />
             </IconButton>
           </span>
         </Tooltip>
+
         <Tooltip title="Align horizontal center">
           <span>
-            <IconButton size="small" onClick={() => alignHorizontalCenter()} disabled={lessThanTwoSelected}>
+            <IconButton size="small" onClick={alignHorizontalCenter} disabled={lessThanTwoSelected} sx={iconSx}>
               <AlignHorizontalCenter fontSize="small" />
             </IconButton>
           </span>
