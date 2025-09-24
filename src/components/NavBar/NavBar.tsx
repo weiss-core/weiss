@@ -1,3 +1,4 @@
+import { useRef } from "react";
 import MuiAppBar from "@mui/material/AppBar";
 import type { AppBarProps as MuiAppBarProps } from "@mui/material/AppBar";
 import { styled } from "@mui/material/styles";
@@ -18,6 +19,7 @@ import Switch from "@mui/material/Switch";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import GitHubIcon from "@mui/icons-material/GitHub";
 import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
+import HelpOverlay from "./HelpOverlay.tsx";
 
 interface StyledAppBarProps extends MuiAppBarProps {
   open?: boolean;
@@ -89,6 +91,7 @@ const StyledAppBar = styled(MuiAppBar, {
 export default function NavBar() {
   const { mode, updateMode, wdgSelectorOpen, setWdgSelectorOpen, downloadWidgets, loadWidgets } = useEditorContext();
   const drawerWidth = WIDGET_SELECTOR_WIDTH;
+  const helpButtonRef = useRef<HTMLButtonElement>(null);
 
   const handleDownload = () => {
     void downloadWidgets();
@@ -129,7 +132,7 @@ export default function NavBar() {
           >
             <MenuIcon />
           </IconButton>
-          <Tooltip title= "Web EPICS Interface Studio">
+          <Tooltip title="Web EPICS Interface Studio">
             <Typography
               noWrap
               component="div"
@@ -180,11 +183,7 @@ export default function NavBar() {
               </Button>
             </Tooltip>
             <Box sx={{ flexGrow: 1 }} /> {/* pushes the icons to the right */}
-            <Tooltip title="Help / Shortcuts">
-              <IconButton sx={{ color: "white" }}>
-                <HelpOutlineIcon />
-              </IconButton>
-            </Tooltip>
+            <HelpOverlay />
             <Tooltip title="GitHub Repository">
               <IconButton sx={{ color: "white" }} href={APP_SRC_URL} target="_blank" rel="noopener noreferrer">
                 <GitHubIcon />
