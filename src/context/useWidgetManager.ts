@@ -51,6 +51,7 @@ export function useWidgetManager() {
   const [selectedWidgetIDs, setSelectedWidgetIDs] = useState<string[]>([]);
   const clipboard = useRef<Widget[]>([]);
   const copiedGroupBounds = useRef({ x: 0, y: 0, width: 0, height: 0 });
+  const allWidgetIDs = useMemo(() => editorWidgets.map((w) => w.id).filter((id) => id !== GRID_ID), [editorWidgets]);
 
   const selectedWidgets = useMemo(
     () => editorWidgets.filter((w) => selectedWidgetIDs.includes(w.id)),
@@ -656,5 +657,6 @@ export function useWidgetManager() {
     loadWidgets,
     PVList,
     macros,
+    allWidgetIDs,
   };
 }

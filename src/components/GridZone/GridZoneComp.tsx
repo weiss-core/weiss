@@ -38,6 +38,8 @@ const GridZoneComp: React.FC<WidgetUpdate> = ({ data }) => {
     pasteWidget,
     downloadWidgets,
     propertyEditorFocused,
+    allWidgetIDs,
+    updateEditorWidgetList,
   } = useEditorContext();
 
   const gridRef = useRef<HTMLDivElement>(null);
@@ -58,6 +60,7 @@ const GridZoneComp: React.FC<WidgetUpdate> = ({ data }) => {
   const gridSize = props.gridSize!.value;
   const snapToGrid = props.snapToGrid?.value;
   const gridLineVisible = props.gridLineVisible?.value;
+  const inEditMode = mode === EDIT_MODE;
 
   const ensureGridCoordinate = useCallback(
     (coord: number) => {
@@ -224,7 +227,13 @@ const GridZoneComp: React.FC<WidgetUpdate> = ({ data }) => {
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (propertyEditorFocused) return;
+      if (propertyEditorFocused || !inEditMode) return;
+      if (e.key.toLowerCase() === "delete" && selectedWidgetIDs.length > 0) {
+        e.preventDefault();
+        updateEditorWidgetList((prev) => prev.filter((w) => !selectedWidgetIDs.includes(w.id)));
+        setSelectedWidgetIDs([]);
+        return;
+      }
       if (e.ctrlKey && e.key.toLowerCase() === "z" && !e.shiftKey) {
         e.preventDefault();
         handleUndo();
@@ -243,6 +252,16 @@ const GridZoneComp: React.FC<WidgetUpdate> = ({ data }) => {
       if (e.ctrlKey && e.key.toLowerCase() === "v") {
         e.preventDefault();
         pasteWidget(mousePosRef.current);
+        return;
+      }
+      if (e.ctrlKey && e.key.toLowerCase() === "a") {
+        e.preventDefault();
+        setSelectedWidgetIDs(allWidgetIDs);
+        return;
+      }
+      if (e.shiftKey && e.key.toLowerCase() === "c") {
+        e.preventDefault();
+        centerScreen();
         return;
       }
     };

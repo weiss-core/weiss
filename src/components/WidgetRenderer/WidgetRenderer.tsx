@@ -21,7 +21,6 @@ interface RendererProps {
  * - Supporting multi-selection and group manipulation
  * - Dragging and resizing widgets with snapping to grid
  * - Updating widget properties in the editor context
- * - Handling keyboard events (e.g., Delete key for removal)
  *
  * @param scale Current zoom level of the grid
  * @param ensureGridCoordinate Function to snap items to grid (if snap activated)
@@ -31,29 +30,14 @@ const WidgetRenderer: React.FC<RendererProps> = ({ scale, ensureGridCoordinate, 
   const {
     mode,
     editorWidgets,
-    updateEditorWidgetList,
     updateWidgetProperties,
-    setSelectedWidgetIDs,
     batchWidgetUpdate,
     selectedWidgetIDs,
     selectedWidgets,
-    propertyEditorFocused,
     groupBounds,
   } = useEditorContext();
+
   const isMultipleSelect = selectedWidgetIDs.length > 1;
-
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (mode !== EDIT_MODE || propertyEditorFocused) return;
-      if (e.key === "Delete" && selectedWidgetIDs.length > 0) {
-        updateEditorWidgetList((prev) => prev.filter((w) => !selectedWidgetIDs.includes(w.id)));
-        setSelectedWidgetIDs([]);
-      }
-    };
-
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [mode, propertyEditorFocused, selectedWidgetIDs, updateEditorWidgetList, setSelectedWidgetIDs]);
 
   function renderWidget(widget: Widget): ReactNode {
     const Comp = WidgetRegistry[widget.widgetName]?.component;
