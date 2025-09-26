@@ -38,6 +38,22 @@ services:
     depends_on:
       - weiss-base-env
 
+  ############### demoioc ######################
+  weiss-demoioc:
+    build:
+      context: ./
+      dockerfile: docker/demoioc/Dockerfile
+      args:
+        GIT_REPO: ${GIT_REPO:-https://github.com/AndreFavotto/weiss.git}
+        GIT_TAG: ${GIT_TAG:-main}
+    restart: always
+    network_mode: host
+    tty: true
+    stdin_open: true
+    env_file: .env
+    depends_on:
+      - weiss-base-env
+
   ############### nginx ######################
   weiss-nginx:
     image: nginx:1.27.0
