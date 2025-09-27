@@ -82,7 +82,7 @@ const DraggableItem: React.FC<DraggableItemProps> = ({ item, open }) => {
         <ListItemButton
           draggable
           onDragStart={handleDragStart}
-          sx={{ minHeight: 40, justifyContent: open ? "initial" : "center" }}
+          sx={{ minHeight: 30, justifyContent: open ? "initial" : "center" }}
         >
           <ListItemIcon
             sx={{
@@ -91,7 +91,7 @@ const DraggableItem: React.FC<DraggableItemProps> = ({ item, open }) => {
               alignItems: "center",
               justifyContent: "center",
               mr: open ? 2 : 0,
-              height: 40,
+              height: 30,
             }}
           >
             {item.widgetIcon ? <item.widgetIcon /> : <WidgetsIcon />}
