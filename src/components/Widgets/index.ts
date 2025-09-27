@@ -10,3 +10,5 @@ export { TextLabel } from "./TextLabel";
 export { GraphY } from "./GraphY";
 export { Slider } from "./Slider";
 export { Gauge } from "./Gauge";
+export { CheckBox } from "./CheckBox";
+export { ProgressBar } from "./ProgressBar";
