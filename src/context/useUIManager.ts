@@ -12,9 +12,6 @@ import type { ExportedWidget } from "../types/widgets";
  * - Coordinates session lifecycle when switching modes.
  * - Handles localStorage persistence for widgets (load on startup, save in edit mode).
  *
- * @param ws Ref to the WebSocket connection used for PV updates.
- * @param startNewSession Function to start a new PV session (runtime mode).
- * @param clearPVData Function to clear all PV values from widgets (edit mode).
  * @param editorWidgets Current list of widgets from the widget manager.
  * @param setSelectedWidgetIDs Function to update currently selected widgets.
  * @param updateWidgetProperties Function to update widget properties.
@@ -52,15 +49,12 @@ export default function useUIManager(
     (newMode: Mode) => {
       const isEdit = newMode == EDIT_MODE;
       if (isEdit) {
-        /* TODO: disconnect from pvserver - see
-         * https://github.com/React-Automation-Studio/React-Automation-Studio/issues/144
-         */
+        // connection to pv server is managed by RAS widgets directly
+        // add actions on mode transition?
       } else {
+        // connection to pv server is managed by RAS widgets directly
         setSelectedWidgetIDs([]);
         setWdgSelectorOpen(false);
-        /* TODO: connect to pvserver - see
-         * https://github.com/React-Automation-Studio/React-Automation-Studio/issues/144
-         */
       }
       updateWidgetProperties(GRID_ID, { gridLineVisible: isEdit }, false);
       setMode(newMode);

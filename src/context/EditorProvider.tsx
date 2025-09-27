@@ -13,7 +13,6 @@ export type EditorContextType = ReturnType<typeof useWidgetManager> & ReturnType
  *
  * Wraps the application with a React context that provides:
  * - Widget management (creation, selection, property updates, PV binding)
- * - WebSocket connection to EPICS PVs (subscribe, write, lifecycle handling)
  * - UI management (edit vs. runtime mode, property editor focus, widget selector state)
  *
  * This provider is required for any component that calls `useEditorContext`.
@@ -23,14 +22,12 @@ export type EditorContextType = ReturnType<typeof useWidgetManager> & ReturnType
 export const EditorProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const widgetManager = useWidgetManager();
   const ui = useUIManager(
-    // TODO: pass reference to pvserver connection
     widgetManager.editorWidgets,
     widgetManager.setSelectedWidgetIDs,
     widgetManager.updateWidgetProperties,
     widgetManager.loadWidgets
   );
 
-  // Memoize context value
   const value = React.useMemo<EditorContextType>(
     () => ({
       ...widgetManager,
