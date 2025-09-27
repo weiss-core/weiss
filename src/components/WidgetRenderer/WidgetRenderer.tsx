@@ -1,9 +1,9 @@
 import React, { useEffect, type ReactNode } from "react";
-import WidgetRegistry from "../WidgetRegistry/WidgetRegistry";
-import { useEditorContext } from "../../context/useEditorContext";
-import type { MultiWidgetPropertyUpdates, Widget } from "../../types/widgets";
+import WidgetRegistry from "@components/WidgetRegistry/WidgetRegistry";
+import { useEditorContext } from "@src/context/useEditorContext";
+import type { MultiWidgetPropertyUpdates, Widget } from "@src/types/widgets";
 import { Rnd, type Position, type RndDragEvent, type DraggableData } from "react-rnd";
-import { EDIT_MODE, FRONT_UI_ZIDX } from "../../constants/constants";
+import { EDIT_MODE, FRONT_UI_ZIDX } from "@src/constants/constants";
 import "./WidgetRenderer.css";
 
 interface RendererProps {

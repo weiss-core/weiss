@@ -6,7 +6,9 @@
     "types": ["@types/wicg-file-system-access"],
     "baseUrl": ".",
     "paths": {
-      "ReactAutomationStudio/*": ["submodules/React-Automation-Studio/ReactApp/src/*"]
+      "@ReactAutomationStudio/*": ["submodules/React-Automation-Studio/ReactApp/src/*"],
+      "@src/*": ["src/*"],
+      "@components/*": ["src/components/*"]
     },
     "noImplicitAny": true,
     "noImplicitThis": true,

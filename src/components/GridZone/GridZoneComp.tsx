@@ -1,13 +1,13 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import type { GridPosition, Widget, WidgetUpdate } from "../../types/widgets";
-import WidgetRegistry from "../WidgetRegistry/WidgetRegistry";
-import { useEditorContext } from "../../context/useEditorContext.tsx";
-import { EDIT_MODE, MAX_ZOOM, MIN_ZOOM, RUNTIME_MODE } from "../../constants/constants.ts";
+import type { GridPosition, Widget, WidgetUpdate } from "@src/types/widgets";
+import WidgetRegistry from "@components/WidgetRegistry/WidgetRegistry";
+import { useEditorContext } from "@src/context/useEditorContext.tsx";
+import { EDIT_MODE, MAX_ZOOM, MIN_ZOOM, RUNTIME_MODE } from "@src/constants/constants.ts";
 import Selecto from "react-selecto";
-import ContextMenu from "../ContextMenu/ContextMenu";
+import ContextMenu from "@components/ContextMenu/ContextMenu";
 import "./GridZone.css";
-import WidgetRenderer from "../WidgetRenderer/WidgetRenderer.tsx";
-import ToolbarButtons from "../Toolbar/Toolbar.tsx";
+import WidgetRenderer from "@components/WidgetRenderer/WidgetRenderer.tsx";
+import ToolbarButtons from "@components/Toolbar/Toolbar.tsx";
 
 /**
  * GridZoneComp renders the main editor canvas where widgets are displayed, moved, and interacted with.

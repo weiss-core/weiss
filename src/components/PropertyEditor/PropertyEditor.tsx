@@ -13,20 +13,20 @@ import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import PushPinIcon from "@mui/icons-material/PushPin";
 import PushPinOutlinedIcon from "@mui/icons-material/PushPinOutlined";
-import { useEditorContext } from "../../context/useEditorContext";
+import { useEditorContext } from "@src/context/useEditorContext";
 import type {
   WidgetProperties,
   PropertyValue,
   PropertyKey,
   WidgetProperty,
   MultiWidgetPropertyUpdates,
-} from "../../types/widgets";
-import { PROPERTY_EDITOR_WIDTH, EDIT_MODE, FRONT_UI_ZIDX } from "../../constants/constants";
+} from "@src/types/widgets";
+import { PROPERTY_EDITOR_WIDTH, EDIT_MODE, FRONT_UI_ZIDX } from "@src/constants/constants";
 import TextFieldProperty from "./TextFieldProperty";
 import BooleanProperty from "./BooleanProperty";
 import ColorProperty from "./ColorProperty";
 import SelectProperty from "./SelectProperty";
-import { CATEGORY_DISPLAY_ORDER } from "../../types/widgetProperties";
+import { CATEGORY_DISPLAY_ORDER } from "@src/types/widgetProperties";
 import StrListProperty from "./StrListProperty";
 import StrRecordProperty from "./StrRecordProperty";
 import ColorListProperty from "./ColorListProperty";

@@ -1,7 +1,7 @@
 import React, { useState, useRef } from "react";
 import { IconButton, Fade, Box, Typography, Tooltip, Divider } from "@mui/material";
 import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
-import { FRONT_UI_ZIDX } from "../../constants/constants";
+import { FRONT_UI_ZIDX } from "@src/constants/constants";
 
 interface ShortcutRowProps {
   action: string;

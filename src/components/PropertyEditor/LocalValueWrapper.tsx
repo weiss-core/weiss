@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import type { PropertyValue } from "../../types/widgets";
+import type { PropertyValue } from "@src/types/widgets";
 
 interface LocalValueWrapperProps {
   render: (val: PropertyValue, setVal: (v: PropertyValue) => void) => React.JSX.Element;

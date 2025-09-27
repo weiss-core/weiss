@@ -1,6 +1,6 @@
 import { SliderComp } from "./SliderComp";
-import { COMMON_PROPS, PROPERTY_SCHEMAS, TEXT_PROPS } from "../../../types/widgetProperties";
-import type { Widget } from "../../../types/widgets";
+import { COMMON_PROPS, PROPERTY_SCHEMAS, TEXT_PROPS } from "@src/types/widgetProperties";
+import type { Widget } from "@src/types/widgets";
 import LinearScaleIcon from "@mui/icons-material/LinearScale";
 
 export const Slider: Widget = {

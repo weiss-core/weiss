@@ -4,8 +4,8 @@ import { Box, Typography, ListItem, Popover, IconButton } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
 import { Sketch } from "@uiw/react-color";
-import type { PropertyKey, PropertyValue } from "../../types/widgets";
-import { COLORS } from "../../constants/constants";
+import type { PropertyKey, PropertyValue } from "@src/types/widgets";
+import { COLORS } from "@src/constants/constants";
 
 interface ColorSelListPropertyProps {
   propName: PropertyKey;

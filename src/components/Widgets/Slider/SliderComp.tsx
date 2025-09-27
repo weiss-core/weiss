@@ -1,8 +1,8 @@
 import React from "react";
-import { useEditorContext } from "../../../context/useEditorContext";
-import type { WidgetUpdate } from "../../../types/widgets";
-import { EDIT_MODE } from "../../../constants/constants";
-import Slider from "ReactAutomationStudio/components/BaseComponents/Slider";
+import { useEditorContext } from "@src/context/useEditorContext";
+import type { WidgetUpdate } from "@src/types/widgets";
+import { EDIT_MODE } from "@src/constants/constants";
+import Slider from "@ReactAutomationStudio/components/BaseComponents/Slider";
 
 const SliderComp: React.FC<WidgetUpdate> = ({ data }) => {
   const { mode, macros } = useEditorContext();

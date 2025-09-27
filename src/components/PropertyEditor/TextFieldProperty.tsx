@@ -1,7 +1,7 @@
 // src/components/PropertyFields/TextFieldProperty.tsx
 import React from "react";
 import { TextField, ListItem } from "@mui/material";
-import type { PropertyKey, PropertyValue } from "../../types/widgets";
+import type { PropertyKey, PropertyValue } from "@src/types/widgets";
 import LocalValueWrapper from "./LocalValueWrapper";
 
 interface TextFieldPropertyProps {

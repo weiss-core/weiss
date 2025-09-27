@@ -1,8 +1,8 @@
 import React from "react";
-import type { WidgetUpdate } from "../../../types/widgets";
-import { EDIT_MODE } from "../../../constants/constants";
-import { useEditorContext } from "../../../context/useEditorContext";
-import BitIndicators from "ReactAutomationStudio/components/BaseComponents/BitIndicators";
+import type { WidgetUpdate } from "@src/types/widgets";
+import { EDIT_MODE } from "@src/constants/constants";
+import { useEditorContext } from "@src/context/useEditorContext";
+import BitIndicators from "@ReactAutomationStudio/components/BaseComponents/BitIndicators";
 
 const MultiBitIndicatorComp: React.FC<WidgetUpdate> = ({ data }) => {
   const p = data.editableProperties;

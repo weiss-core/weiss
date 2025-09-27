@@ -1,7 +1,7 @@
 import { CheckBoxComp } from "./CheckBoxComp";
-import { COMMON_PROPS, PROPERTY_SCHEMAS, TEXT_PROPS } from "../../../types/widgetProperties";
-import type { Widget } from "../../../types/widgets";
-import { COLORS } from "../../../constants/constants";
+import { COMMON_PROPS, PROPERTY_SCHEMAS, TEXT_PROPS } from "@src/types/widgetProperties";
+import type { Widget } from "@src/types/widgets";
+import { COLORS } from "@src/constants/constants";
 import CheckBoxIcon from "@mui/icons-material/CheckBox";
 
 export const CheckBox: Widget = {

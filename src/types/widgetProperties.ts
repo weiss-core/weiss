@@ -1,5 +1,5 @@
 import type { WidgetProperty, PropertyValue, WidgetProperties } from "./widgets";
-import { COLORS } from "../constants/constants";
+import { COLORS } from "@src/constants/constants";
 
 /**
  * Helper function to enforce proper typing of widget properties.

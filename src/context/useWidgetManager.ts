@@ -7,10 +7,10 @@ import type {
   MultiWidgetPropertyUpdates,
   GridPosition,
   ExportedWidget,
-} from "../types/widgets";
-import { GridZone } from "../components/GridZone";
-import { GRID_ID, MAX_HISTORY } from "../constants/constants";
-import WidgetRegistry from "../components/WidgetRegistry/WidgetRegistry";
+} from "@src/types/widgets";
+import { GridZone } from "@components/GridZone";
+import { GRID_ID, MAX_HISTORY } from "@src/constants/constants";
+import WidgetRegistry from "@components/WidgetRegistry/WidgetRegistry";
 
 /**
  * Deep clone a list of widgets.

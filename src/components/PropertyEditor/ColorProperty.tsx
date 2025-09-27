@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { Box, Typography, ListItem, Popover } from "@mui/material";
 import { Sketch } from "@uiw/react-color";
-import type { PropertyKey, PropertyValue } from "../../types/widgets";
-import { COLORS } from "../../constants/constants";
+import type { PropertyKey, PropertyValue } from "@src/types/widgets";
+import { COLORS } from "@src/constants/constants";
 
 interface ColorPropertyProps {
   propName: PropertyKey;

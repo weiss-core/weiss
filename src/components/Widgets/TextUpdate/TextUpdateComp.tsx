@@ -1,8 +1,8 @@
 import React from "react";
-import type { WidgetUpdate } from "../../../types/widgets";
-import { EDIT_MODE, FLEX_ALIGN_MAP } from "../../../constants/constants";
-import { useEditorContext } from "../../../context/useEditorContext";
-import TextUpdate from "ReactAutomationStudio/components/BaseComponents/TextUpdate";
+import type { WidgetUpdate } from "@src/types/widgets";
+import { EDIT_MODE, FLEX_ALIGN_MAP } from "@src/constants/constants";
+import { useEditorContext } from "@src/context/useEditorContext";
+import TextUpdate from "@ReactAutomationStudio/components/BaseComponents/TextUpdate";
 
 const TextUpdateComp: React.FC<WidgetUpdate> = ({ data }) => {
   const p = data.editableProperties;

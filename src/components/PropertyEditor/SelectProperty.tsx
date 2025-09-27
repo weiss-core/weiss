@@ -6,7 +6,7 @@ import InputLabel from "@mui/material/InputLabel";
 import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
 import type { SelectChangeEvent } from "@mui/material/Select";
-import type { PropertyKey, PropertyValue } from "../../types/widgets";
+import type { PropertyKey, PropertyValue } from "@src/types/widgets";
 
 interface SelectPropertyProps {
   propName: PropertyKey;

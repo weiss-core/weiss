@@ -1,5 +1,5 @@
 import React from "react";
-import { useEditorContext } from "../../context/useEditorContext";
+import { useEditorContext } from "@src/context/useEditorContext";
 import IconButton from "@mui/material/IconButton";
 import Tooltip from "@mui/material/Tooltip";
 import Box from "@mui/material/Box";
@@ -14,7 +14,7 @@ import FlipToBack from "@mui/icons-material/FlipToBack";
 import AlignVerticalCenter from "@mui/icons-material/AlignVerticalCenter";
 import AlignHorizontalCenter from "@mui/icons-material/AlignHorizontalCenter";
 import DragIndicator from "@mui/icons-material/DragIndicator";
-import { EDIT_MODE } from "../../constants/constants";
+import { EDIT_MODE } from "@src/constants/constants";
 import { Rnd } from "react-rnd";
 import { grey } from "@mui/material/colors";
 import "./Toolbar.css";

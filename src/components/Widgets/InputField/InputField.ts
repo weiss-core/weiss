@@ -1,8 +1,8 @@
 import { InputFieldComp } from "./InputFieldComp";
-import { COLORS } from "../../../constants/constants";
-import type { Widget } from "../../../types/widgets";
+import { COLORS } from "@src/constants/constants";
+import type { Widget } from "@src/types/widgets";
 import InputIcon from "@mui/icons-material/Input";
-import { PROPERTY_SCHEMAS, COMMON_PROPS, TEXT_PROPS } from "../../../types/widgetProperties";
+import { PROPERTY_SCHEMAS, COMMON_PROPS, TEXT_PROPS } from "@src/types/widgetProperties";
 
 export const InputField: Widget = {
   id: "__InputField__",

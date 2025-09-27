@@ -1,8 +1,8 @@
 import React from "react";
-import { useEditorContext } from "../../../context/useEditorContext";
-import type { WidgetUpdate } from "../../../types/widgets";
-import { EDIT_MODE } from "../../../constants/constants";
-import ProgressBar from "ReactAutomationStudio/components/BaseComponents/ProgressBar";
+import { useEditorContext } from "@src/context/useEditorContext";
+import type { WidgetUpdate } from "@src/types/widgets";
+import { EDIT_MODE } from "@src/constants/constants";
+import ProgressBar from "@ReactAutomationStudio/components/BaseComponents/ProgressBar";
 
 const ProgressBarComp: React.FC<WidgetUpdate> = ({ data }) => {
   const { mode, macros } = useEditorContext();

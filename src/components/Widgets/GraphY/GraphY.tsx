@@ -1,6 +1,6 @@
 import { GraphYComp } from "./GraphYComp";
-import { COMMON_PROPS, PLOT_PROPS, PROPERTY_SCHEMAS, TEXT_PROPS } from "../../../types/widgetProperties";
-import type { Widget } from "../../../types/widgets";
+import { COMMON_PROPS, PLOT_PROPS, PROPERTY_SCHEMAS, TEXT_PROPS } from "@src/types/widgetProperties";
+import type { Widget } from "@src/types/widgets";
 import ShowChartIcon from "@mui/icons-material/ShowChart";
 
 export const GraphY: Widget = {

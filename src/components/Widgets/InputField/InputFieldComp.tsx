@@ -1,8 +1,8 @@
 import React from "react";
-import type { WidgetUpdate } from "../../../types/widgets";
-import { useEditorContext } from "../../../context/useEditorContext";
-import { EDIT_MODE } from "../../../constants/constants";
-import TextInput from "ReactAutomationStudio/components/BaseComponents/TextInput";
+import type { WidgetUpdate } from "@src/types/widgets";
+import { useEditorContext } from "@src/context/useEditorContext";
+import { EDIT_MODE } from "@src/constants/constants";
+import TextInput from "@ReactAutomationStudio/components/BaseComponents/TextInput";
 
 const InputFieldComp: React.FC<WidgetUpdate> = ({ data }) => {
   const { mode, macros } = useEditorContext();

@@ -1,4 +1,3 @@
-import { useRef } from "react";
 import MuiAppBar from "@mui/material/AppBar";
 import type { AppBarProps as MuiAppBarProps } from "@mui/material/AppBar";
 import { styled } from "@mui/material/styles";
@@ -11,9 +10,9 @@ import MenuIcon from "@mui/icons-material/Menu";
 import FileUploadIcon from "@mui/icons-material/FileUpload";
 import FileDownloadIcon from "@mui/icons-material/FileDownload";
 import Tooltip from "@mui/material/Tooltip";
-import { COLORS, RUNTIME_MODE, EDIT_MODE, APP_SRC_URL } from "../../constants/constants.ts";
-import { useEditorContext } from "../../context/useEditorContext.tsx";
-import { WIDGET_SELECTOR_WIDTH } from "../../constants/constants.ts";
+import { COLORS, RUNTIME_MODE, EDIT_MODE, APP_SRC_URL } from "@src/constants/constants.ts";
+import { useEditorContext } from "@src/context/useEditorContext.tsx";
+import { WIDGET_SELECTOR_WIDTH } from "@src/constants/constants.ts";
 import "./NavBar.css";
 import Switch from "@mui/material/Switch";
 import FormControlLabel from "@mui/material/FormControlLabel";

@@ -1,6 +1,6 @@
-import { GRID_ID } from "../../constants/constants";
-import { PROPERTY_SCHEMAS } from "../../types/widgetProperties";
-import type { Widget } from "../../types/widgets";
+import { GRID_ID } from "@src/constants/constants";
+import { PROPERTY_SCHEMAS } from "@src/types/widgetProperties";
+import type { Widget } from "@src/types/widgets";
 import { GridZoneComp } from "./GridZoneComp";
 
 // not added to registry, but treated as a special type of widget for consistency

@@ -1,8 +1,8 @@
 import React from "react";
-import type { WidgetUpdate } from "../../../types/widgets";
-import { EDIT_MODE, RUNTIME_MODE } from "../../../constants/constants";
-import { useEditorContext } from "../../../context/useEditorContext";
-import LightPanel from "ReactAutomationStudio/components/BaseComponents/LightPanel";
+import type { WidgetUpdate } from "@src/types/widgets";
+import { EDIT_MODE, RUNTIME_MODE } from "@src/constants/constants";
+import { useEditorContext } from "@src/context/useEditorContext";
+import LightPanel from "@ReactAutomationStudio/components/BaseComponents/LightPanel";
 
 const LedIndicatorComp: React.FC<WidgetUpdate> = ({ data }) => {
   const p = data.editableProperties;

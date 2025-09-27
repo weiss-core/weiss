@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
-import { EDIT_MODE, GRID_ID, type Mode } from "../constants/constants";
+import { EDIT_MODE, GRID_ID, type Mode } from "@src/constants/constants";
 import { useWidgetManager } from "./useWidgetManager";
-import type { ExportedWidget } from "../types/widgets";
+import type { ExportedWidget } from "@src/types/widgets";
 
 /**
  * Hook that manages global UI state for WEISS.

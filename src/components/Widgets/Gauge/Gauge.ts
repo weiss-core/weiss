@@ -1,6 +1,6 @@
 import { GaugeComp } from "./GaugeComp";
-import { COMMON_PROPS, PROPERTY_SCHEMAS, TEXT_PROPS } from "../../../types/widgetProperties";
-import type { Widget } from "../../../types/widgets";
+import { COMMON_PROPS, PROPERTY_SCHEMAS, TEXT_PROPS } from "@src/types/widgetProperties";
+import type { Widget } from "@src/types/widgets";
 import SpeedIcon from "@mui/icons-material/Speed";
 
 export const Gauge: Widget = {

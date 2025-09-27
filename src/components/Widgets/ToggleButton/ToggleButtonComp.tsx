@@ -1,8 +1,8 @@
 import React from "react";
-import { useEditorContext } from "../../../context/useEditorContext";
-import type { WidgetUpdate } from "../../../types/widgets";
-import { EDIT_MODE, FLEX_ALIGN_MAP } from "../../../constants/constants";
-import ToggleButton from "ReactAutomationStudio/components/BaseComponents/ToggleButton";
+import { useEditorContext } from "@src/context/useEditorContext";
+import type { WidgetUpdate } from "@src/types/widgets";
+import { EDIT_MODE, FLEX_ALIGN_MAP } from "@src/constants/constants";
+import ToggleButton from "@ReactAutomationStudio/components/BaseComponents/ToggleButton";
 import PowerSettingsNewIcon from "@mui/icons-material/PowerSettingsNew";
 
 const ToggleButtonComp: React.FC<WidgetUpdate> = ({ data }) => {

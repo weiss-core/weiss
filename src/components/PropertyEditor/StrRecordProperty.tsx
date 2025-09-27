@@ -5,7 +5,7 @@ import TextField from "@mui/material/TextField";
 import IconButton from "@mui/material/IconButton";
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
-import type { PropertyKey, PropertyValue } from "../../types/widgets";
+import type { PropertyKey, PropertyValue } from "@src/types/widgets";
 
 interface StrRecordPropertyProps {
   propName: PropertyKey;

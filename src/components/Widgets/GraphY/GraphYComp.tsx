@@ -1,8 +1,8 @@
 import React from "react";
-import type { WidgetUpdate } from "../../../types/widgets";
-import { useEditorContext } from "../../../context/useEditorContext";
-import GraphY from "ReactAutomationStudio/components/BaseComponents/GraphY";
-import { EDIT_MODE } from "../../../constants/constants";
+import type { WidgetUpdate } from "@src/types/widgets";
+import { useEditorContext } from "@src/context/useEditorContext";
+import GraphY from "@ReactAutomationStudio/components/BaseComponents/GraphY";
+import { EDIT_MODE } from "@src/constants/constants";
 
 const GraphYComp: React.FC<WidgetUpdate> = ({ data }) => {
   const { mode, macros } = useEditorContext();
