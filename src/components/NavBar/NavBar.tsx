@@ -1,3 +1,4 @@
+import { useState } from "react";
 import MuiAppBar from "@mui/material/AppBar";
 import type { AppBarProps as MuiAppBarProps } from "@mui/material/AppBar";
 import { styled } from "@mui/material/styles";
@@ -17,7 +18,10 @@ import "./NavBar.css";
 import Switch from "@mui/material/Switch";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import GitHubIcon from "@mui/icons-material/GitHub";
+import ComputerIcon from "@mui/icons-material/Computer";
 import HelpOverlay from "./HelpOverlay.tsx";
+import { ListItemIcon, ListItemText, Menu, MenuItem } from "@mui/material";
+import GitLabIcon from "@components/CustomIcons/GItlabIcon.tsx";
 
 interface StyledAppBarProps extends MuiAppBarProps {
   open?: boolean;
@@ -89,12 +93,21 @@ const StyledAppBar = styled(MuiAppBar, {
 export default function NavBar() {
   const { mode, updateMode, wdgSelectorOpen, setWdgSelectorOpen, downloadWidgets, loadWidgets } = useEditorContext();
   const drawerWidth = WIDGET_SELECTOR_WIDTH;
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+
+  const handleMenuOpen = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+  };
 
   const handleDownload = () => {
     void downloadWidgets();
   };
 
-  const handleUpload = () => {
+  const handleImportFile = () => {
     const input = document.createElement("input");
     input.type = "file";
     input.accept = "application/json";
@@ -110,6 +123,18 @@ export default function NavBar() {
       }
     };
     input.click();
+  };
+
+  const handleImportGithub = () => {
+    handleMenuClose();
+    console.log("TODO: trigger GitHub OAuth + file browser workflow");
+    window.alert("Not implemented");
+  };
+
+  const handleImportGitlab = () => {
+    handleMenuClose();
+    console.log("TODO: trigger GitLab OAuth + file browser workflow");
+    window.alert("Not implemented");
   };
 
   return (
@@ -172,14 +197,36 @@ export default function NavBar() {
             </Tooltip>
             <Tooltip title="Import file">
               <Button
-                onClick={handleUpload}
+                onClick={handleMenuOpen}
                 startIcon={<FileUploadIcon />}
                 sx={{ color: "white", textTransform: "none" }}
               >
                 Import
               </Button>
             </Tooltip>
-            <Box sx={{ flexGrow: 1 }} /> {/* pushes the icons to the right */}
+            <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose}>
+              <MenuItem onClick={handleImportFile}>
+                <ListItemIcon>
+                  <ComputerIcon fontSize="small" />
+                </ListItemIcon>
+                <ListItemText primary="From disk" />
+              </MenuItem>
+
+              <MenuItem onClick={handleImportGithub}>
+                <ListItemIcon>
+                  <GitHubIcon fontSize="small" />
+                </ListItemIcon>
+                <ListItemText primary="From GitHub" />
+              </MenuItem>
+
+              <MenuItem onClick={handleImportGitlab}>
+                <ListItemIcon>
+                  <GitLabIcon fontSize="small" />
+                </ListItemIcon>
+                <ListItemText primary="From GitLab" />
+              </MenuItem>
+            </Menu>
+            <Box sx={{ flexGrow: 1 }} />
             <HelpOverlay />
             <Tooltip title="GitHub Repository">
               <IconButton sx={{ color: "white" }} href={APP_SRC_URL} target="_blank" rel="noopener noreferrer">
