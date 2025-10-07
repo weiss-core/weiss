@@ -3,6 +3,7 @@ import type { WidgetUpdate } from "@src/types/widgets";
 import { EDIT_MODE } from "@src/constants/constants";
 import { useEditorContext } from "@src/context/useEditorContext";
 import BitIndicators from "@ReactAutomationStudio/components/BaseComponents/BitIndicators";
+import GradientBitIcon from "@src/components/CustomIcons/BitStateIcon";
 
 const MultiBitIndicatorComp: React.FC<WidgetUpdate> = ({ data }) => {
   const p = data.editableProperties;
@@ -29,7 +30,14 @@ const MultiBitIndicatorComp: React.FC<WidgetUpdate> = ({ data }) => {
       bitLabels={bitLabels}
       alarmSensitive={p.alarmBorder?.value}
       disableContextMenu={inEditMode}
-    />
+    >
+      {inEditMode ? (
+        <GradientBitIcon
+          onColor={p.onColor!.value}
+          offColor={p.offColor!.value}
+        />
+      ) : undefined}
+    </BitIndicators>
   );
 };
 
