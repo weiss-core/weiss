@@ -1,21 +1,21 @@
-import { ProgressBarComp } from "./ProgressBarComp";
+import { DropDownComp } from "./DropDownComp";
 import { COMMON_PROPS, PROPERTY_SCHEMAS, TEXT_PROPS } from "@src/types/widgetProperties";
 import type { Widget } from "@src/types/widgets";
-import PercentIcon from "@mui/icons-material/Percent";
+import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 
-export const ProgressBar: Widget = {
+export const DropDown: Widget = {
   id: "__Slider__",
-  component: ProgressBarComp,
-  widgetName: "ProgressBar",
-  widgetIcon: PercentIcon,
-  widgetLabel: "Progress Bar",
-  category: "Monitoring",
+  component: DropDownComp,
+  widgetName: "DropDown",
+  widgetIcon: ArrowDropDownIcon,
+  widgetLabel: "Drop Down",
+  category: "Controls",
   editableProperties: {
     ...COMMON_PROPS,
     ...TEXT_PROPS,
-    width: { ...PROPERTY_SCHEMAS.width, value: 500 },
+    width: { ...PROPERTY_SCHEMAS.width, value: 100 },
     height: { ...PROPERTY_SCHEMAS.height, value: 80 },
-    label: { ...PROPERTY_SCHEMAS.label, value: "ProgressBar" },
+    label: { ...PROPERTY_SCHEMAS.label, value: "DropDown" },
     pvName: PROPERTY_SCHEMAS.pvName,
     disabled: PROPERTY_SCHEMAS.disabled,
     alarmBorder: PROPERTY_SCHEMAS.alarmBorder,

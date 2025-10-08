@@ -12,3 +12,4 @@ export { Slider } from "./Slider";
 export { Gauge } from "./Gauge";
 export { CheckBox } from "./CheckBox";
 export { ProgressBar } from "./ProgressBar";
+export { DropDown } from "./DropDown";
