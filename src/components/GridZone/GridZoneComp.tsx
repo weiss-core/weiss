@@ -214,7 +214,6 @@ const GridZoneComp: React.FC<WidgetUpdate> = ({ data }) => {
 
     const handleMouseUp = () => {
       gridGrabbed.current = false;
-      setIsPanning(false);
     };
 
     window.addEventListener("mousemove", handleMouseMove);
@@ -239,7 +238,10 @@ const GridZoneComp: React.FC<WidgetUpdate> = ({ data }) => {
         handleUndo();
         return;
       }
-      if ((e.ctrlKey && e.key.toLowerCase() === "y") || (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === "z")) {
+      if (
+        (e.ctrlKey && e.key.toLowerCase() === "y") ||
+        (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === "z")
+      ) {
         e.preventDefault();
         handleRedo();
         return;
@@ -268,7 +270,15 @@ const GridZoneComp: React.FC<WidgetUpdate> = ({ data }) => {
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [handleUndo, handleRedo, copyWidget, pasteWidget, downloadWidgets, mousePosRef, propertyEditorFocused]);
+  }, [
+    handleUndo,
+    handleRedo,
+    copyWidget,
+    pasteWidget,
+    downloadWidgets,
+    mousePosRef,
+    propertyEditorFocused,
+  ]);
 
   return (
     <div
@@ -290,12 +300,16 @@ const GridZoneComp: React.FC<WidgetUpdate> = ({ data }) => {
         linear-gradient(90deg, ${props.gridLineColor!.value} 1px, transparent 1px)`
           : "none",
         backgroundSize: `${props.gridSize!.value * zoom}px ${props.gridSize!.value * zoom}px`,
-        backgroundPosition: `${pan.x % (props.gridSize!.value * zoom)}px ${pan.y % (props.gridSize!.value * zoom)}px`,
+        backgroundPosition: `${pan.x % (props.gridSize!.value * zoom)}px ${
+          pan.y % (props.gridSize!.value * zoom)
+        }px`,
       }}
     >
       <div
         id="centerRef"
-        className={`centerRef ${mode === EDIT_MODE && props.centerVisible?.value ? "centerMark" : ""}`}
+        className={`centerRef ${
+          mode === EDIT_MODE && props.centerVisible?.value ? "centerMark" : ""
+        }`}
         style={{
           transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoom})`,
         }}
@@ -337,7 +351,10 @@ const GridZoneComp: React.FC<WidgetUpdate> = ({ data }) => {
           }}
         />
       )}
-      <ToolbarButtons onMouseEnter={() => setMouseOverMenu(true)} onMouseLeave={() => setMouseOverMenu(false)} />
+      <ToolbarButtons
+        onMouseEnter={() => setMouseOverMenu(true)}
+        onMouseLeave={() => setMouseOverMenu(false)}
+      />
       <ContextMenu
         pos={contextMenuPos}
         mousePos={mousePosRef.current}
