@@ -1,13 +1,13 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import type { GridPosition, Widget, WidgetUpdate } from "../../types/widgets";
-import WidgetRegistry from "../WidgetRegistry/WidgetRegistry";
-import { useEditorContext } from "../../context/useEditorContext.tsx";
-import { EDIT_MODE, MAX_ZOOM, MIN_ZOOM, RUNTIME_MODE } from "../../constants/constants.ts";
+import type { GridPosition, Widget, WidgetUpdate } from "@src/types/widgets";
+import WidgetRegistry from "@components/WidgetRegistry/WidgetRegistry";
+import { useEditorContext } from "@src/context/useEditorContext.tsx";
+import { EDIT_MODE, MAX_ZOOM, MIN_ZOOM, RUNTIME_MODE } from "@src/constants/constants.ts";
 import Selecto from "react-selecto";
-import ContextMenu from "../ContextMenu/ContextMenu";
+import ContextMenu from "@components/ContextMenu/ContextMenu";
 import "./GridZone.css";
-import WidgetRenderer from "../WidgetRenderer/WidgetRenderer.tsx";
-import ToolbarButtons from "../Toolbar/Toolbar.tsx";
+import WidgetRenderer from "@components/WidgetRenderer/WidgetRenderer.tsx";
+import ToolbarButtons from "@components/Toolbar/Toolbar.tsx";
 
 /**
  * GridZoneComp renders the main editor canvas where widgets are displayed, moved, and interacted with.
@@ -38,6 +38,8 @@ const GridZoneComp: React.FC<WidgetUpdate> = ({ data }) => {
     pasteWidget,
     downloadWidgets,
     propertyEditorFocused,
+    allWidgetIDs,
+    updateEditorWidgetList,
   } = useEditorContext();
 
   const gridRef = useRef<HTMLDivElement>(null);
@@ -58,6 +60,7 @@ const GridZoneComp: React.FC<WidgetUpdate> = ({ data }) => {
   const gridSize = props.gridSize!.value;
   const snapToGrid = props.snapToGrid?.value;
   const gridLineVisible = props.gridLineVisible?.value;
+  const inEditMode = mode === EDIT_MODE;
 
   const ensureGridCoordinate = useCallback(
     (coord: number) => {
@@ -205,7 +208,7 @@ const GridZoneComp: React.FC<WidgetUpdate> = ({ data }) => {
           setIsPanning(true);
         }
         lastPosRef.current = { x: e.clientX, y: e.clientY };
-        setPan((prev) => ({ x: prev.x + dx / zoom, y: prev.y + dy / zoom }));
+        setPan((prev) => ({ x: prev.x + dx, y: prev.y + dy }));
       }
     };
 
@@ -223,13 +226,22 @@ const GridZoneComp: React.FC<WidgetUpdate> = ({ data }) => {
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (propertyEditorFocused) return;
+      if (propertyEditorFocused || !inEditMode) return;
+      if (e.key.toLowerCase() === "delete" && selectedWidgetIDs.length > 0) {
+        e.preventDefault();
+        updateEditorWidgetList((prev) => prev.filter((w) => !selectedWidgetIDs.includes(w.id)));
+        setSelectedWidgetIDs([]);
+        return;
+      }
       if (e.ctrlKey && e.key.toLowerCase() === "z" && !e.shiftKey) {
         e.preventDefault();
         handleUndo();
         return;
       }
-      if ((e.ctrlKey && e.key.toLowerCase() === "y") || (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === "z")) {
+      if (
+        (e.ctrlKey && e.key.toLowerCase() === "y") ||
+        (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === "z")
+      ) {
         e.preventDefault();
         handleRedo();
         return;
@@ -244,11 +256,29 @@ const GridZoneComp: React.FC<WidgetUpdate> = ({ data }) => {
         pasteWidget(mousePosRef.current);
         return;
       }
+      if (e.ctrlKey && e.key.toLowerCase() === "a") {
+        e.preventDefault();
+        setSelectedWidgetIDs(allWidgetIDs);
+        return;
+      }
+      if (e.shiftKey && e.key.toLowerCase() === "c") {
+        e.preventDefault();
+        centerScreen();
+        return;
+      }
     };
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [handleUndo, handleRedo, copyWidget, pasteWidget, downloadWidgets, mousePosRef, propertyEditorFocused]);
+  }, [
+    handleUndo,
+    handleRedo,
+    copyWidget,
+    pasteWidget,
+    downloadWidgets,
+    mousePosRef,
+    propertyEditorFocused,
+  ]);
 
   return (
     <div
@@ -270,17 +300,26 @@ const GridZoneComp: React.FC<WidgetUpdate> = ({ data }) => {
         linear-gradient(90deg, ${props.gridLineColor!.value} 1px, transparent 1px)`
           : "none",
         backgroundSize: `${props.gridSize!.value * zoom}px ${props.gridSize!.value * zoom}px`,
-        backgroundPosition: `${pan.x % (props.gridSize!.value * zoom)}px ${pan.y % (props.gridSize!.value * zoom)}px`,
+        backgroundPosition: `${pan.x % (props.gridSize!.value * zoom)}px ${
+          pan.y % (props.gridSize!.value * zoom)
+        }px`,
       }}
     >
       <div
         id="centerRef"
-        className={`centerRef ${mode === EDIT_MODE && props.centerVisible?.value ? "centerMark" : ""}`}
+        className={`centerRef ${
+          mode === EDIT_MODE && props.centerVisible?.value ? "centerMark" : ""
+        }`}
         style={{
           transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoom})`,
         }}
       >
-        <WidgetRenderer scale={zoom} ensureGridCoordinate={ensureGridCoordinate} setIsDragging={setIsDragging} isPanning={isPanning}/>
+        <WidgetRenderer
+          scale={zoom}
+          ensureGridCoordinate={ensureGridCoordinate}
+          setIsDragging={setIsDragging}
+          isPanning={isPanning}
+        />
       </div>
       {!disableSelecto && (
         <Selecto
@@ -312,7 +351,10 @@ const GridZoneComp: React.FC<WidgetUpdate> = ({ data }) => {
           }}
         />
       )}
-      <ToolbarButtons onMouseEnter={() => setMouseOverMenu(true)} onMouseLeave={() => setMouseOverMenu(false)} />
+      <ToolbarButtons
+        onMouseEnter={() => setMouseOverMenu(true)}
+        onMouseLeave={() => setMouseOverMenu(false)}
+      />
       <ContextMenu
         pos={contextMenuPos}
         mousePos={mousePosRef.current}

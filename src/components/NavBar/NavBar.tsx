@@ -1,3 +1,4 @@
+import { useState } from "react";
 import MuiAppBar from "@mui/material/AppBar";
 import type { AppBarProps as MuiAppBarProps } from "@mui/material/AppBar";
 import { styled } from "@mui/material/styles";
@@ -10,14 +11,17 @@ import MenuIcon from "@mui/icons-material/Menu";
 import FileUploadIcon from "@mui/icons-material/FileUpload";
 import FileDownloadIcon from "@mui/icons-material/FileDownload";
 import Tooltip from "@mui/material/Tooltip";
-import { COLORS, RUNTIME_MODE, EDIT_MODE, APP_SRC_URL } from "../../constants/constants.ts";
-import { useEditorContext } from "../../context/useEditorContext.tsx";
-import { WIDGET_SELECTOR_WIDTH } from "../../constants/constants.ts";
+import { COLORS, RUNTIME_MODE, EDIT_MODE, APP_SRC_URL } from "@src/constants/constants.ts";
+import { useEditorContext } from "@src/context/useEditorContext.tsx";
+import { WIDGET_SELECTOR_WIDTH } from "@src/constants/constants.ts";
 import "./NavBar.css";
 import Switch from "@mui/material/Switch";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import GitHubIcon from "@mui/icons-material/GitHub";
-import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
+import ComputerIcon from "@mui/icons-material/Computer";
+import HelpOverlay from "./HelpOverlay.tsx";
+import { ListItemIcon, ListItemText, Menu, MenuItem } from "@mui/material";
+import GitLabIcon from "@components/CustomIcons/GItlabIcon.tsx";
 
 interface StyledAppBarProps extends MuiAppBarProps {
   open?: boolean;
@@ -48,13 +52,13 @@ const ModeSwitch = styled(Switch)(({ theme }) => ({
     },
     "&::before": {
       backgroundImage: `url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" height="16" width="16" viewBox="0 0 24 24"><path fill="${encodeURIComponent(
-        theme.palette.getContrastText(theme.palette.primary.main)
+        theme.palette.getContrastText(theme.palette.primary.main),
       )}" d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"/></svg>')`,
       left: 12,
     },
     "&::after": {
       backgroundImage: `url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" height="16" width="16" viewBox="0 0 24 24"><path fill="${encodeURIComponent(
-        theme.palette.getContrastText(theme.palette.primary.main)
+        theme.palette.getContrastText(theme.palette.primary.main),
       )}" d="M19,13H5V11H19V13Z" /></svg>')`,
       right: 12,
     },
@@ -87,14 +91,24 @@ const StyledAppBar = styled(MuiAppBar, {
 }));
 
 export default function NavBar() {
-  const { mode, updateMode, wdgSelectorOpen, setWdgSelectorOpen, downloadWidgets, loadWidgets } = useEditorContext();
+  const { mode, updateMode, wdgSelectorOpen, setWdgSelectorOpen, downloadWidgets, loadWidgets } =
+    useEditorContext();
   const drawerWidth = WIDGET_SELECTOR_WIDTH;
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+
+  const handleMenuOpen = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+  };
 
   const handleDownload = () => {
     void downloadWidgets();
   };
 
-  const handleUpload = () => {
+  const handleImportFile = () => {
     const input = document.createElement("input");
     input.type = "file";
     input.accept = "application/json";
@@ -112,9 +126,26 @@ export default function NavBar() {
     input.click();
   };
 
+  const handleImportGithub = () => {
+    handleMenuClose();
+    console.log("TODO: trigger GitHub OAuth + file browser workflow");
+    window.alert("Not implemented");
+  };
+
+  const handleImportGitlab = () => {
+    handleMenuClose();
+    console.log("TODO: trigger GitLab OAuth + file browser workflow");
+    window.alert("Not implemented");
+  };
+
   return (
     <Box sx={{ display: "flex" }}>
-      <StyledAppBar component="nav" position="fixed" open={wdgSelectorOpen} drawerWidth={drawerWidth}>
+      <StyledAppBar
+        component="nav"
+        position="fixed"
+        open={wdgSelectorOpen}
+        drawerWidth={drawerWidth}
+      >
         <Toolbar sx={{ minHeight: 56, px: 2 }}>
           <IconButton
             color="inherit"
@@ -129,7 +160,7 @@ export default function NavBar() {
           >
             <MenuIcon />
           </IconButton>
-          <Tooltip title= "Web EPICS Interface Studio">
+          <Tooltip title="Web EPICS Interface & Synoptic Studio">
             <Typography
               noWrap
               component="div"
@@ -172,21 +203,44 @@ export default function NavBar() {
             </Tooltip>
             <Tooltip title="Import file">
               <Button
-                onClick={handleUpload}
+                onClick={handleMenuOpen}
                 startIcon={<FileUploadIcon />}
                 sx={{ color: "white", textTransform: "none" }}
               >
                 Import
               </Button>
             </Tooltip>
-            <Box sx={{ flexGrow: 1 }} /> {/* pushes the icons to the right */}
-            <Tooltip title="Help / Shortcuts">
-              <IconButton sx={{ color: "white" }}>
-                <HelpOutlineIcon />
-              </IconButton>
-            </Tooltip>
+            <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose}>
+              <MenuItem onClick={handleImportFile}>
+                <ListItemIcon>
+                  <ComputerIcon fontSize="small" />
+                </ListItemIcon>
+                <ListItemText primary="From disk" />
+              </MenuItem>
+
+              <MenuItem onClick={handleImportGithub}>
+                <ListItemIcon>
+                  <GitHubIcon fontSize="small" />
+                </ListItemIcon>
+                <ListItemText primary="From GitHub" />
+              </MenuItem>
+
+              <MenuItem onClick={handleImportGitlab}>
+                <ListItemIcon>
+                  <GitLabIcon fontSize="small" />
+                </ListItemIcon>
+                <ListItemText primary="From GitLab" />
+              </MenuItem>
+            </Menu>
+            <Box sx={{ flexGrow: 1 }} />
+            <HelpOverlay />
             <Tooltip title="GitHub Repository">
-              <IconButton sx={{ color: "white" }} href={APP_SRC_URL} target="_blank" rel="noopener noreferrer">
+              <IconButton
+                sx={{ color: "white" }}
+                href={APP_SRC_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
                 <GitHubIcon />
               </IconButton>
             </Tooltip>

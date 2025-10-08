@@ -1,1 +1,0 @@
-export { BitIndicator } from "./BitIndicator";

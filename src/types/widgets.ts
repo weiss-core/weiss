@@ -1,6 +1,5 @@
 import type { SvgIconProps } from "@mui/material/SvgIcon";
 import { PROPERTY_SCHEMAS } from "./widgetProperties";
-import type { MultiPvData, PVData } from "./pvaPyWS";
 
 /**
  * Selector types for widget properties.
@@ -10,13 +9,23 @@ import type { MultiPvData, PVData } from "./pvaPyWS";
  * - "boolean": checkbox
  * - "colorSelector": color picker
  * - "select": dropdown selection
- * - "pvList": list of PVs (text input)
+ * - "strList": list of string entries
+ * - "strRecord": string-string record (key-value pairs)
  * - "none": no selector (property not displayed)
  */
-export type PropertySelectorType = "text" | "number" | "boolean" | "colorSelector" | "select" | "pvList" | "none";
+export type PropertySelectorType =
+  | "text"
+  | "number"
+  | "boolean"
+  | "colorSel"
+  | "colorSelList"
+  | "select"
+  | "strList"
+  | "strRecord"
+  | "none";
 
 /** Allowed values for a widget property: string, number, boolean, or string dictionary */
-export type PropertyValue = string | number | boolean | Record<string, string>;
+export type PropertyValue = string | number | boolean | string[] | Record<string, string>;
 
 /**
  * Represents a single widget property.
@@ -91,8 +100,6 @@ export interface Widget {
   id: string;
   widgetLabel: string;
   widgetIcon?: WidgetIconType;
-  pvData?: PVData;
-  multiPvData?: MultiPvData;
   widgetName: string;
   component: React.FC<WidgetUpdate>;
   category: string;

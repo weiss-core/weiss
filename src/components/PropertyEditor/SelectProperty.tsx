@@ -6,7 +6,7 @@ import InputLabel from "@mui/material/InputLabel";
 import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
 import type { SelectChangeEvent } from "@mui/material/Select";
-import type { PropertyKey, PropertyValue } from "../../types/widgets";
+import type { PropertyKey, PropertyValue } from "@src/types/widgets";
 
 interface SelectPropertyProps {
   propName: PropertyKey;
@@ -16,7 +16,13 @@ interface SelectPropertyProps {
   onChange: (propName: PropertyKey, newValue: PropertyValue) => void;
 }
 
-const SelectProperty: React.FC<SelectPropertyProps> = ({ propName, label, value, options, onChange }) => {
+const SelectProperty: React.FC<SelectPropertyProps> = ({
+  propName,
+  label,
+  value,
+  options,
+  onChange,
+}) => {
   const handleChange = (e: SelectChangeEvent) => {
     onChange(propName, e.target.value);
   };

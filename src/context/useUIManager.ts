@@ -1,11 +1,10 @@
 import { useState, useEffect, useRef, useCallback } from "react";
-import usePvaPyWS from "./usePvaPyWS";
-import { EDIT_MODE, GRID_ID, type Mode } from "../constants/constants";
+import { EDIT_MODE, GRID_ID, type Mode } from "@src/constants/constants";
 import { useWidgetManager } from "./useWidgetManager";
-import type { ExportedWidget } from "../types/widgets";
+import type { ExportedWidget } from "@src/types/widgets";
 
 /**
- * Hook that manages global UI state for the Web EPICS Interface Studio interface.
+ * Hook that manages global UI state for WEISS.
  *
  * Responsibilities:
  * - Tracks editor mode (`edit` vs `runtime`).
@@ -13,9 +12,6 @@ import type { ExportedWidget } from "../types/widgets";
  * - Coordinates session lifecycle when switching modes.
  * - Handles localStorage persistence for widgets (load on startup, save in edit mode).
  *
- * @param ws Ref to the WebSocket connection used for PV updates.
- * @param startNewSession Function to start a new PV session (runtime mode).
- * @param clearPVData Function to clear all PV values from widgets (edit mode).
  * @param editorWidgets Current list of widgets from the widget manager.
  * @param setSelectedWidgetIDs Function to update currently selected widgets.
  * @param updateWidgetProperties Function to update widget properties.
@@ -23,13 +19,10 @@ import type { ExportedWidget } from "../types/widgets";
  * @returns An object containing UI state, setters, and mode updater.
  */
 export default function useUIManager(
-  ws: ReturnType<typeof usePvaPyWS>["ws"],
-  startNewSession: ReturnType<typeof usePvaPyWS>["startNewSession"],
-  clearPVData: ReturnType<typeof useWidgetManager>["clearPVData"],
   editorWidgets: ReturnType<typeof useWidgetManager>["editorWidgets"],
   setSelectedWidgetIDs: ReturnType<typeof useWidgetManager>["setSelectedWidgetIDs"],
   updateWidgetProperties: ReturnType<typeof useWidgetManager>["updateWidgetProperties"],
-  loadWidgets: ReturnType<typeof useWidgetManager>["loadWidgets"]
+  loadWidgets: ReturnType<typeof useWidgetManager>["loadWidgets"],
 ) {
   const [propertyEditorFocused, setPropertyEditorFocused] = useState(false);
   const [wdgSelectorOpen, setWdgSelectorOpen] = useState(false);
@@ -56,18 +49,17 @@ export default function useUIManager(
     (newMode: Mode) => {
       const isEdit = newMode == EDIT_MODE;
       if (isEdit) {
-        ws.current?.close();
-        ws.current = null;
-        clearPVData();
+        // connection to pv server is managed by RAS widgets directly
+        // add actions on mode transition?
       } else {
+        // connection to pv server is managed by RAS widgets directly
         setSelectedWidgetIDs([]);
         setWdgSelectorOpen(false);
-        startNewSession();
       }
       updateWidgetProperties(GRID_ID, { gridLineVisible: isEdit }, false);
       setMode(newMode);
     },
-    [updateWidgetProperties, clearPVData, setSelectedWidgetIDs, startNewSession, ws]
+    [updateWidgetProperties, setSelectedWidgetIDs],
   );
 
   /**
@@ -103,9 +95,9 @@ export default function useUIManager(
               id: widget.id,
               widgetName: widget.widgetName,
               properties: Object.fromEntries(
-                Object.entries(widget.editableProperties).map(([key, def]) => [key, def.value])
+                Object.entries(widget.editableProperties).map(([key, def]) => [key, def.value]),
               ),
-            } as ExportedWidget)
+            }) as ExportedWidget,
         );
         localStorage.setItem("editorWidgets", JSON.stringify(exportable));
       } catch (err) {

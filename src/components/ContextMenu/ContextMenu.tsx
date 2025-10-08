@@ -5,7 +5,6 @@ import MenuItem from "@mui/material/MenuItem";
 import ListItemText from "@mui/material/ListItemText";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import Typography from "@mui/material/Typography";
-import { useEditorContext } from "../../context/useEditorContext";
 import ContentCopy from "@mui/icons-material/ContentCopy";
 import ContentCut from "@mui/icons-material/ContentCut";
 import ContentPaste from "@mui/icons-material/ContentPaste";
@@ -13,8 +12,9 @@ import KeyboardArrowUp from "@mui/icons-material/KeyboardArrowUp";
 import KeyboardArrowDown from "@mui/icons-material/KeyboardArrowDown";
 import FlipToFront from "@mui/icons-material/FlipToFront";
 import FlipToBack from "@mui/icons-material/FlipToBack";
-import { EDIT_MODE, FRONT_UI_ZIDX } from "../../constants/constants";
-import type { GridPosition } from "../../types/widgets";
+import { useEditorContext } from "@src/context/useEditorContext";
+import { EDIT_MODE, FRONT_UI_ZIDX } from "@src/constants/constants";
+import type { GridPosition } from "@src/types/widgets";
 
 export interface ContextMenuProps {
   pos: GridPosition;
@@ -25,9 +25,24 @@ export interface ContextMenuProps {
   onMouseLeave: () => void;
 }
 
-const ContextMenu: React.FC<ContextMenuProps> = ({ pos, mousePos, visible, onClose, onMouseEnter, onMouseLeave }) => {
-  const { mode, bringToFront, sendToBack, stepForward, stepBackwards, copyWidget, pasteWidget, selectedWidgetIDs } =
-    useEditorContext();
+const ContextMenu: React.FC<ContextMenuProps> = ({
+  pos,
+  mousePos,
+  visible,
+  onClose,
+  onMouseEnter,
+  onMouseLeave,
+}) => {
+  const {
+    mode,
+    bringToFront,
+    sendToBack,
+    stepForward,
+    stepBackwards,
+    copyWidget,
+    pasteWidget,
+    selectedWidgetIDs,
+  } = useEditorContext();
   if (!visible) return null;
   if (mode !== EDIT_MODE) return null; // TODO: create context menu for RUNTIME
   const noSelection = selectedWidgetIDs.length === 0;

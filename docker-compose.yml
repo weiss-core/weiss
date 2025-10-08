@@ -1,29 +1,29 @@
-services:
-  weiss:
-    build:
-      context: "."
-      target: prod
-      args:
-        GIT_REPO: ${GIT_REPO}
-        GIT_TAG: ${GIT_TAG}
-        PROD_PORT: ${PROD_PORT}
-    image: weiss:${GIT_TAG}
-    container_name: weiss
-    network_mode: "host"
-    environment:
-      - NODE_ENV=production
-    depends_on:
-      - weiss-pvapyws
+# services:
+#   weiss:
+#     build:
+#       context: "."
+#       target: prod
+#       args:
+#         GIT_REPO: ${GIT_REPO}
+#         APP_VERSION: ${APP_VERSION}
+#         PROD_PORT: ${PROD_PORT}
+#     image: weiss:${APP_VERSION}
+#     container_name: weiss
+#     network_mode: "host"
+#     environment:
+#       - NODE_ENV=production
+#     depends_on:
+#       - weiss-pvapyws
 
-  weiss-pvapyws:
-    build:
-      context: ./pvaPyWS
-    image: weiss-pvapyws:${GIT_TAG}
-    container_name: weiss-pvapyws
-    ports:
-      - "8080:8080"
-    restart: always
-    environment:
-      EPICS_DEFAULT_PROTOCOL: ${EPICS_DEFAULT_PROTOCOL}
-      EPICS_CA_ADDR_LIST: ${EPICS_CA_ADDR_LIST}
-      EPICS_PVA_ADDR_LIST: ${EPICS_PVA_ADDR_LIST}
+#   weiss-pvapyws:
+#     build:
+#       context: ./pvaPyWS
+#     image: weiss-pvapyws:${APP_VERSION}
+#     container_name: weiss-pvapyws
+#     ports:
+#       - "8080:8080"
+#     restart: always
+#     environment:
+#       EPICS_DEFAULT_PROTOCOL: ${EPICS_DEFAULT_PROTOCOL}
+#       EPICS_CA_ADDR_LIST: ${EPICS_CA_ADDR_LIST}
+#       EPICS_PVA_ADDR_LIST: ${EPICS_PVA_ADDR_LIST}

@@ -1,9 +1,8 @@
 import { TextUpdateComp } from "./TextUpdateComp";
-import { PROPERTY_SCHEMAS, COMMON_PROPS, TEXT_PROPS } from "../../../types/widgetProperties";
-import { COLORS } from "../../../constants/constants";
-import type { Widget } from "../../../types/widgets";
+import { PROPERTY_SCHEMAS, COMMON_PROPS, TEXT_PROPS } from "@src/types/widgetProperties";
+import { COLORS } from "@src/constants/constants";
+import type { Widget } from "@src/types/widgets";
 import TextsmsIcon from "@mui/icons-material/Textsms";
-import type { PVData } from "../../../types/pvaPyWS";
 
 export const TextUpdate: Widget = {
   id: "__TextUpdate__",
@@ -12,7 +11,6 @@ export const TextUpdate: Widget = {
   widgetIcon: TextsmsIcon,
   widgetLabel: "Text Update",
   category: "Monitoring",
-  pvData: {} as PVData,
   editableProperties: {
     ...COMMON_PROPS,
     ...TEXT_PROPS,

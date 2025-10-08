@@ -11,21 +11,25 @@ import Tooltip from "@mui/material/Tooltip";
 import ListSubheader from "@mui/material/ListSubheader";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
-import { useEditorContext } from "../../context/useEditorContext";
+import PushPinIcon from "@mui/icons-material/PushPin";
+import PushPinOutlinedIcon from "@mui/icons-material/PushPinOutlined";
+import { useEditorContext } from "@src/context/useEditorContext";
 import type {
   WidgetProperties,
   PropertyValue,
   PropertyKey,
   WidgetProperty,
   MultiWidgetPropertyUpdates,
-} from "../../types/widgets";
-import { PROPERTY_EDITOR_WIDTH, EDIT_MODE, FRONT_UI_ZIDX } from "../../constants/constants";
+} from "@src/types/widgets";
+import { PROPERTY_EDITOR_WIDTH, EDIT_MODE, FRONT_UI_ZIDX } from "@src/constants/constants";
 import TextFieldProperty from "./TextFieldProperty";
 import BooleanProperty from "./BooleanProperty";
 import ColorProperty from "./ColorProperty";
 import SelectProperty from "./SelectProperty";
-import { CATEGORY_DISPLAY_ORDER } from "../../types/widgetProperties";
-import PvListProperty from "./PVListProperty";
+import { CATEGORY_DISPLAY_ORDER } from "@src/types/widgetProperties";
+import StrListProperty from "./StrListProperty";
+import StrRecordProperty from "./StrRecordProperty";
+import ColorListProperty from "./ColorListProperty";
 
 const openedMixin = (theme: Theme): CSSObject => ({
   width: PROPERTY_EDITOR_WIDTH,
@@ -116,6 +120,7 @@ const getGroupedProperties = (properties: WidgetProperties) => {
  * - Supports all PropertySelectorType definitions.
  * - Updates multiple widgets at once when properties are edited in batch.
  * - Toggle button to open/close the editor manually.
+ * - Pin button to keep it open.
  *
  * @notes
  * - Only visible in EDIT_MODE.
@@ -123,11 +128,12 @@ const getGroupedProperties = (properties: WidgetProperties) => {
  * - Focus state is managed to coordinate with the editor context.
  */
 const PropertyEditor: React.FC = () => {
-  const { mode, selectedWidgetIDs, editingWidgets, batchWidgetUpdate, setPropertyEditorFocused } = useEditorContext();
+  const { mode, selectedWidgetIDs, editingWidgets, batchWidgetUpdate, setPropertyEditorFocused } =
+    useEditorContext();
   const isOnlyGridSelected = selectedWidgetIDs.length === 0;
   const singleWidget = editingWidgets.length === 1;
   const [open, setOpen] = useState(false);
-  const [manuallyOpened, setManuallyOpened] = useState(false);
+  const [pinned, setPinned] = useState(false);
   const [collapsedGroups, setCollapsedGroups] = useState<Record<string, boolean>>({});
   const properties: WidgetProperties = useMemo(() => {
     if (editingWidgets.length === 0) return {};
@@ -152,15 +158,15 @@ const PropertyEditor: React.FC = () => {
       setOpen(true);
       return;
     }
-    if (!manuallyOpened) setOpen(false);
-  }, [isOnlyGridSelected, manuallyOpened]);
+    if (!pinned) setOpen(false);
+  }, [pinned, isOnlyGridSelected]);
 
   const toggleDrawer = () => {
-    setOpen((prev) => {
-      const next = !prev;
-      setManuallyOpened(next);
-      return next;
-    });
+    setOpen((prev) => !prev);
+  };
+
+  const togglePin = () => {
+    setPinned((prev) => !prev);
   };
 
   const toggleGroup = (category: string) => {
@@ -170,7 +176,9 @@ const PropertyEditor: React.FC = () => {
     });
   };
 
-  const header = singleWidget ? `${editingWidgets[0].widgetLabel} properties` : "Common properties in selection";
+  const header = singleWidget
+    ? `${editingWidgets[0].widgetLabel} properties`
+    : "Common properties in selection";
   const groupedProperties = getGroupedProperties(properties);
 
   const handlePropChange = (propName: PropertyKey, newValue: PropertyValue) => {
@@ -221,12 +229,16 @@ const PropertyEditor: React.FC = () => {
                 case "text":
                 case "number":
                   return <TextFieldProperty key={propName} {...commonProps} selType={selType} />;
-                case "pvList":
-                  return <PvListProperty key={propName} {...commonProps} />;
+                case "strList":
+                  return <StrListProperty key={propName} {...commonProps} />;
+                case "strRecord":
+                  return <StrRecordProperty key={propName} {...commonProps} />;
                 case "boolean":
                   return <BooleanProperty key={propName} {...commonProps} />;
-                case "colorSelector":
+                case "colorSel":
                   return <ColorProperty key={propName} {...commonProps} />;
+                case "colorSelList":
+                  return <ColorListProperty key={propName} {...commonProps} />;
                 case "select":
                   return <SelectProperty key={propName} {...commonProps} options={options ?? []} />;
                 default:
@@ -252,16 +264,27 @@ const PropertyEditor: React.FC = () => {
         open={open}
         onFocus={() => setPropertyEditorFocused(true)}
         onBlur={() => setPropertyEditorFocused(false)}
-        slotProps={{ paper: { elevation: 8 } }}
         sx={{ zIndex: FRONT_UI_ZIDX + 1 }}
       >
         <Toolbar />
         <List sx={{ width: "100%" }}>
           <ListItem
             secondaryAction={
-              <IconButton edge="end" onClick={toggleDrawer} size="small">
-                <ChevronRightIcon />
-              </IconButton>
+              <>
+                <Tooltip title={pinned ? "Unpin" : "Pin"}>
+                  <IconButton edge="end" onClick={togglePin} size="small">
+                    {pinned ? <PushPinIcon /> : <PushPinOutlinedIcon />}
+                  </IconButton>
+                </Tooltip>
+                <IconButton
+                  edge="end"
+                  onClick={toggleDrawer}
+                  size="small"
+                  sx={{ display: pinned ? "none" : "auto" }}
+                >
+                  <ChevronRightIcon />
+                </IconButton>
+              </>
             }
           >
             <ListItemText primary={header} />

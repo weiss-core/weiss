@@ -1,8 +1,8 @@
 import * as React from "react";
-import { WIDGET_SELECTOR_WIDTH, EDIT_MODE } from "../../constants/constants";
-import type { Widget } from "../../types/widgets";
-import WidgetRegistry from "../WidgetRegistry/WidgetRegistry";
-import { useEditorContext } from "../../context/useEditorContext";
+import { WIDGET_SELECTOR_WIDTH, EDIT_MODE } from "@src/constants/constants";
+import type { Widget } from "@src/types/widgets";
+import WidgetRegistry from "@components/WidgetRegistry/WidgetRegistry";
+import { useEditorContext } from "@src/context/useEditorContext";
 import { styled } from "@mui/material/styles";
 import type { Theme, CSSObject } from "@mui/material/styles";
 import Box from "@mui/material/Box";
@@ -49,22 +49,22 @@ const DrawerHeader = styled("div")(({ theme }) => ({
   ...theme.mixins.toolbar,
 }));
 
-const Drawer = styled(DrawerBase, { shouldForwardProp: (prop) => prop !== "open" })<{ open: boolean }>(
-  ({ theme, open }) => ({
-    width: WIDGET_SELECTOR_WIDTH,
-    flexShrink: 0,
-    whiteSpace: "nowrap",
-    boxSizing: "border-box",
-    ...(open && {
-      ...openedMixin(theme),
-      "& .MuiDrawer-paper": openedMixin(theme),
-    }),
-    ...(!open && {
-      ...closedMixin(theme),
-      "& .MuiDrawer-paper": closedMixin(theme),
-    }),
-  })
-);
+const Drawer = styled(DrawerBase, { shouldForwardProp: (prop) => prop !== "open" })<{
+  open: boolean;
+}>(({ theme, open }) => ({
+  width: WIDGET_SELECTOR_WIDTH,
+  flexShrink: 0,
+  whiteSpace: "nowrap",
+  boxSizing: "border-box",
+  ...(open && {
+    ...openedMixin(theme),
+    "& .MuiDrawer-paper": openedMixin(theme),
+  }),
+  ...(!open && {
+    ...closedMixin(theme),
+    "& .MuiDrawer-paper": closedMixin(theme),
+  }),
+}));
 
 interface DraggableItemProps {
   item: Widget;
@@ -82,7 +82,7 @@ const DraggableItem: React.FC<DraggableItemProps> = ({ item, open }) => {
         <ListItemButton
           draggable
           onDragStart={handleDragStart}
-          sx={{ minHeight: 40, justifyContent: open ? "initial" : "center" }}
+          sx={{ minHeight: 30, justifyContent: open ? "initial" : "center" }}
         >
           <ListItemIcon
             sx={{
@@ -91,7 +91,7 @@ const DraggableItem: React.FC<DraggableItemProps> = ({ item, open }) => {
               alignItems: "center",
               justifyContent: "center",
               mr: open ? 2 : 0,
-              height: 40,
+              height: 30,
             }}
           >
             {item.widgetIcon ? <item.widgetIcon /> : <WidgetsIcon />}
@@ -119,8 +119,12 @@ const DraggableItem: React.FC<DraggableItemProps> = ({ item, open }) => {
 const WidgetSelector: React.FC = () => {
   const { mode, wdgSelectorOpen, setWdgSelectorOpen } = useEditorContext();
   const palette: Record<string, Widget> = React.useMemo(
-    () => Object.fromEntries(Object.values(WidgetRegistry).map((w) => [w.widgetName, w])) as Record<string, Widget>,
-    []
+    () =>
+      Object.fromEntries(Object.values(WidgetRegistry).map((w) => [w.widgetName, w])) as Record<
+        string,
+        Widget
+      >,
+    [],
   );
 
   const categories = React.useMemo(() => {

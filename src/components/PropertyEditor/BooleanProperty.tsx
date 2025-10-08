@@ -1,8 +1,8 @@
 // src/components/PropertyFields/BooleanProperty.tsx
 import React from "react";
 import { FormControlLabel, Checkbox, ListItem } from "@mui/material";
-import type { PropertyKey, PropertyValue } from "../../types/widgets"; // Adjust path as needed
-import { COLORS } from "../../constants/constants";
+import type { PropertyKey, PropertyValue } from "@src/types/widgets"; // Adjust path as needed
+import { COLORS } from "@src/constants/constants";
 
 interface BooleanPropertyProps {
   propName: PropertyKey;

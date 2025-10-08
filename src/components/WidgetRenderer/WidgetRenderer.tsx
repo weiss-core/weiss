@@ -1,9 +1,9 @@
 import React, { useEffect, type ReactNode } from "react";
-import WidgetRegistry from "../WidgetRegistry/WidgetRegistry";
-import { useEditorContext } from "../../context/useEditorContext";
-import type { MultiWidgetPropertyUpdates, Widget } from "../../types/widgets";
+import WidgetRegistry from "@components/WidgetRegistry/WidgetRegistry";
+import { useEditorContext } from "@src/context/useEditorContext";
+import type { MultiWidgetPropertyUpdates, Widget } from "@src/types/widgets";
 import { Rnd, type Position, type RndDragEvent, type DraggableData } from "react-rnd";
-import { EDIT_MODE, FRONT_UI_ZIDX } from "../../constants/constants";
+import { EDIT_MODE, FRONT_UI_ZIDX } from "@src/constants/constants";
 import "./WidgetRenderer.css";
 
 interface RendererProps {
@@ -21,39 +21,28 @@ interface RendererProps {
  * - Supporting multi-selection and group manipulation
  * - Dragging and resizing widgets with snapping to grid
  * - Updating widget properties in the editor context
- * - Handling keyboard events (e.g., Delete key for removal)
  *
  * @param scale Current zoom level of the grid
  * @param ensureGridCoordinate Function to snap items to grid (if snap activated)
  * @param setIsDragging Callback to indicate dragging state
  */
-const WidgetRenderer: React.FC<RendererProps> = ({ scale, ensureGridCoordinate, setIsDragging, isPanning }) => {
+const WidgetRenderer: React.FC<RendererProps> = ({
+  scale,
+  ensureGridCoordinate,
+  setIsDragging,
+  isPanning,
+}) => {
   const {
     mode,
     editorWidgets,
-    updateEditorWidgetList,
     updateWidgetProperties,
-    setSelectedWidgetIDs,
     batchWidgetUpdate,
     selectedWidgetIDs,
     selectedWidgets,
-    propertyEditorFocused,
     groupBounds,
   } = useEditorContext();
+
   const isMultipleSelect = selectedWidgetIDs.length > 1;
-
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (mode !== EDIT_MODE || propertyEditorFocused) return;
-      if (e.key === "Delete" && selectedWidgetIDs.length > 0) {
-        updateEditorWidgetList((prev) => prev.filter((w) => !selectedWidgetIDs.includes(w.id)));
-        setSelectedWidgetIDs([]);
-      }
-    };
-
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [mode, propertyEditorFocused, selectedWidgetIDs, updateEditorWidgetList, setSelectedWidgetIDs]);
 
   function renderWidget(widget: Widget): ReactNode {
     const Comp = WidgetRegistry[widget.widgetName]?.component;
@@ -73,7 +62,11 @@ const WidgetRenderer: React.FC<RendererProps> = ({ scale, ensureGridCoordinate, 
     setIsDragging(false);
     const newWidth = ensureGridCoordinate(parseInt(ref.style.width));
     const newHeight = ensureGridCoordinate(parseInt(ref.style.height));
-    if (w.editableProperties.width?.value == newWidth && w.editableProperties.height?.value == newHeight) return;
+    if (
+      w.editableProperties.width?.value == newWidth &&
+      w.editableProperties.height?.value == newHeight
+    )
+      return;
     const newX = ensureGridCoordinate(position.x);
     const newY = ensureGridCoordinate(position.y);
     updateWidgetProperties(w.id, { width: newWidth, height: newHeight, x: newX, y: newY });
@@ -150,7 +143,10 @@ const WidgetRenderer: React.FC<RendererProps> = ({ scale, ensureGridCoordinate, 
           onClick={(e: React.MouseEvent) => e.stopPropagation()}
           onResize={() => setIsDragging(true)}
           onResizeStop={(_e, _direction, ref) => handleGroupResizeStop(ref)}
-          style={{ outline: `${selectedWidgetIDs.length > 1 ? "1px dashed" : "none"}`, zIndex: FRONT_UI_ZIDX - 1 }}
+          style={{
+            outline: `${selectedWidgetIDs.length > 1 ? "1px dashed" : "none"}`,
+            zIndex: FRONT_UI_ZIDX - 1,
+          }}
         >
           {selectedWidgets.map((w) => {
             return (
@@ -195,7 +191,9 @@ const WidgetRenderer: React.FC<RendererProps> = ({ scale, ensureGridCoordinate, 
             onDragStop={(_e, d) => handleDragStop(_e, d, w)}
             onResizeStart={() => setIsDragging(true)}
             onClick={(e: React.MouseEvent) => e.stopPropagation()}
-            onResizeStop={(_e, _direction, ref, _delta, position) => handleResizeStop(ref, position, w)}
+            onResizeStop={(_e, _direction, ref, _delta, position) =>
+              handleResizeStop(ref, position, w)
+            }
           >
             {isInGroupBox ? null : renderWidget(w)}
           </Rnd>

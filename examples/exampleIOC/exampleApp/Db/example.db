@@ -9,19 +9,32 @@ record(calc, "test:seconds") {
 
 record(ao, "test:freq"){
   field(DESC, "sin frequency")
-  field(VAL, "0.1")
+  field(VAL, "0.5")
   field(DRVH, "1") # Limited freq due to 10Hz update on seconds
+  field(HOPR, "1")
   field(DRVL, "0")
+  field(LOPR, "0")
   field(EGU, "Hz")
 }
 
 record(ao, "test:ampl"){
   field(DESC, "sin amplitude")
-  field(VAL, "1")
+  field(VAL, "5000")
+  field(DRVH, "10000")
+  field(HOPR, "10000")
+  field(DRVL, "0")
+  field(LOPR, "0")
+}
+
+record(ai, "test:ampl-rb"){
+  field(DESC, "sin amplitude")
+  field(INP, "test:ampl CPP")
+  field(SCAN, ".1 second")
+  field(MDEL, "-1")
 }
 
 record(calc, "test:sin"){
-  field(DESC, "Sinus wave")
+  field(DESC, "Sine wave")
   field(INPA, "test:seconds CP")
   field(INPB, "test:ampl")
   field(INPC, "test:freq")
@@ -29,12 +42,32 @@ record(calc, "test:sin"){
   field(PREC, "3")
   field(VAL, "0")
   field(EGU, "V")
+  field(MDEL, "-1")
 }
 
 record(compress, "test:sinArr"){
-  field(DESC, "Sin array")
+  field(DESC, "Sine array")
   field(ALG, "Circular Buffer")
   field(INP, "test:sin CP")
+  field(NSAM, "80")
+}
+
+record(calc, "test:cos"){
+  field(DESC, "Cosine wave")
+  field(INPA, "test:seconds CP")
+  field(INPB, "test:ampl")
+  field(INPC, "test:freq")
+  field(CALC, "B*COS(2*PI*C*A)")
+  field(PREC, "3")
+  field(VAL, "0")
+  field(EGU, "V")
+  field(MDEL, "-1")
+}
+
+record(compress, "test:cosArr"){
+  field(DESC, "Cosine array")
+  field(ALG, "Circular Buffer")
+  field(INP, "test:cos CP")
   field(NSAM, "80")
 }
 
@@ -54,22 +87,13 @@ record(bi, "test:bi") {
 
 record(ao, "test:ao") {
   field(DESC, "Analog output")
-  field(PREC, "3")
   field(OUT, "test:ai PP")
 }
 
 record(ai, "test:ai") {
   field(DESC, "Analog input")
-  field(PREC, "3")
-  field(VAL, "5")
-  field(HIHI, "10")
-  field(HIGH, "7")
-  field(LOW, "3")
-  field(LOLO, "0")
-  field(HHSV, "MAJOR")
-  field(HSV, "MINOR")
-  field(LSV, "MINOR")
-  field(LLSV, "MAJOR")
+  field(VAL, "0")
+  field(PINI, "YES")
 }
 
 record(stringout, "test:strout") {

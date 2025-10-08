@@ -1,5 +1,5 @@
-import * as Widgets from "../../components/Widgets";
-import type { Widget } from "../../types/widgets";
+import * as Widgets from "@components/Widgets";
+import type { Widget } from "@src/types/widgets";
 
 /**
  * WidgetRegistry is a centralized mapping of widget names to their corresponding widget definitions.
