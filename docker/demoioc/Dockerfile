@@ -1,11 +1,11 @@
 FROM weiss-base-env AS source_fetch
 
 ARG GIT_REPO=https://github.com/AndreFavotto/weiss.git
-ARG GIT_TAG=main
+ARG APP_VERSION=main
 
 RUN git clone ${GIT_REPO} /app && \
     cd /app && \
-    git checkout ${GIT_TAG}
+    git checkout ${APP_VERSION}
 
 FROM weiss-base-env AS demoioc
 

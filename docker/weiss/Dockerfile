@@ -1,7 +1,7 @@
 FROM alpine/git:latest AS source_fetch
 ARG GIT_REPO=https://github.com/AndreFavotto/weiss.git
-ARG GIT_TAG=main
-RUN git clone --recursive ${GIT_REPO} /app && cd /app && git checkout ${GIT_TAG}
+ARG APP_VERSION=main
+RUN git clone --recursive ${GIT_REPO} /app && cd /app && git checkout ${APP_VERSION}
 
 # Dev environment
 FROM node:20-alpine AS dev

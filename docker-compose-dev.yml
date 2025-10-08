@@ -45,7 +45,7 @@ services:
       dockerfile: docker/demoioc/Dockerfile
       args:
         GIT_REPO: ${GIT_REPO:-https://github.com/AndreFavotto/weiss.git}
-        GIT_TAG: ${GIT_TAG:-main}
+        APP_VERSION: ${APP_VERSION:-main}
     restart: always
     network_mode: host
     tty: true
@@ -80,11 +80,11 @@ services:
       target: dev
       args:
         GIT_REPO: ${GIT_REPO:-https://github.com/AndreFavotto/weiss.git}
-        GIT_TAG: ${GIT_TAG:-main}
+        APP_VERSION: ${APP_VERSION:-main}
     volumes:
       - .:/app
       - /app/node_modules # Prevent host node_modules from interfering
-    image: weiss-dev:${GIT_TAG}
+    image: weiss-dev:${APP_VERSION}
     container_name: weiss-dev
     restart: always
     ports:

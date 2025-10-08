@@ -5,9 +5,9 @@
 #       target: prod
 #       args:
 #         GIT_REPO: ${GIT_REPO}
-#         GIT_TAG: ${GIT_TAG}
+#         APP_VERSION: ${APP_VERSION}
 #         PROD_PORT: ${PROD_PORT}
-#     image: weiss:${GIT_TAG}
+#     image: weiss:${APP_VERSION}
 #     container_name: weiss
 #     network_mode: "host"
 #     environment:
@@ -18,7 +18,7 @@
 #   weiss-pvapyws:
 #     build:
 #       context: ./pvaPyWS
-#     image: weiss-pvapyws:${GIT_TAG}
+#     image: weiss-pvapyws:${APP_VERSION}
 #     container_name: weiss-pvapyws
 #     ports:
 #       - "8080:8080"
