@@ -11,6 +11,7 @@ import type {
 import { GridZone } from "@components/GridZone";
 import { GRID_ID, MAX_HISTORY } from "@src/constants/constants";
 import WidgetRegistry from "@components/WidgetRegistry/WidgetRegistry";
+import { v4 as uuidv4 } from "uuid";
 
 /**
  * Deep clone a list of widgets.
@@ -489,7 +490,7 @@ export function useWidgetManager() {
 
       const newWidgets = clipboard.current.map((w) => {
         const clone = deepCloneWidget(w);
-        const id = `${w.widgetName}-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+        const id = `${w.widgetName}-${uuidv4()}`;
         return {
           ...clone,
           id,

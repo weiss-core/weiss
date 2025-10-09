@@ -8,6 +8,7 @@ import ContextMenu from "@components/ContextMenu/ContextMenu";
 import "./GridZone.css";
 import WidgetRenderer from "@components/WidgetRenderer/WidgetRenderer.tsx";
 import ToolbarButtons from "@components/Toolbar/Toolbar.tsx";
+import { v4 as uuidv4 } from "uuid";
 
 /**
  * GridZoneComp renders the main editor canvas where widgets are displayed, moved, and interacted with.
@@ -130,7 +131,7 @@ const GridZoneComp: React.FC<WidgetUpdate> = ({ data }) => {
     if (editableProperties.y) editableProperties.y.value = ensureGridCoordinate(userY);
 
     const newWidget: Widget = {
-      id: `${entry.widgetName}-${Date.now()}`,
+      id: `${entry.widgetName}-${uuidv4()}`,
       widgetLabel: droppedComp.widgetLabel,
       component: droppedComp.component,
       widgetName: droppedComp.widgetName,
