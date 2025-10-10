@@ -26,7 +26,7 @@ export default function useUIManager(
 ) {
   const [propertyEditorFocused, setPropertyEditorFocused] = useState(false);
   const [wdgSelectorOpen, setWdgSelectorOpen] = useState(false);
-  const [pickedWidget, setPickedWidget] = useState<Widget>({} as Widget);
+  const [pickedWidget, setPickedWidget] = useState<Widget | null>(null);
   const [mode, setMode] = useState<Mode>(EDIT_MODE);
   const loadedRef = useRef(false);
 

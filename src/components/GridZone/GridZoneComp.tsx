@@ -244,7 +244,15 @@ const GridZoneComp: React.FC<WidgetUpdate> = ({ data }) => {
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (propertyEditorFocused || !inEditMode) return;
+      if (propertyEditorFocused) return;
+      // centering should work in any mode
+      if (e.shiftKey && e.key.toLowerCase() === "c") {
+        e.preventDefault();
+        centerScreen();
+        return;
+      }
+      if (!inEditMode) return;
+      // shortcuts for edit mode only
       if (e.key.toLowerCase() === "delete" && selectedWidgetIDs.length > 0) {
         e.preventDefault();
         updateEditorWidgetList((prev) => prev.filter((w) => !selectedWidgetIDs.includes(w.id)));
@@ -277,11 +285,6 @@ const GridZoneComp: React.FC<WidgetUpdate> = ({ data }) => {
       if (e.ctrlKey && e.key.toLowerCase() === "a") {
         e.preventDefault();
         setSelectedWidgetIDs(allWidgetIDs);
-        return;
-      }
-      if (e.shiftKey && e.key.toLowerCase() === "c") {
-        e.preventDefault();
-        centerScreen();
         return;
       }
     };
