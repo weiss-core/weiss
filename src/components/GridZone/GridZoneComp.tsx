@@ -98,9 +98,14 @@ const GridZoneComp: React.FC<WidgetUpdate> = ({ data }) => {
   }, [shouldCenterPan, zoom, mode]);
 
   useEffect(() => {
-    const handleClick = () => setContextMenuVisible(false);
-    window.addEventListener("click", handleClick);
-    return () => window.removeEventListener("click", handleClick);
+    const handleCtrlZoom = (e: WheelEvent) => {
+      // disable standard zoom/pinch
+      if (e.ctrlKey) e.preventDefault();
+    };
+    window.addEventListener("wheel", handleCtrlZoom, { passive: false });
+    return () => {
+      window.removeEventListener("wheel", handleCtrlZoom);
+    };
   }, []);
 
   const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
@@ -188,15 +193,17 @@ const GridZoneComp: React.FC<WidgetUpdate> = ({ data }) => {
     }
   };
 
+  const handleMouseUp = (e: React.MouseEvent) => {
+    if (e.button === 1 && !isPanning) {
+      centerScreen();
+    }
+    gridGrabbed.current = false;
+    setIsPanning(false);
+  };
+
   const handleClick = (_e: React.MouseEvent) => {
     setContextMenuVisible(false);
     setSelectedWidgetIDs([]);
-  };
-
-  const handleAuxClick = (e: React.MouseEvent) => {
-    if (e.button !== 1) return;
-    if (!isPanning) centerScreen();
-    setIsPanning(false);
   };
 
   const handleContextMenu = (e: React.MouseEvent) => {
@@ -229,23 +236,16 @@ const GridZoneComp: React.FC<WidgetUpdate> = ({ data }) => {
         setPan((prev) => ({ x: prev.x + dx, y: prev.y + dy }));
       }
     };
-
-    const handleMouseUp = () => {
-      gridGrabbed.current = false;
-    };
-
     window.addEventListener("mousemove", handleMouseMove);
-    window.addEventListener("mouseup", handleMouseUp);
     return () => {
       window.removeEventListener("mousemove", handleMouseMove);
-      window.removeEventListener("mouseup", handleMouseUp);
     };
   }, [gridGrabbed, isPanning, setIsPanning, ensureGridCoordinate, pan, zoom, mode]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (propertyEditorFocused) return;
-      // centering should work in any mode
+      // shortcuts for all modes
       if (e.shiftKey && e.key.toLowerCase() === "c") {
         e.preventDefault();
         centerScreen();
@@ -253,6 +253,11 @@ const GridZoneComp: React.FC<WidgetUpdate> = ({ data }) => {
       }
       if (!inEditMode) return;
       // shortcuts for edit mode only
+      if (e.ctrlKey && e.key.toLowerCase() === "s") {
+        e.preventDefault();
+        downloadWidgets();
+        return;
+      }
       if (e.key.toLowerCase() === "delete" && selectedWidgetIDs.length > 0) {
         e.preventDefault();
         deleteWidget();
@@ -310,8 +315,8 @@ const GridZoneComp: React.FC<WidgetUpdate> = ({ data }) => {
       onContextMenu={handleContextMenu}
       onWheel={handleWheel}
       onMouseDown={handleMouseDown}
+      onMouseUp={handleMouseUp}
       onClick={handleClick}
-      onAuxClick={handleAuxClick}
       style={{
         cursor: gridGrabbed.current ? "grabbing" : "default",
         backgroundColor: props.backgroundColor?.value,
