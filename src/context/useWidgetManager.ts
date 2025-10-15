@@ -13,6 +13,18 @@ import { GRID_ID, MAX_HISTORY } from "@src/constants/constants";
 import WidgetRegistry from "@components/WidgetRegistry/WidgetRegistry";
 import { v4 as uuidv4 } from "uuid";
 
+interface WidgetGroup {
+  id: string;
+  widgetIds: string[];
+}
+
+type WidgetGroups = Record<string, WidgetGroup>;
+export interface DOMRectLike {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
 /**
  * Deep clone a list of widgets.
  * @param widgets Array of widgets to clone
@@ -52,8 +64,11 @@ export function useWidgetManager() {
   const [redoStack, setRedoStack] = useState<Widget[][]>([]);
   const [editorWidgets, setEditorWidgets] = useState<Widget[]>([GridZone]);
   const [selectedWidgetIDs, setSelectedWidgetIDs] = useState<string[]>([]);
+  const [widgetGroups, setWidgetGroups] = useState<
+    Record<string, { id: string; widgetIds: string[] }>
+  >({});
   const clipboard = useRef<Widget[]>([]);
-  const copiedGroupBounds = useRef({ x: 0, y: 0, width: 0, height: 0 });
+  const copiedSelectionBounds = useRef({ x: 0, y: 0, width: 0, height: 0 });
   const allWidgetIDs = useMemo(
     () => editorWidgets.map((w) => w.id).filter((id) => id !== GRID_ID),
     [editorWidgets]
@@ -70,27 +85,25 @@ export function useWidgetManager() {
       : [editorWidgets.find((w) => w.id === GRID_ID) ?? editorWidgets[0]];
   }, [selectedWidgets, editorWidgets]);
 
-  const groupBounds = useMemo(() => {
-    if (selectedWidgets.length === 0) return null;
-    const left = Math.min(...selectedWidgets.map((w) => w.editableProperties.x!.value));
-    const top = Math.min(...selectedWidgets.map((w) => w.editableProperties.y!.value));
-    const right = Math.max(
-      ...selectedWidgets.map(
-        (w) => w.editableProperties.x!.value + w.editableProperties.width!.value
-      )
-    );
-    const bottom = Math.max(
-      ...selectedWidgets.map(
-        (w) => w.editableProperties.y!.value + w.editableProperties.height!.value
-      )
-    );
-    return {
-      x: left,
-      y: top,
-      width: right - left,
-      height: bottom - top,
-    };
-  }, [selectedWidgets]);
+  function computeGroupBounds(widgetIds: string[]): DOMRectLike | null {
+    const widgets = editorWidgets.filter((w) => widgetIds.includes(w.id));
+    if (!widgets.length) return null;
+
+    const xs = widgets.map((w) => w.editableProperties.x!.value);
+    const ys = widgets.map((w) => w.editableProperties.y!.value);
+    const ws = widgets.map((w) => w.editableProperties.width!.value);
+    const hs = widgets.map((w) => w.editableProperties.height!.value);
+    const minX = Math.min(...xs);
+    const minY = Math.min(...ys);
+    const maxX = Math.max(...xs.map((x, i) => x + ws[i]));
+    const maxY = Math.max(...ys.map((y, i) => y + hs[i]));
+    return { x: minX, y: minY, width: maxX - minX, height: maxY - minY };
+  }
+
+  const selectionBounds = useMemo(
+    () => computeGroupBounds(selectedWidgetIDs),
+    [selectedWidgetIDs, editorWidgets]
+  );
 
   /**
    * Update the full widget list.
@@ -165,6 +178,63 @@ export function useWidgetManager() {
   const addWidget = (newWidget: Widget) => {
     updateEditorWidgetList((prev) => [...prev, newWidget]);
   };
+
+  /**
+   * Delete currently selected widgets.
+   */
+  const deleteWidget = useCallback(() => {
+    updateEditorWidgetList((prev) => prev.filter((w) => !selectedWidgetIDs.includes(w.id)));
+    setSelectedWidgetIDs([]);
+  }, [selectedWidgetIDs]);
+
+  function createGroup(widgetIds: string[]): string {
+    const id = uuidv4();
+    setWidgetGroups((prev) => ({
+      ...prev,
+      [id]: { id, widgetIds },
+    }));
+    return id;
+  }
+
+  function deleteGroup(id: string) {
+    setWidgetGroups((prev) => {
+      const next = { ...prev };
+      delete next[id];
+      return next;
+    });
+  }
+
+  function addToGroup(groupId: string, widgetIds: string[]) {
+    setWidgetGroups((prev) => ({
+      ...prev,
+      [groupId]: {
+        ...prev[groupId],
+        widgetIds: Array.from(new Set([...prev[groupId].widgetIds, ...widgetIds])),
+      },
+    }));
+  }
+
+  function removeFromGroup(groupId: string, widgetIds: string[]) {
+    setWidgetGroups((prev) => ({
+      ...prev,
+      [groupId]: {
+        ...prev[groupId],
+        widgetIds: prev[groupId].widgetIds.filter((id) => !widgetIds.includes(id)),
+      },
+    }));
+  }
+
+  function groupSelected() {
+    if (selectedWidgetIDs.length < 2) return;
+    createGroup(selectedWidgetIDs);
+  }
+
+  function ungroupSelected() {
+    const groupsToRemove = Object.values(widgetGroups).filter((g) =>
+      g.widgetIds.some((id) => selectedWidgetIDs.includes(id))
+    );
+    groupsToRemove.forEach((g) => deleteGroup(g.id));
+  }
 
   /**
    * Update properties of a single widget.
@@ -454,28 +524,20 @@ export function useWidgetManager() {
   }, [editorWidgets, redoStack]);
 
   /**
-   * Delete currently selected widgets.
-   */
-  const deleteWidget = useCallback(() => {
-    updateEditorWidgetList((prev) => prev.filter((w) => !selectedWidgetIDs.includes(w.id)));
-    setSelectedWidgetIDs([]);
-  }, [selectedWidgetIDs]);
-
-  /**
    * Copy currently selected widgets to clipboard.
    * @note the widget clipboard is managed internally. The actual system clipboard is not used here.
    */
   const copyWidget = useCallback(() => {
     if (selectedWidgets.length === 0) return;
-    if (selectedWidgets.length > 1 && groupBounds) {
-      copiedGroupBounds.current = groupBounds;
+    if (selectedWidgets.length > 1 && selectionBounds) {
+      copiedSelectionBounds.current = selectionBounds;
     }
     clipboard.current = selectedWidgets
       .filter((w) => w !== undefined)
       .map((w) => {
         return deepCloneWidget(w);
       });
-  }, [selectedWidgets, groupBounds]);
+  }, [selectedWidgets, selectionBounds]);
 
   /**
    * Paste widgets from clipboard at a specified grid position.
@@ -487,10 +549,10 @@ export function useWidgetManager() {
 
       const pastingGroup = clipboard.current.length > 1;
       const baseX = pastingGroup
-        ? copiedGroupBounds.current.x
+        ? copiedSelectionBounds.current.x
         : clipboard.current[0].editableProperties.x!.value;
       const baseY = pastingGroup
-        ? copiedGroupBounds.current.y
+        ? copiedSelectionBounds.current.y
         : clipboard.current[0].editableProperties.y!.value;
 
       const dx = pos.x - baseX;
@@ -517,7 +579,7 @@ export function useWidgetManager() {
       updateEditorWidgetList((prev) => [...prev, ...newWidgets]);
       setSelectedWidgetIDs(newWidgets.map((w) => w.id));
     },
-    [updateEditorWidgetList, copiedGroupBounds]
+    [updateEditorWidgetList, copiedSelectionBounds]
   );
 
   /**
@@ -665,7 +727,7 @@ export function useWidgetManager() {
     setEditorWidgets,
     selectedWidgetIDs,
     editingWidgets,
-    groupBounds,
+    selectionBounds,
     undoStack,
     redoStack,
     setSelectedWidgetIDs,
@@ -675,6 +737,15 @@ export function useWidgetManager() {
     getWidget,
     addWidget,
     deleteWidget,
+    createGroup,
+    deleteGroup,
+    addToGroup,
+    removeFromGroup,
+    widgetGroups,
+    setWidgetGroups,
+    computeGroupBounds,
+    groupSelected,
+    ungroupSelected,
     copyWidget,
     pasteWidget,
     updateWidgetProperties,

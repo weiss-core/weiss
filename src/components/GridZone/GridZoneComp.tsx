@@ -42,6 +42,8 @@ const GridZoneComp: React.FC<WidgetUpdate> = ({ data }) => {
     propertyEditorFocused,
     allWidgetIDs,
     pickedWidget,
+    groupSelected,
+    ungroupSelected,
   } = useEditorContext();
 
   const gridRef = useRef<HTMLDivElement>(null);
@@ -291,6 +293,19 @@ const GridZoneComp: React.FC<WidgetUpdate> = ({ data }) => {
         setSelectedWidgetIDs(allWidgetIDs);
         return;
       }
+      if (e.ctrlKey && e.key.toLowerCase() === "g" && !e.shiftKey) {
+        e.preventDefault();
+        groupSelected();
+        return;
+      }
+      if (
+        (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === "g") ||
+        (e.ctrlKey && e.key.toLowerCase() === "u")
+      ) {
+        e.preventDefault();
+        ungroupSelected();
+        return;
+      }
     };
 
     window.addEventListener("keydown", handleKeyDown);
@@ -361,7 +376,7 @@ const GridZoneComp: React.FC<WidgetUpdate> = ({ data }) => {
           isPanning={isPanning}
         />
       </div>
-      {!disableSelecto && (
+      {/* {!disableSelecto && (
         <Selecto
           ref={selectoRef}
           container={document.getElementById("gridContainer")}
@@ -390,7 +405,7 @@ const GridZoneComp: React.FC<WidgetUpdate> = ({ data }) => {
             }
           }}
         />
-      )}
+      )} */}
       <ToolbarButtons
         onMouseEnter={() => setMouseOverMenu(true)}
         onMouseLeave={() => setMouseOverMenu(false)}
