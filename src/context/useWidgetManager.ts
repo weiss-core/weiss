@@ -454,6 +454,14 @@ export function useWidgetManager() {
   }, [editorWidgets, redoStack]);
 
   /**
+   * Delete currently selected widgets.
+   */
+  const deleteWidget = useCallback(() => {
+    updateEditorWidgetList((prev) => prev.filter((w) => !selectedWidgetIDs.includes(w.id)));
+    setSelectedWidgetIDs([]);
+  }, [selectedWidgetIDs]);
+
+  /**
    * Copy currently selected widgets to clipboard.
    * @note the widget clipboard is managed internally. The actual system clipboard is not used here.
    */
@@ -666,6 +674,7 @@ export function useWidgetManager() {
     batchWidgetUpdate,
     getWidget,
     addWidget,
+    deleteWidget,
     copyWidget,
     pasteWidget,
     updateWidgetProperties,

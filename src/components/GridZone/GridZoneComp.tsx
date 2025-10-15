@@ -38,9 +38,9 @@ const GridZoneComp: React.FC<WidgetUpdate> = ({ data }) => {
     copyWidget,
     pasteWidget,
     downloadWidgets,
+    deleteWidget,
     propertyEditorFocused,
     allWidgetIDs,
-    updateEditorWidgetList,
     pickedWidget,
   } = useEditorContext();
 
@@ -255,8 +255,7 @@ const GridZoneComp: React.FC<WidgetUpdate> = ({ data }) => {
       // shortcuts for edit mode only
       if (e.key.toLowerCase() === "delete" && selectedWidgetIDs.length > 0) {
         e.preventDefault();
-        updateEditorWidgetList((prev) => prev.filter((w) => !selectedWidgetIDs.includes(w.id)));
-        setSelectedWidgetIDs([]);
+        deleteWidget();
         return;
       }
       if (e.ctrlKey && e.key.toLowerCase() === "z" && !e.shiftKey) {

@@ -14,6 +14,7 @@ import FlipToBack from "@mui/icons-material/FlipToBack";
 import AlignVerticalCenter from "@mui/icons-material/AlignVerticalCenter";
 import AlignHorizontalCenter from "@mui/icons-material/AlignHorizontalCenter";
 import DragIndicator from "@mui/icons-material/DragIndicator";
+import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import { EDIT_MODE } from "@src/constants/constants";
 import { Rnd } from "react-rnd";
 import { grey } from "@mui/material/colors";
@@ -40,6 +41,7 @@ const ToolbarButtons: React.FC<ToolBarProps> = ({ onMouseEnter, onMouseLeave }) 
     alignLeft,
     alignRight,
     alignVerticalCenter,
+    deleteWidget,
   } = useEditorContext();
 
   if (mode !== EDIT_MODE) return null;
@@ -59,7 +61,7 @@ const ToolbarButtons: React.FC<ToolBarProps> = ({ onMouseEnter, onMouseLeave }) 
   return (
     <Rnd
       className="toolBar"
-      default={{ x: 80, y: 15, width: 350, height: 40 }}
+      default={{ x: 80, y: 15, width: 370, height: 40 }}
       bounds="window"
       enableResizing={false}
       dragHandleClassName="dragHandle"
@@ -168,6 +170,14 @@ const ToolbarButtons: React.FC<ToolBarProps> = ({ onMouseEnter, onMouseLeave }) 
               sx={iconSx}
             >
               <AlignHorizontalCenter fontSize="small" />
+            </IconButton>
+          </span>
+        </Tooltip>
+
+        <Tooltip title="Delete widget">
+          <span>
+            <IconButton size="small" onClick={deleteWidget} disabled={noneSelected} sx={iconSx}>
+              <DeleteOutlineIcon fontSize="small" />
             </IconButton>
           </span>
         </Tooltip>
