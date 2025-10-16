@@ -94,6 +94,7 @@ export default function useUIManager(
           (widget) =>
             ({
               id: widget.id,
+              groupId: widget.groupId,
               widgetName: widget.widgetName,
               properties: Object.fromEntries(
                 Object.entries(widget.editableProperties).map(([key, def]) => [key, def.value])

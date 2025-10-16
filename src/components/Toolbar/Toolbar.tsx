@@ -70,7 +70,12 @@ const ToolbarButtons: React.FC<ToolBarProps> = ({ onMouseEnter, onMouseLeave }) 
       enableResizing={false}
       dragHandleClassName="dragHandle"
     >
-      <Box className="toolbarBox" onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave}>
+      <Box
+        className="toolbarBox"
+        onMouseEnter={onMouseEnter}
+        onMouseLeave={onMouseLeave}
+        onClick={(e) => e.stopPropagation()}
+      >
         <Box
           className="dragHandle"
           sx={{ cursor: "move", px: 1, display: "flex", alignItems: "center" }}

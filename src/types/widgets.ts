@@ -100,6 +100,7 @@ export interface Widget {
   id: string;
   widgetLabel: string;
   widgetIcon?: WidgetIconType;
+  groupId?: string;
   widgetName: string;
   component: React.FC<WidgetUpdate>;
   category: string;
@@ -114,6 +115,7 @@ export interface Widget {
  */
 export interface ExportedWidget {
   id: string;
+  groupId?: string;
   widgetName: string;
   properties: Partial<Record<PropertyKey, PropertyValue>>;
 }

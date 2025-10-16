@@ -12,13 +12,6 @@ import { GridZone } from "@components/GridZone";
 import { GRID_ID, MAX_HISTORY } from "@src/constants/constants";
 import WidgetRegistry from "@components/WidgetRegistry/WidgetRegistry";
 import { v4 as uuidv4 } from "uuid";
-
-interface WidgetGroup {
-  id: string;
-  widgetIds: string[];
-}
-
-type WidgetGroups = Record<string, WidgetGroup>;
 export interface DOMRectLike {
   x: number;
   y: number;
@@ -187,41 +180,30 @@ export function useWidgetManager() {
     setSelectedWidgetIDs([]);
   }, [selectedWidgetIDs]);
 
-  function createGroup(widgetIds: string[]): string {
+  function createGroup(widgetIds: string[]) {
     const id = uuidv4();
-    setWidgetGroups((prev) => ({
-      ...prev,
-      [id]: { id, widgetIds },
-    }));
+    setEditorWidgets((prev) =>
+      prev.map((w) => (widgetIds.includes(w.id) ? { ...w, groupId: id } : w))
+    );
     return id;
   }
 
-  function deleteGroup(id: string) {
-    setWidgetGroups((prev) => {
-      const next = { ...prev };
-      delete next[id];
-      return next;
-    });
+  function deleteGroup(groupId: string) {
+    setEditorWidgets((prev) =>
+      prev.map((w) => (w.groupId === groupId ? { ...w, groupId: undefined } : w))
+    );
   }
 
   function addToGroup(groupId: string, widgetIds: string[]) {
-    setWidgetGroups((prev) => ({
-      ...prev,
-      [groupId]: {
-        ...prev[groupId],
-        widgetIds: Array.from(new Set([...prev[groupId].widgetIds, ...widgetIds])),
-      },
-    }));
+    setEditorWidgets((prev) => prev.map((w) => (widgetIds.includes(w.id) ? { ...w, groupId } : w)));
   }
 
   function removeFromGroup(groupId: string, widgetIds: string[]) {
-    setWidgetGroups((prev) => ({
-      ...prev,
-      [groupId]: {
-        ...prev[groupId],
-        widgetIds: prev[groupId].widgetIds.filter((id) => !widgetIds.includes(id)),
-      },
-    }));
+    setEditorWidgets((prev) =>
+      prev.map((w) =>
+        w.groupId === groupId && widgetIds.includes(w.id) ? { ...w, groupId: undefined } : w
+      )
+    );
   }
 
   function groupSelected() {
@@ -230,12 +212,12 @@ export function useWidgetManager() {
   }
 
   function ungroupSelected() {
-    const groupsToRemove = Object.values(widgetGroups).filter((g) =>
-      g.widgetIds.some((id) => selectedWidgetIDs.includes(id))
-    );
-    groupsToRemove.forEach((g) => deleteGroup(g.id));
+    const groupedIds = editorWidgets
+      .filter((w) => selectedWidgetIDs.includes(w.id) && w.groupId)
+      .map((w) => w.groupId!);
+    const uniqueGroupIds = Array.from(new Set(groupedIds));
+    uniqueGroupIds.forEach((gid) => deleteGroup(gid));
   }
-
   /**
    * Update properties of a single widget.
    * @param id Widget ID
@@ -591,6 +573,7 @@ export function useWidgetManager() {
       (widget) =>
         ({
           id: widget.id,
+          groupId: widget.groupId,
           widgetName: widget.widgetName,
           properties: Object.fromEntries(
             Object.entries(widget.editableProperties).map(([key, def]) => [key, def.value])
@@ -677,6 +660,7 @@ export function useWidgetManager() {
 
             const instance = deepCloneWidget(baseWdg);
             instance.id = raw.id;
+            instance.groupId = raw.groupId;
 
             // overlay values from the file
             for (const [key, val] of Object.entries(raw.properties ?? {})) {
