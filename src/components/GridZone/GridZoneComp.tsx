@@ -3,7 +3,6 @@ import type { GridPosition, Widget, WidgetUpdate } from "@src/types/widgets";
 import WidgetRegistry from "@components/WidgetRegistry/WidgetRegistry";
 import { useEditorContext } from "@src/context/useEditorContext.tsx";
 import { EDIT_MODE, MAX_ZOOM, MIN_ZOOM, RUNTIME_MODE } from "@src/constants/constants.ts";
-import Selecto from "react-selecto";
 import ContextMenu from "@components/ContextMenu/ContextMenu";
 import "./GridZone.css";
 import WidgetRenderer from "@components/WidgetRenderer/WidgetRenderer.tsx";
@@ -49,7 +48,6 @@ const GridZoneComp: React.FC<WidgetUpdate> = ({ data }) => {
   const gridRef = useRef<HTMLDivElement>(null);
   const lastPosRef = useRef<GridPosition>({ x: 0, y: 0 });
   const mousePosRef = useRef<GridPosition>({ x: 0, y: 0 });
-  const selectoRef = useRef<Selecto>(null);
   const gridGrabbed = useRef(false);
 
   const [zoom, setZoom] = useState(1);
@@ -65,7 +63,6 @@ const GridZoneComp: React.FC<WidgetUpdate> = ({ data }) => {
     x: number;
     y: number;
   } | null>(null);
-  const disableSelecto = mouseOverMenu || isDragging || gridGrabbed.current || mode == RUNTIME_MODE;
   const gridSize = props.gridSize!.value;
   const snapToGrid = props.snapToGrid?.value;
   const gridLineVisible = props.gridLineVisible?.value;
@@ -376,36 +373,6 @@ const GridZoneComp: React.FC<WidgetUpdate> = ({ data }) => {
           isPanning={isPanning}
         />
       </div>
-      {/* {!disableSelecto && (
-        <Selecto
-          ref={selectoRef}
-          container={document.getElementById("gridContainer")}
-          rootContainer={document.getElementById("gridContainer")}
-          selectableTargets={[".selectable"]}
-          hitRate={100}
-          selectByClick
-          preventDragFromInside
-          preventRightClick={false}
-          preventClickEventOnDragStart
-          preventClickEventOnDrag
-          toggleContinueSelect={["ctrl"]}
-          onSelectEnd={(e) => {
-            if (e.selected.length == 0) {
-              setContextMenuVisible(false);
-            }
-            if (selectedWidgetIDs.length > 1 && e.inputEvent.button == 2) {
-              return;
-            }
-            if (e.added.length === 0 && e.removed.length === 0) {
-              selectoRef.current?.setSelectedTargets([]);
-              setSelectedWidgetIDs([]);
-            } else {
-              const selectedIDs = e.selected.map((el) => el.id);
-              setSelectedWidgetIDs(selectedIDs);
-            }
-          }}
-        />
-      )} */}
       <ToolbarButtons
         onMouseEnter={() => setMouseOverMenu(true)}
         onMouseLeave={() => setMouseOverMenu(false)}
