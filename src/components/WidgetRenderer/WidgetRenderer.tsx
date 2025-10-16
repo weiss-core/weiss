@@ -173,13 +173,19 @@ const WidgetRenderer: React.FC<RendererProps> = ({
     batchWidgetUpdate(updates);
   };
 
-  const handleWidgetClick = (e: React.MouseEvent, w: Widget) => {
+  const handleWidgetRightClick = (e: React.MouseEvent, w: Widget) => {
+    if (mode !== EDIT_MODE) return;
     e.stopPropagation();
     if (e.ctrlKey) {
       setSelectedWidgetIDs((prev) => [...prev, w.id]);
     } else {
       setSelectedWidgetIDs([w.id]);
     }
+  };
+
+  const handleWidgetLeftClick = (_e: React.MouseEvent, w: Widget) => {
+    if (mode !== EDIT_MODE) return;
+    setSelectedWidgetIDs([w.id]);
   };
 
   return (
@@ -211,7 +217,8 @@ const WidgetRenderer: React.FC<RendererProps> = ({
               <div
                 key={w.id}
                 className="selectable selected"
-                onClick={(e) => handleWidgetClick(e, w)}
+                onClick={(e) => handleWidgetRightClick(e, w)}
+                onContextMenu={(e) => handleWidgetLeftClick(e, w)}
                 style={{
                   width: w.editableProperties.width!.value,
                   height: w.editableProperties.height!.value,
@@ -269,7 +276,8 @@ const WidgetRenderer: React.FC<RendererProps> = ({
                   left: w.editableProperties.x!.value - bounds.x,
                   top: w.editableProperties.y!.value - bounds.y,
                 }}
-                onClick={(e) => handleWidgetClick(e, w)}
+                onClick={(e) => handleWidgetRightClick(e, w)}
+                onContextMenu={(e) => handleWidgetLeftClick(e, w)}
               >
                 {renderWidget(w)}
               </div>
@@ -301,7 +309,8 @@ const WidgetRenderer: React.FC<RendererProps> = ({
             onDrag={() => setIsDragging(true)}
             onDragStop={(_e, d) => handleDragStop(_e, d, w)}
             onResizeStart={() => setIsDragging(true)}
-            onClick={(e: React.MouseEvent) => handleWidgetClick(e, w)}
+            onClick={(e: React.MouseEvent) => handleWidgetRightClick(e, w)}
+            onContextMenu={(e) => handleWidgetLeftClick(e, w)}
             onResizeStop={(_e, _direction, ref, _delta, position) =>
               handleResizeStop(ref, position, w)
             }

@@ -8,6 +8,7 @@ import "./GridZone.css";
 import WidgetRenderer from "@components/WidgetRenderer/WidgetRenderer.tsx";
 import ToolbarButtons from "@components/Toolbar/Toolbar.tsx";
 import { v4 as uuidv4 } from "uuid";
+import SelectionArea from "./SelectionArea";
 
 /**
  * GridZoneComp renders the main editor canvas where widgets are displayed, moved, and interacted with.
@@ -29,6 +30,7 @@ const GridZoneComp: React.FC<WidgetUpdate> = ({ data }) => {
   const props = data.editableProperties;
   const {
     mode,
+    editorWidgets,
     addWidget,
     selectedWidgetIDs,
     setSelectedWidgetIDs,
@@ -202,7 +204,7 @@ const GridZoneComp: React.FC<WidgetUpdate> = ({ data }) => {
 
   const handleClick = (_e: React.MouseEvent) => {
     setContextMenuVisible(false);
-    setSelectedWidgetIDs([]);
+    // setSelectedWidgetIDs([]);
   };
 
   const handleContextMenu = (e: React.MouseEvent) => {
@@ -373,6 +375,33 @@ const GridZoneComp: React.FC<WidgetUpdate> = ({ data }) => {
           isPanning={isPanning}
         />
       </div>
+      <SelectionArea
+        gridRef={gridRef}
+        zoom={zoom}
+        pan={pan}
+        enabled={inEditMode && !isDragging && !isPanning}
+        onSelectArea={(area) => {
+          // area = {x, y, width, height} in user coordinates
+          // Example: select widgets inside this region
+          const selected = allWidgetIDs.filter((id) => {
+            const w = editorWidgets.find((w) => w.id === id);
+            if (!w) return false;
+            const { x, y, width, height } = {
+              x: w.editableProperties.x?.value ?? 0,
+              y: w.editableProperties.y?.value ?? 0,
+              width: w.editableProperties.width?.value ?? 0,
+              height: w.editableProperties.height?.value ?? 0,
+            };
+            return (
+              x >= area.x &&
+              y >= area.y &&
+              x + width <= area.x + area.width &&
+              y + height <= area.y + area.height
+            );
+          });
+          setSelectedWidgetIDs(selected);
+        }}
+      />
       <ToolbarButtons
         onMouseEnter={() => setMouseOverMenu(true)}
         onMouseLeave={() => setMouseOverMenu(false)}
