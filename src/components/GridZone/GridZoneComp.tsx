@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import type { GridPosition, Widget, WidgetUpdate } from "@src/types/widgets";
 import WidgetRegistry from "@components/WidgetRegistry/WidgetRegistry";
 import { useEditorContext } from "@src/context/useEditorContext.tsx";
-import { EDIT_MODE, MAX_ZOOM, MIN_ZOOM } from "@src/constants/constants.ts";
+import { EDIT_MODE, GRID_ID, MAX_ZOOM, MIN_ZOOM } from "@src/constants/constants.ts";
 import ContextMenu from "@components/ContextMenu/ContextMenu";
 import "./GridZone.css";
 import WidgetRenderer from "@components/WidgetRenderer/WidgetRenderer.tsx";
@@ -56,8 +56,6 @@ const GridZoneComp: React.FC<WidgetUpdate> = ({ data }) => {
   const [isPanning, setIsPanning] = useState(false);
   const [contextMenuPos, setContextMenuPos] = useState<GridPosition>({ x: 0, y: 0 });
   const [contextMenuVisible, setContextMenuVisible] = useState(false);
-  const [mouseOverMenu, setMouseOverMenu] = useState(false);
-  const [isDragging, setIsDragging] = useState(false);
   const [shouldCenterPan, setShouldCenterPan] = useState(true);
   const [dragPreview, setDragPreview] = useState<{
     widget: Widget;
@@ -203,7 +201,6 @@ const GridZoneComp: React.FC<WidgetUpdate> = ({ data }) => {
 
   const handleClick = (_e: React.MouseEvent) => {
     setContextMenuVisible(false);
-    // setSelectedWidgetIDs([]);
   };
 
   const handleContextMenu = (e: React.MouseEvent) => {
@@ -318,7 +315,7 @@ const GridZoneComp: React.FC<WidgetUpdate> = ({ data }) => {
   return (
     <div
       ref={gridRef}
-      id="gridZone"
+      id={GRID_ID}
       className="gridZone"
       onDragOver={handleDragOver}
       onDrop={handleDrop}
@@ -330,10 +327,11 @@ const GridZoneComp: React.FC<WidgetUpdate> = ({ data }) => {
       style={{
         cursor: gridGrabbed.current ? "grabbing" : "default",
         backgroundColor: props.backgroundColor?.value,
-        backgroundImage: gridLineVisible
-          ? `linear-gradient(${props.gridLineColor!.value} 1px, transparent 1px),
+        backgroundImage:
+          gridLineVisible && inEditMode
+            ? `linear-gradient(${props.gridLineColor!.value} 1px, transparent 1px),
         linear-gradient(90deg, ${props.gridLineColor!.value} 1px, transparent 1px)`
-          : "none",
+            : "none",
         backgroundSize: `${props.gridSize!.value * zoom}px ${props.gridSize!.value * zoom}px`,
         backgroundPosition: `${pan.x % (props.gridSize!.value * zoom)}px ${
           pan.y % (props.gridSize!.value * zoom)
@@ -367,29 +365,17 @@ const GridZoneComp: React.FC<WidgetUpdate> = ({ data }) => {
         <WidgetRenderer
           scale={zoom}
           ensureGridCoordinate={ensureGridCoordinate}
-          setIsDragging={setIsDragging}
           isPanning={isPanning}
         />
       </div>
-      <SelectionManager
-        gridRef={gridRef}
-        zoom={zoom}
-        pan={pan}
-        enabled={inEditMode && !isDragging && !isPanning && !mouseOverMenu}
-      />
-      <ToolbarButtons
-        onMouseEnter={() => setMouseOverMenu(true)}
-        onMouseLeave={() => setMouseOverMenu(false)}
-      />
+      <SelectionManager gridRef={gridRef} zoom={zoom} pan={pan} />
+      <ToolbarButtons />
       <ContextMenu
         pos={contextMenuPos}
         mousePos={mousePosRef.current}
         visible={contextMenuVisible}
-        onMouseEnter={() => setMouseOverMenu(true)}
-        onMouseLeave={() => setMouseOverMenu(false)}
         onClose={() => {
           setContextMenuVisible(false);
-          setMouseOverMenu(false);
         }}
       />
     </div>

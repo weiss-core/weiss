@@ -3,31 +3,28 @@ import WidgetRegistry from "@components/WidgetRegistry/WidgetRegistry";
 import { useEditorContext } from "@src/context/useEditorContext";
 import type { Widget, GridPosition, MultiWidgetPropertyUpdates } from "@src/types/widgets";
 import { Rnd, type DraggableData, type RndDragEvent } from "react-rnd";
-import { EDIT_MODE, GRID_ID, FRONT_UI_ZIDX } from "@src/constants/constants";
+import { GRID_ID, FRONT_UI_ZIDX } from "@src/constants/constants";
 import "./WidgetRenderer.css";
+
+// add delay to set isDragging flag - needed because onDragStop fires before onMouseUp
+const DRAG_END_DELAY = 80; //ms
 
 interface RendererProps {
   scale: number;
   ensureGridCoordinate: (coord: number) => number;
-  setIsDragging: React.Dispatch<React.SetStateAction<boolean>>;
   isPanning: boolean;
 }
 
-const WidgetRenderer: React.FC<RendererProps> = ({
-  scale,
-  ensureGridCoordinate,
-  setIsDragging,
-  isPanning,
-}) => {
+const WidgetRenderer: React.FC<RendererProps> = ({ scale, ensureGridCoordinate, isPanning }) => {
   const {
-    mode,
+    inEditMode,
     editorWidgets,
     selectedWidgetIDs,
     updateWidgetProperties,
     batchWidgetUpdate,
     selectionBounds,
+    setIsDragging,
   } = useEditorContext();
-  const inEditMode = mode === EDIT_MODE;
 
   /** --- Core widget rendering --- */
   const renderWidgetContent = (w: Widget): ReactNode => {
@@ -41,7 +38,8 @@ const WidgetRenderer: React.FC<RendererProps> = ({
     const oldY = w.editableProperties.y!.value;
     if (oldX === d.x && oldY === d.y) return;
 
-    setIsDragging(false);
+    setTimeout(() => setIsDragging(false), DRAG_END_DELAY);
+
     const deltaX = d.x - oldX;
     const deltaY = d.y - oldY;
 
@@ -67,7 +65,7 @@ const WidgetRenderer: React.FC<RendererProps> = ({
 
   /** --- Handle resize logic --- */
   const handleResizeStop = (ref: HTMLElement, position: GridPosition, w: Widget) => {
-    setIsDragging(false);
+    setTimeout(() => setIsDragging(false), DRAG_END_DELAY);
     updateWidgetProperties(w.id, {
       width: ensureGridCoordinate(parseInt(ref.style.width)),
       height: ensureGridCoordinate(parseInt(ref.style.height)),
@@ -140,7 +138,7 @@ const WidgetRenderer: React.FC<RendererProps> = ({
         position={{ x: selectionBounds.x, y: selectionBounds.y }}
         enableResizing={false}
         disableDragging={!inEditMode || isPanning}
-        onDragStart={() => setIsDragging(true)}
+        onDrag={() => setIsDragging(true)}
         onDragStop={(_e, d) => {
           // Commit final positions of all selected widgets
           const updates: MultiWidgetPropertyUpdates = {};
@@ -151,11 +149,11 @@ const WidgetRenderer: React.FC<RendererProps> = ({
             };
           });
           batchWidgetUpdate(updates);
-          setIsDragging(false);
+          setTimeout(() => setIsDragging(false), DRAG_END_DELAY);
         }}
         style={{
           position: "absolute",
-          border: "2px dashed rgba(0, 128, 255, 0.8)",
+          outline: "2px dashed rgba(0, 128, 255, 0.8)",
           backgroundColor: "rgba(59, 130, 246, 0.1)",
           zIndex: FRONT_UI_ZIDX,
           pointerEvents: "auto",

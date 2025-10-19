@@ -124,7 +124,7 @@ const DraggableItem: React.FC<DraggableItemProps> = ({ item, open }) => {
  * - Uses WidgetRegistry to dynamically fetch all available widget definitions
  */
 const WidgetPicker: React.FC = () => {
-  const { mode, wdgPickerOpen, setwdgPickerOpen } = useEditorContext();
+  const { mode, wdgPickerOpen, setWdgPickerOpen } = useEditorContext();
   const palette: Record<string, Widget> = React.useMemo(
     () =>
       Object.fromEntries(Object.values(WidgetRegistry).map((w) => [w.widgetName, w])) as Record<
@@ -148,7 +148,7 @@ const WidgetPicker: React.FC = () => {
     <Box sx={{ display: "flex" }}>
       <Drawer variant="permanent" open={wdgPickerOpen} onClick={(e) => e.stopPropagation()}>
         <DrawerHeader>
-          <IconButton onClick={() => setwdgPickerOpen((o) => !o)}>
+          <IconButton onClick={() => setWdgPickerOpen((o) => !o)}>
             {wdgPickerOpen ? <ChevronLeftIcon /> : <ChevronRightIcon />}
           </IconButton>
         </DrawerHeader>

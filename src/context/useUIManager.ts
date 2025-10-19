@@ -25,10 +25,11 @@ export default function useUIManager(
   loadWidgets: ReturnType<typeof useWidgetManager>["loadWidgets"]
 ) {
   const [propertyEditorFocused, setPropertyEditorFocused] = useState(false);
-  const [wdgSelectorOpen, setWdgSelectorOpen] = useState(false);
+  const [wdgPickerOpen, setWdgPickerOpen] = useState(false);
   const [pickedWidget, setPickedWidget] = useState<Widget | null>(null);
   const [mode, setMode] = useState<Mode>(EDIT_MODE);
   const loadedRef = useRef(false);
+  const inEditMode = mode === EDIT_MODE;
 
   /**
    * Switch between edit and runtime modes.
@@ -55,9 +56,8 @@ export default function useUIManager(
       } else {
         // connection to pv server is managed by RAS widgets directly
         setSelectedWidgetIDs([]);
-        setWdgSelectorOpen(false);
+        setWdgPickerOpen(false);
       }
-      updateWidgetProperties(GRID_ID, { gridLineVisible: isEdit }, false);
       setMode(newMode);
     },
     [updateWidgetProperties, setSelectedWidgetIDs]
@@ -94,7 +94,7 @@ export default function useUIManager(
           (widget) =>
             ({
               id: widget.id,
-              groupId: widget.groupId,
+              children: widget.children,
               widgetName: widget.widgetName,
               properties: Object.fromEntries(
                 Object.entries(widget.editableProperties).map(([key, def]) => [key, def.value])
@@ -113,9 +113,10 @@ export default function useUIManager(
     setPropertyEditorFocused,
     mode,
     updateMode,
-    wdgSelectorOpen,
-    setWdgSelectorOpen,
+    wdgPickerOpen,
+    setWdgPickerOpen,
     pickedWidget,
     setPickedWidget,
+    inEditMode,
   };
 }

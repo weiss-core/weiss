@@ -22,12 +22,7 @@ import { Rnd } from "react-rnd";
 import { grey } from "@mui/material/colors";
 import "./Toolbar.css";
 
-export interface ToolBarProps {
-  onMouseEnter: () => void;
-  onMouseLeave: () => void;
-}
-
-const ToolbarButtons: React.FC<ToolBarProps> = ({ onMouseEnter, onMouseLeave }) => {
+const ToolbarButtons: React.FC = () => {
   const {
     mode,
     selectedWidgetIDs,
@@ -70,12 +65,7 @@ const ToolbarButtons: React.FC<ToolBarProps> = ({ onMouseEnter, onMouseLeave }) 
       enableResizing={false}
       dragHandleClassName="dragHandle"
     >
-      <Box
-        className="toolbarBox"
-        onMouseEnter={onMouseEnter}
-        onMouseLeave={onMouseLeave}
-        onClick={(e) => e.stopPropagation()}
-      >
+      <Box className="toolbarBox" onClick={(e) => e.stopPropagation()}>
         <Box
           className="dragHandle"
           sx={{ cursor: "move", px: 1, display: "flex", alignItems: "center" }}

@@ -103,6 +103,7 @@ export function useWidgetManager() {
   const [undoStack, setUndoStack] = useState<Widget[][]>([]);
   const [redoStack, setRedoStack] = useState<Widget[][]>([]);
   const [editorWidgets, setEditorWidgets] = useState<Widget[]>([GridZone]);
+  const [isDragging, setIsDragging] = useState(false);
   const [selectedWidgetIDs, setSelectedWidgetIDs] = useState<string[]>([]);
   const [widgetGroups, setWidgetGroups] = useState<
     Record<string, { id: string; widgetIds: string[] }>
@@ -215,7 +216,7 @@ export function useWidgetManager() {
       id: groupID,
       widgetLabel: "Group",
       widgetName: "Group",
-      category: "container",
+      category: "internal",
       component: () => null,
       children: selectedWidgets,
       editableProperties: {
@@ -688,7 +689,8 @@ export function useWidgetManager() {
             } else {
               baseWdg = WidgetRegistry[raw.widgetName];
             }
-            if (!baseWdg) {
+            if (!baseWdg && raw.widgetName != "Group") {
+              //TODO: actually handle group loading properly
               console.warn(`Unknown widget type: ${raw.widgetName}`);
               return null;
             }
@@ -783,5 +785,7 @@ export function useWidgetManager() {
     PVList,
     macros,
     allWidgetIDs,
+    isDragging,
+    setIsDragging,
   };
 }

@@ -21,18 +21,9 @@ export interface ContextMenuProps {
   mousePos: GridPosition;
   visible: boolean;
   onClose: () => void;
-  onMouseEnter: () => void;
-  onMouseLeave: () => void;
 }
 
-const ContextMenu: React.FC<ContextMenuProps> = ({
-  pos,
-  mousePos,
-  visible,
-  onClose,
-  onMouseEnter,
-  onMouseLeave,
-}) => {
+const ContextMenu: React.FC<ContextMenuProps> = ({ pos, mousePos, visible, onClose }) => {
   const {
     mode,
     bringToFront,
@@ -109,6 +100,9 @@ const ContextMenu: React.FC<ContextMenuProps> = ({
         maxWidth: "100%",
         boxShadow: 3,
       }}
+      onMouseUp={(e) => e.stopPropagation()}
+      onMouseDown={(e) => e.stopPropagation()}
+      onMouseMove={(e) => e.stopPropagation()}
     >
       <MenuList dense sx={{ zIndex: FRONT_UI_ZIDX }}>
         {options.map((opt, index) => (
@@ -116,8 +110,6 @@ const ContextMenu: React.FC<ContextMenuProps> = ({
             sx={{ zIndex: FRONT_UI_ZIDX }}
             key={index}
             disabled={opt.disabled}
-            onMouseEnter={() => onMouseEnter()}
-            onMouseLeave={() => onMouseLeave()}
             onClick={(e) => {
               e.stopPropagation();
               opt.action();
