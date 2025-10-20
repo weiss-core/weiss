@@ -11,111 +11,100 @@ interface SelectionManagerProps {
 
 const CLICK_THRESHOLD = 3;
 
-const SelectionManager: React.FC<SelectionManagerProps> = ({
-  gridRef,
-  zoom,
-  pan,
-  enabled = true,
-}) => {
-  const { editorWidgets, setSelectedWidgetIDs } = useEditorContext();
-  const [isSelecting, setIsSelecting] = useState(false);
-  const [start, setStart] = useState({ x: 0, y: 0 });
-  const [end, setEnd] = useState({ x: 0, y: 0 });
+const SelectionManager: React.FC<SelectionManagerProps> = ({ gridRef, zoom, pan }) => {
+  const { editorWidgets, setSelectedWidgetIDs, isDragging } = useEditorContext();
+  const [selection, setSelection] = useState<{
+    start?: { x: number; y: number };
+    end?: { x: number; y: number };
+  }>({});
+  const isSelecting = !!selection.start;
 
   const areaRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (!enabled || !gridRef.current) return;
     const grid = gridRef.current;
+    if (!grid) return;
 
     const handleMouseDown = (e: MouseEvent) => {
+      const id = (e.target as HTMLElement).getAttribute("id");
+      if (id !== GRID_ID) return;
+
       const rect = grid.getBoundingClientRect();
       const x = (e.clientX - rect.left - pan.x) / zoom;
       const y = (e.clientY - rect.top - pan.y) / zoom;
 
-      setStart({ x, y });
-      setEnd({ x, y });
-      setIsSelecting(true);
+      setSelection({ start: { x, y }, end: { x, y } });
     };
 
     const handleMouseMove = (e: MouseEvent) => {
-      if (!isSelecting) return;
+      if (!selection.start) return;
       const rect = grid.getBoundingClientRect();
       const x = (e.clientX - rect.left - pan.x) / zoom;
       const y = (e.clientY - rect.top - pan.y) / zoom;
-      setEnd({ x, y });
+      setSelection((prev) => (prev.start ? { ...prev, end: { x, y } } : prev));
     };
 
     const handleMouseUp = (e: MouseEvent) => {
-      if (!isSelecting) return;
-      setIsSelecting(false);
+      const target = e.target as HTMLElement;
+      const id = target.getAttribute("id");
+      const widgetEl = target.closest(".selectable");
+      if (id !== GRID_ID && !widgetEl) return;
+      // --- Ignore mouse up if dragging widgets
+      if (isDragging) {
+        setSelection({});
+        return;
+      }
 
       const rect = grid.getBoundingClientRect();
       const xEnd = (e.clientX - rect.left - pan.x) / zoom;
       const yEnd = (e.clientY - rect.top - pan.y) / zoom;
 
-      const dx = Math.abs(xEnd - start.x);
-      const dy = Math.abs(yEnd - start.y);
-
-      // --- Single click
-      if (dx < CLICK_THRESHOLD && dy < CLICK_THRESHOLD) {
-        const groupEl = (e.target as HTMLElement)?.closest(".groupBox");
-        const widgetEl = (e.target as HTMLElement)?.closest(".selectable");
-        if (groupEl) {
-          // Select all widgets with this groupId
-          const groupId = groupEl.getAttribute("id");
-          if (groupId) {
-            const groupWidgetIds = editorWidgets
-              .filter((w) => w.groupId === groupId)
-              .map((w) => w.id);
-            e.ctrlKey
-              ? setSelectedWidgetIDs((prev) => Array.from(new Set([...prev, ...groupWidgetIds])))
-              : setSelectedWidgetIDs(groupWidgetIds);
-          }
-        } else if (widgetEl) {
-          const id = widgetEl.getAttribute("id");
-          if (id) {
-            e.ctrlKey ? setSelectedWidgetIDs((prev) => [...prev, id]) : setSelectedWidgetIDs([id]);
-          }
+      // --- No active selection: interpret as click
+      if (!selection.start) {
+        const wId = widgetEl?.getAttribute("id");
+        if (widgetEl && wId) {
+          e.ctrlKey
+            ? setSelectedWidgetIDs((prev) =>
+                prev.includes(wId) ? prev.filter((pid) => pid !== wId) : [...prev, wId]
+              )
+            : setSelectedWidgetIDs([wId]);
         } else {
-          // Clicked empty space
           setSelectedWidgetIDs([]);
         }
         return;
       }
 
-      // --- Area selection
+      // --- Finish area selection
+      const { start } = selection;
+      const dx = Math.abs(xEnd - start.x);
+      const dy = Math.abs(yEnd - start.y);
+
+      // just a click (too small)
+      if (dx < CLICK_THRESHOLD && dy < CLICK_THRESHOLD) {
+        setSelection({});
+        setSelectedWidgetIDs([]);
+        return;
+      }
+
       const selX = Math.min(start.x, xEnd);
       const selY = Math.min(start.y, yEnd);
-      const selWidth = Math.abs(xEnd - start.x);
-      const selHeight = Math.abs(yEnd - start.y);
+      const selW = Math.abs(xEnd - start.x);
+      const selH = Math.abs(yEnd - start.y);
 
-      const selectedIds = new Set<string>();
-
-      // First select all fully contained widgets
-      editorWidgets.forEach((w) => {
-        if (w.id === GRID_ID) return;
-        const x = w.editableProperties.x!.value;
-        const y = w.editableProperties.y!.value;
-        const width = w.editableProperties.width!.value;
-        const height = w.editableProperties.height!.value;
-
-        const inside =
-          x >= selX && y >= selY && x + width <= selX + selWidth && y + height <= selY + selHeight;
-
-        if (inside) {
-          if (w.groupId) {
-            // Add all widgets in the same group
-            editorWidgets
-              .filter((wg) => wg.groupId === w.groupId)
-              .forEach((wg) => selectedIds.add(wg.id));
-          } else {
-            selectedIds.add(w.id);
-          }
-        }
-      });
-
-      setSelectedWidgetIDs(Array.from(selectedIds));
+      const selectedIds = editorWidgets
+        .filter((w) => {
+          if (w.id === GRID_ID) return false;
+          const { x, y, width, height } = {
+            x: w.editableProperties.x!.value,
+            y: w.editableProperties.y!.value,
+            width: w.editableProperties.width!.value,
+            height: w.editableProperties.height!.value,
+          };
+          return x >= selX && y >= selY && x + width <= selX + selW && y + height <= selY + selH;
+        })
+        .map((w) => w.id);
+      setSelectedWidgetIDs(selectedIds);
+      setSelection({});
     };
 
     grid.addEventListener("mousedown", handleMouseDown);
@@ -127,13 +116,13 @@ const SelectionManager: React.FC<SelectionManagerProps> = ({
       window.removeEventListener("mousemove", handleMouseMove);
       window.removeEventListener("mouseup", handleMouseUp);
     };
-  }, [enabled, zoom, pan, gridRef, editorWidgets, start, setSelectedWidgetIDs]);
+  }, [zoom, pan, gridRef, editorWidgets, setSelectedWidgetIDs, selection, isDragging]);
 
-  if (!isSelecting) return null;
-  const x = Math.min(start.x, end.x) * zoom + pan.x;
-  const y = Math.min(start.y, end.y) * zoom + pan.y;
-  const w = Math.abs(end.x - start.x) * zoom;
-  const h = Math.abs(end.y - start.y) * zoom;
+  if (!isSelecting || !selection.end) return null;
+  const x = Math.min(selection.start!.x, selection.end.x) * zoom + pan.x;
+  const y = Math.min(selection.start!.y, selection.end.y) * zoom + pan.y;
+  const w = Math.abs(selection.end.x - selection.start!.x) * zoom;
+  const h = Math.abs(selection.end.y - selection.start!.y) * zoom;
 
   return (
     <div
@@ -148,6 +137,7 @@ const SelectionManager: React.FC<SelectionManagerProps> = ({
         backgroundColor: "rgba(0, 128, 255, 0.2)",
         pointerEvents: "none",
         zIndex: FRONT_UI_ZIDX - 1,
+        boxSizing: "border-box",
       }}
     />
   );

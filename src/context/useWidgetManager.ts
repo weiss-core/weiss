@@ -12,6 +12,7 @@ import { GridZone } from "@components/GridZone";
 import { GRID_ID, MAX_HISTORY } from "@src/constants/constants";
 import WidgetRegistry from "@components/WidgetRegistry/WidgetRegistry";
 import { v4 as uuidv4 } from "uuid";
+import { PROPERTY_SCHEMAS } from "@src/types/widgetProperties";
 export interface DOMRectLike {
   x: number;
   y: number;
@@ -25,6 +26,52 @@ export interface DOMRectLike {
  */
 function deepCloneWidgetList(widgets: Widget[]): Widget[] {
   return widgets.map(deepCloneWidget);
+}
+
+function updateNestedWidgets(widgets: Widget[], updates: MultiWidgetPropertyUpdates): Widget[] {
+  const updateOne = (w: Widget): Widget => {
+    // Clone so we never mutate directly
+    let newWidget = w;
+
+    // Apply update if it exists for this widget ID
+    const changes = updates[w.id];
+    if (changes) {
+      const updatedProps: WidgetProperties = { ...w.editableProperties };
+      for (const [k, v] of Object.entries(changes)) {
+        const propName = k as PropertyKey;
+        if (!updatedProps[propName]) {
+          console.warn(`Tried updating inexistent property ${propName} on ${w.id}`);
+          continue;
+        }
+        updatedProps[propName].value = v;
+      }
+      newWidget = { ...newWidget, editableProperties: updatedProps };
+    }
+
+    // If there are children, search them too (recursively, but update only once)
+    if (w.children?.length) {
+      const updatedChildren = w.children.map(updateOne);
+      // Only recreate if children changed
+      if (updatedChildren.some((c, i) => c !== w.children![i])) {
+        newWidget = { ...newWidget, children: updatedChildren };
+      }
+    }
+
+    return newWidget;
+  };
+
+  return widgets.map(updateOne);
+}
+
+function findWidgetRecursive(widgets: Widget[], id: string): Widget | undefined {
+  for (const w of widgets) {
+    if (w.id === id) return w;
+    if (w.children) {
+      const found = findWidgetRecursive(w.children, id);
+      if (found) return found;
+    }
+  }
+  return undefined;
 }
 
 /**
@@ -56,6 +103,7 @@ export function useWidgetManager() {
   const [undoStack, setUndoStack] = useState<Widget[][]>([]);
   const [redoStack, setRedoStack] = useState<Widget[][]>([]);
   const [editorWidgets, setEditorWidgets] = useState<Widget[]>([GridZone]);
+  const [isDragging, setIsDragging] = useState(false);
   const [selectedWidgetIDs, setSelectedWidgetIDs] = useState<string[]>([]);
   const [widgetGroups, setWidgetGroups] = useState<
     Record<string, { id: string; widgetIds: string[] }>
@@ -128,28 +176,7 @@ export function useWidgetManager() {
    */
   const batchWidgetUpdate = useCallback(
     (updates: MultiWidgetPropertyUpdates, keepHistory = true) => {
-      const idsToUpdate = new Set(Object.keys(updates));
-      updateEditorWidgetList(
-        (prev) =>
-          prev.map((w) => {
-            if (!idsToUpdate.has(w.id)) return w;
-            const changes = updates[w.id];
-            const updatedProps: WidgetProperties = { ...w.editableProperties };
-            for (const [k, v] of Object.entries(changes)) {
-              const propName = k as PropertyKey;
-              if (!updatedProps[propName]) {
-                console.warn(`tried updating inexistent property ${propName} on ${w.id}`);
-                continue;
-              }
-              updatedProps[propName].value = v;
-            }
-            return {
-              ...w,
-              editableProperties: updatedProps,
-            };
-          }),
-        keepHistory
-      );
+      updateEditorWidgetList((prev) => updateNestedWidgets(prev, updates), keepHistory);
     },
     [updateEditorWidgetList]
   );
@@ -160,7 +187,7 @@ export function useWidgetManager() {
    * @returns Widget object or undefined
    */
   const getWidget = useCallback(
-    (id: string) => editorWidgets.find((w) => w.id === id),
+    (id: string) => findWidgetRecursive(editorWidgets, id),
     [editorWidgets]
   );
 
@@ -180,44 +207,53 @@ export function useWidgetManager() {
     setSelectedWidgetIDs([]);
   }, [selectedWidgetIDs]);
 
-  function createGroup(widgetIds: string[]) {
-    const id = uuidv4();
-    setEditorWidgets((prev) =>
-      prev.map((w) => (widgetIds.includes(w.id) ? { ...w, groupId: id } : w))
-    );
-    return id;
-  }
-
-  function deleteGroup(groupId: string) {
-    setEditorWidgets((prev) =>
-      prev.map((w) => (w.groupId === groupId ? { ...w, groupId: undefined } : w))
-    );
-  }
-
-  function addToGroup(groupId: string, widgetIds: string[]) {
-    setEditorWidgets((prev) => prev.map((w) => (widgetIds.includes(w.id) ? { ...w, groupId } : w)));
-  }
-
-  function removeFromGroup(groupId: string, widgetIds: string[]) {
-    setEditorWidgets((prev) =>
-      prev.map((w) =>
-        w.groupId === groupId && widgetIds.includes(w.id) ? { ...w, groupId: undefined } : w
-      )
-    );
-  }
-
   function groupSelected() {
-    if (selectedWidgetIDs.length < 2) return;
-    createGroup(selectedWidgetIDs);
+    if (selectedWidgetIDs.length < 2 || !selectionBounds) return;
+    const selectedWidgets = editorWidgets.filter((w) => selectedWidgetIDs.includes(w.id));
+    const groupID = uuidv4();
+    // Create the new group widget and attach selected widgets as children
+    const groupWidget: Widget = {
+      id: groupID,
+      widgetLabel: "Group",
+      widgetName: "Group",
+      category: "internal",
+      component: () => null,
+      children: selectedWidgets,
+      editableProperties: {
+        x: { ...PROPERTY_SCHEMAS.x, value: selectionBounds.x },
+        y: { ...PROPERTY_SCHEMAS.y, value: selectionBounds.y },
+        width: { ...PROPERTY_SCHEMAS.width, value: selectionBounds.width },
+        height: { ...PROPERTY_SCHEMAS.height, value: selectionBounds.height },
+      },
+    };
+
+    setEditorWidgets((prev) => {
+      // Remove selected widgets from top-level array
+      const remainingWidgets = prev.filter((w) => !selectedWidgetIDs.includes(w.id));
+      return [...remainingWidgets, groupWidget];
+    });
+
+    setSelectedWidgetIDs([groupID]);
   }
 
   function ungroupSelected() {
-    const groupedIds = editorWidgets
-      .filter((w) => selectedWidgetIDs.includes(w.id) && w.groupId)
-      .map((w) => w.groupId!);
-    const uniqueGroupIds = Array.from(new Set(groupedIds));
-    uniqueGroupIds.forEach((gid) => deleteGroup(gid));
+    setEditorWidgets((prev) => {
+      const newWidgets: Widget[] = [];
+
+      prev.forEach((w) => {
+        if (selectedWidgetIDs.includes(w.id) && w.children) {
+          newWidgets.push(...w.children);
+        } else {
+          newWidgets.push(w);
+        }
+      });
+
+      return newWidgets;
+    });
+
+    setSelectedWidgetIDs([]);
   }
+
   /**
    * Update properties of a single widget.
    * @param id Widget ID
@@ -573,7 +609,7 @@ export function useWidgetManager() {
       (widget) =>
         ({
           id: widget.id,
-          groupId: widget.groupId,
+          parentId: widget.children,
           widgetName: widget.widgetName,
           properties: Object.fromEntries(
             Object.entries(widget.editableProperties).map(([key, def]) => [key, def.value])
@@ -653,14 +689,15 @@ export function useWidgetManager() {
             } else {
               baseWdg = WidgetRegistry[raw.widgetName];
             }
-            if (!baseWdg) {
+            if (!baseWdg && raw.widgetName != "Group") {
+              //TODO: actually handle group loading properly
               console.warn(`Unknown widget type: ${raw.widgetName}`);
               return null;
             }
 
             const instance = deepCloneWidget(baseWdg);
             instance.id = raw.id;
-            instance.groupId = raw.groupId;
+            instance.children = raw.children;
 
             // overlay values from the file
             for (const [key, val] of Object.entries(raw.properties ?? {})) {
@@ -721,10 +758,6 @@ export function useWidgetManager() {
     getWidget,
     addWidget,
     deleteWidget,
-    createGroup,
-    deleteGroup,
-    addToGroup,
-    removeFromGroup,
     widgetGroups,
     setWidgetGroups,
     computeGroupBounds,
@@ -752,5 +785,7 @@ export function useWidgetManager() {
     PVList,
     macros,
     allWidgetIDs,
+    isDragging,
+    setIsDragging,
   };
 }

@@ -11,4 +11,5 @@
 
 .groupBox {
   box-sizing: border-box;
+  outline: 1px dashed rgba(80, 80, 80, 0.199);
 }

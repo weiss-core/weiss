@@ -91,7 +91,7 @@ const StyledAppBar = styled(MuiAppBar, {
 }));
 
 export default function NavBar() {
-  const { mode, updateMode, wdgSelectorOpen, setWdgSelectorOpen, downloadWidgets, loadWidgets } =
+  const { mode, updateMode, wdgPickerOpen, setWdgPickerOpen, downloadWidgets, loadWidgets } =
     useEditorContext();
   const drawerWidth = WIDGET_SELECTOR_WIDTH;
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -140,18 +140,13 @@ export default function NavBar() {
 
   return (
     <Box sx={{ display: "flex" }}>
-      <StyledAppBar
-        component="nav"
-        position="fixed"
-        open={wdgSelectorOpen}
-        drawerWidth={drawerWidth}
-      >
+      <StyledAppBar component="nav" position="fixed" open={wdgPickerOpen} drawerWidth={drawerWidth}>
         <Toolbar sx={{ minHeight: 56, px: 2 }}>
           <IconButton
             color="inherit"
             aria-label="open drawer"
             edge="start"
-            onClick={() => setWdgSelectorOpen((o) => !o)}
+            onClick={() => setWdgPickerOpen((o) => !o)}
             sx={{
               mr: 2,
               size: "small",
