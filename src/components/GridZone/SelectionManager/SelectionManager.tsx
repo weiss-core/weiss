@@ -26,6 +26,7 @@ const SelectionManager: React.FC<SelectionManagerProps> = ({ gridRef, zoom, pan 
     if (!grid) return;
 
     const handleMouseDown = (e: MouseEvent) => {
+      if (e.button !== 0) return;
       const id = (e.target as HTMLElement).getAttribute("id");
       if (id !== GRID_ID) return;
 
