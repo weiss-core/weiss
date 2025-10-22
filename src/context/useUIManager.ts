@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
-import { EDIT_MODE, GRID_ID, type Mode } from "@src/constants/constants";
+import { EDIT_MODE, type Mode } from "@src/constants/constants";
 import { useWidgetManager } from "./useWidgetManager";
-import type { ExportedWidget } from "@src/types/widgets";
+import type { ExportedWidget, Widget } from "@src/types/widgets";
 
 /**
  * Hook that manages global UI state for WEISS.
@@ -16,6 +16,7 @@ import type { ExportedWidget } from "@src/types/widgets";
  * @param setSelectedWidgetIDs Function to update currently selected widgets.
  * @param updateWidgetProperties Function to update widget properties.
  * @param loadWidgets Function to load widgets into the editor (used for localStorage).
+ * @param formatWdgToExport Function to format (reduce) widgets to exporting format.
  * @returns An object containing UI state, setters, and mode updater.
  */
 export default function useUIManager(
@@ -23,11 +24,16 @@ export default function useUIManager(
   setSelectedWidgetIDs: ReturnType<typeof useWidgetManager>["setSelectedWidgetIDs"],
   updateWidgetProperties: ReturnType<typeof useWidgetManager>["updateWidgetProperties"],
   loadWidgets: ReturnType<typeof useWidgetManager>["loadWidgets"],
+  formatWdgToExport: ReturnType<typeof useWidgetManager>["formatWdgToExport"]
 ) {
   const [propertyEditorFocused, setPropertyEditorFocused] = useState(false);
-  const [wdgSelectorOpen, setWdgSelectorOpen] = useState(false);
+  const [wdgPickerOpen, setWdgPickerOpen] = useState(false);
+  const [pickedWidget, setPickedWidget] = useState<Widget | null>(null);
   const [mode, setMode] = useState<Mode>(EDIT_MODE);
+  const [isDragging, setIsDragging] = useState(false);
+  const [isPanning, setIsPanning] = useState(false);
   const loadedRef = useRef(false);
+  const inEditMode = mode === EDIT_MODE;
 
   /**
    * Switch between edit and runtime modes.
@@ -39,9 +45,7 @@ export default function useUIManager(
    * Runtime mode:
    * - Clears widget selection.
    * - Closes widget selector.
-   * - Starts a new PV session.
-   *
-   * Also updates the visibility of grid lines in the editor.
+   * - Starts WebSocket connection.
    *
    * @param newMode The mode to switch to ("edit" | "runtime").
    */
@@ -52,14 +56,12 @@ export default function useUIManager(
         // connection to pv server is managed by RAS widgets directly
         // add actions on mode transition?
       } else {
-        // connection to pv server is managed by RAS widgets directly
         setSelectedWidgetIDs([]);
-        setWdgSelectorOpen(false);
+        setWdgPickerOpen(false);
       }
-      updateWidgetProperties(GRID_ID, { gridLineVisible: isEdit }, false);
       setMode(newMode);
     },
-    [updateWidgetProperties, setSelectedWidgetIDs],
+    [setSelectedWidgetIDs]
   );
 
   /**
@@ -87,31 +89,29 @@ export default function useUIManager(
    * Only writes while in edit mode to avoid saving runtime PV updates.
    */
   useEffect(() => {
-    if (mode === EDIT_MODE) {
+    if (inEditMode) {
       try {
-        const exportable = editorWidgets.map(
-          (widget) =>
-            ({
-              id: widget.id,
-              widgetName: widget.widgetName,
-              properties: Object.fromEntries(
-                Object.entries(widget.editableProperties).map(([key, def]) => [key, def.value]),
-              ),
-            }) as ExportedWidget,
-        );
+        const exportable = editorWidgets.map(formatWdgToExport);
         localStorage.setItem("editorWidgets", JSON.stringify(exportable));
       } catch (err) {
         console.error("Failed to save widgets:", err);
       }
     }
-  }, [editorWidgets, mode]);
+  }, [editorWidgets, inEditMode, formatWdgToExport]);
 
   return {
     propertyEditorFocused,
     setPropertyEditorFocused,
     mode,
     updateMode,
-    wdgSelectorOpen,
-    setWdgSelectorOpen,
+    wdgPickerOpen,
+    setWdgPickerOpen,
+    pickedWidget,
+    setPickedWidget,
+    inEditMode,
+    isDragging,
+    setIsDragging,
+    isPanning,
+    setIsPanning,
   };
 }

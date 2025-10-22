@@ -72,8 +72,15 @@ interface DraggableItemProps {
 }
 
 const DraggableItem: React.FC<DraggableItemProps> = ({ item, open }) => {
+  const { setPickedWidget } = useEditorContext();
+
   const handleDragStart = (e: React.DragEvent<HTMLDivElement>) => {
     e.dataTransfer.setData("application/json", JSON.stringify(item));
+    e.dataTransfer.effectAllowed = "copy";
+    const img = new Image();
+    img.src = "";
+    e.dataTransfer.setDragImage(img, 0, 0);
+    setPickedWidget(item);
   };
 
   return (
@@ -104,7 +111,7 @@ const DraggableItem: React.FC<DraggableItemProps> = ({ item, open }) => {
 };
 
 /**
- * WidgetSelector renders the sidebar containing all available widgets for the editor.
+ * WidgetPicker renders the sidebar containing all available widgets for the editor.
  *
  * Features:
  * - Groups widgets by category and displays them in a collapsible drawer
@@ -116,15 +123,15 @@ const DraggableItem: React.FC<DraggableItemProps> = ({ item, open }) => {
  * - Relies on `useEditorContext` for editor mode and drawer open state
  * - Uses WidgetRegistry to dynamically fetch all available widget definitions
  */
-const WidgetSelector: React.FC = () => {
-  const { mode, wdgSelectorOpen, setWdgSelectorOpen } = useEditorContext();
+const WidgetPicker: React.FC = () => {
+  const { mode, wdgPickerOpen, setWdgPickerOpen } = useEditorContext();
   const palette: Record<string, Widget> = React.useMemo(
     () =>
       Object.fromEntries(Object.values(WidgetRegistry).map((w) => [w.widgetName, w])) as Record<
         string,
         Widget
       >,
-    [],
+    []
   );
 
   const categories = React.useMemo(() => {
@@ -139,23 +146,23 @@ const WidgetSelector: React.FC = () => {
   if (mode !== EDIT_MODE) return;
   return (
     <Box sx={{ display: "flex" }}>
-      <Drawer variant="permanent" open={wdgSelectorOpen}>
+      <Drawer variant="permanent" open={wdgPickerOpen} onClick={(e) => e.stopPropagation()}>
         <DrawerHeader>
-          <IconButton onClick={() => setWdgSelectorOpen((o) => !o)}>
-            {wdgSelectorOpen ? <ChevronLeftIcon /> : <ChevronRightIcon />}
+          <IconButton onClick={() => setWdgPickerOpen((o) => !o)}>
+            {wdgPickerOpen ? <ChevronLeftIcon /> : <ChevronRightIcon />}
           </IconButton>
         </DrawerHeader>
 
         <List disablePadding>
           {Object.entries(categories).map(([category, items], index) => (
             <React.Fragment key={category}>
-              {wdgSelectorOpen && (
+              {wdgPickerOpen && (
                 <ListSubheader component="div" sx={{ px: 2, lineHeight: "32px" }}>
                   {category}
                 </ListSubheader>
               )}
               {items.map((item) => (
-                <DraggableItem key={item.widgetName} item={item} open={wdgSelectorOpen} />
+                <DraggableItem key={item.widgetName} item={item} open={wdgPickerOpen} />
               ))}
               {index < Object.keys(categories).length - 1 && <Divider />}
             </React.Fragment>
@@ -166,4 +173,4 @@ const WidgetSelector: React.FC = () => {
   );
 };
 
-export default WidgetSelector;
+export default WidgetPicker;

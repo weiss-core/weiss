@@ -20,18 +20,20 @@ const ColorSelListProperty: React.FC<ColorSelListPropertyProps> = ({
   value,
   onChange,
 }) => {
-  if (!Array.isArray(value)) {
-    console.warn(`ColorSelListProperty expected string[], got`, value);
-    return null;
-  }
-
   const [colors, setColors] = useState<string[]>([]);
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
 
   useEffect(() => {
-    setColors(value.length > 0 ? value : ["rgba(0,0,0,1)"]);
+    const arr = (value as string[]) ?? [];
+    const val = arr.length > 0 ? arr : ["rgba(0,0,0,1)"];
+    setColors(val);
   }, [value]);
+
+  if (!Array.isArray(value)) {
+    console.warn(`ColorSelListProperty expected string[], got`, value);
+    return null;
+  }
 
   const commit = (newColors: string[]) => {
     setColors(newColors);

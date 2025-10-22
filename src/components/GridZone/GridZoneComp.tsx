@@ -2,12 +2,13 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import type { GridPosition, Widget, WidgetUpdate } from "@src/types/widgets";
 import WidgetRegistry from "@components/WidgetRegistry/WidgetRegistry";
 import { useEditorContext } from "@src/context/useEditorContext.tsx";
-import { EDIT_MODE, MAX_ZOOM, MIN_ZOOM, RUNTIME_MODE } from "@src/constants/constants.ts";
-import Selecto from "react-selecto";
+import { EDIT_MODE, GRID_ID, MAX_ZOOM, MIN_ZOOM } from "@src/constants/constants.ts";
 import ContextMenu from "@components/ContextMenu/ContextMenu";
 import "./GridZone.css";
 import WidgetRenderer from "@components/WidgetRenderer/WidgetRenderer.tsx";
 import ToolbarButtons from "@components/Toolbar/Toolbar.tsx";
+import { v4 as uuidv4 } from "uuid";
+import SelectionManager from "./SelectionManager/SelectionManager";
 
 /**
  * GridZoneComp renders the main editor canvas where widgets are displayed, moved, and interacted with.
@@ -37,26 +38,31 @@ const GridZoneComp: React.FC<WidgetUpdate> = ({ data }) => {
     copyWidget,
     pasteWidget,
     downloadWidgets,
+    deleteWidget,
     propertyEditorFocused,
     allWidgetIDs,
-    updateEditorWidgetList,
+    pickedWidget,
+    groupSelected,
+    ungroupSelected,
+    isPanning,
+    setIsPanning,
   } = useEditorContext();
 
   const gridRef = useRef<HTMLDivElement>(null);
   const lastPosRef = useRef<GridPosition>({ x: 0, y: 0 });
   const mousePosRef = useRef<GridPosition>({ x: 0, y: 0 });
-  const selectoRef = useRef<Selecto>(null);
   const gridGrabbed = useRef(false);
 
   const [zoom, setZoom] = useState(1);
   const [pan, setPan] = useState<GridPosition>({ x: 0, y: 0 });
-  const [isPanning, setIsPanning] = useState(false);
   const [contextMenuPos, setContextMenuPos] = useState<GridPosition>({ x: 0, y: 0 });
   const [contextMenuVisible, setContextMenuVisible] = useState(false);
-  const [mouseOverMenu, setMouseOverMenu] = useState(false);
-  const [isDragging, setIsDragging] = useState(false);
   const [shouldCenterPan, setShouldCenterPan] = useState(true);
-  const disableSelecto = mouseOverMenu || isDragging || gridGrabbed.current || mode == RUNTIME_MODE;
+  const [dragPreview, setDragPreview] = useState<{
+    widget: Widget;
+    x: number;
+    y: number;
+  } | null>(null);
   const gridSize = props.gridSize!.value;
   const snapToGrid = props.snapToGrid?.value;
   const gridLineVisible = props.gridLineVisible?.value;
@@ -91,13 +97,28 @@ const GridZoneComp: React.FC<WidgetUpdate> = ({ data }) => {
   }, [shouldCenterPan, zoom, mode]);
 
   useEffect(() => {
-    const handleClick = () => setContextMenuVisible(false);
-    window.addEventListener("click", handleClick);
-    return () => window.removeEventListener("click", handleClick);
+    const handleCtrlZoom = (e: WheelEvent) => {
+      // disable standard zoom/pinch
+      if (e.ctrlKey) e.preventDefault();
+    };
+    window.addEventListener("wheel", handleCtrlZoom, { passive: false });
+    return () => {
+      window.removeEventListener("wheel", handleCtrlZoom);
+    };
   }, []);
 
   const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
+    if (!pickedWidget) return setDragPreview(null);
+    const rect = e.currentTarget.getBoundingClientRect();
+    const userX = (e.clientX - rect.left - pan.x) / zoom;
+    const userY = (e.clientY - rect.top - pan.y) / zoom;
+
+    setDragPreview({
+      widget: pickedWidget,
+      x: ensureGridCoordinate(userX),
+      y: ensureGridCoordinate(userY),
+    });
   };
 
   const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
@@ -130,7 +151,7 @@ const GridZoneComp: React.FC<WidgetUpdate> = ({ data }) => {
     if (editableProperties.y) editableProperties.y.value = ensureGridCoordinate(userY);
 
     const newWidget: Widget = {
-      id: `${entry.widgetName}-${Date.now()}`,
+      id: `${entry.widgetName}-${uuidv4()}`,
       widgetLabel: droppedComp.widgetLabel,
       component: droppedComp.component,
       widgetName: droppedComp.widgetName,
@@ -138,6 +159,7 @@ const GridZoneComp: React.FC<WidgetUpdate> = ({ data }) => {
       editableProperties,
     };
     addWidget(newWidget);
+    setDragPreview(null);
   };
 
   const handleWheel = (e: React.WheelEvent<HTMLDivElement>) => {
@@ -170,15 +192,16 @@ const GridZoneComp: React.FC<WidgetUpdate> = ({ data }) => {
     }
   };
 
-  const handleClick = (_e: React.MouseEvent) => {
-    setContextMenuVisible(false);
-    setSelectedWidgetIDs([]);
+  const handleMouseUp = (e: React.MouseEvent) => {
+    if (e.button === 1 && !isPanning) {
+      centerScreen();
+    }
+    gridGrabbed.current = false;
+    setIsPanning(false);
   };
 
-  const handleAuxClick = (e: React.MouseEvent) => {
-    if (e.button !== 1) return;
-    if (!isPanning) centerScreen();
-    setIsPanning(false);
+  const handleClick = (_e: React.MouseEvent) => {
+    setContextMenuVisible(false);
   };
 
   const handleContextMenu = (e: React.MouseEvent) => {
@@ -211,26 +234,33 @@ const GridZoneComp: React.FC<WidgetUpdate> = ({ data }) => {
         setPan((prev) => ({ x: prev.x + dx, y: prev.y + dy }));
       }
     };
-
-    const handleMouseUp = () => {
-      gridGrabbed.current = false;
-    };
-
     window.addEventListener("mousemove", handleMouseMove);
-    window.addEventListener("mouseup", handleMouseUp);
     return () => {
       window.removeEventListener("mousemove", handleMouseMove);
-      window.removeEventListener("mouseup", handleMouseUp);
     };
   }, [gridGrabbed, isPanning, setIsPanning, ensureGridCoordinate, pan, zoom, mode]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (propertyEditorFocused || !inEditMode) return;
+      if (propertyEditorFocused) return;
+      // shortcuts for all modes
+      if (e.shiftKey && e.key.toLowerCase() === "c") {
+        e.preventDefault();
+        centerScreen();
+        return;
+      }
+      if (!inEditMode) return;
+      // shortcuts for edit mode only
+      if (e.ctrlKey && e.key.toLowerCase() === "s") {
+        e.preventDefault();
+        downloadWidgets().catch((err) => {
+          console.error("Failed to download widgets:", err);
+        });
+        return;
+      }
       if (e.key.toLowerCase() === "delete" && selectedWidgetIDs.length > 0) {
         e.preventDefault();
-        updateEditorWidgetList((prev) => prev.filter((w) => !selectedWidgetIDs.includes(w.id)));
-        setSelectedWidgetIDs([]);
+        deleteWidget();
         return;
       }
       if (e.ctrlKey && e.key.toLowerCase() === "z" && !e.shiftKey) {
@@ -261,50 +291,63 @@ const GridZoneComp: React.FC<WidgetUpdate> = ({ data }) => {
         setSelectedWidgetIDs(allWidgetIDs);
         return;
       }
-      if (e.shiftKey && e.key.toLowerCase() === "c") {
+      if (e.ctrlKey && e.key.toLowerCase() === "g") {
         e.preventDefault();
-        centerScreen();
+        groupSelected();
+        return;
+      }
+      if (e.ctrlKey && e.key.toLowerCase() === "u") {
+        e.preventDefault();
+        ungroupSelected();
         return;
       }
     };
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [
-    handleUndo,
-    handleRedo,
-    copyWidget,
-    pasteWidget,
-    downloadWidgets,
-    mousePosRef,
-    propertyEditorFocused,
-  ]);
+  });
 
   return (
     <div
       ref={gridRef}
-      id="gridZone"
+      id={GRID_ID}
       className="gridZone"
       onDragOver={handleDragOver}
       onDrop={handleDrop}
       onContextMenu={handleContextMenu}
       onWheel={handleWheel}
       onMouseDown={handleMouseDown}
+      onMouseUp={handleMouseUp}
       onClick={handleClick}
-      onAuxClick={handleAuxClick}
       style={{
         cursor: gridGrabbed.current ? "grabbing" : "default",
         backgroundColor: props.backgroundColor?.value,
-        backgroundImage: gridLineVisible
-          ? `linear-gradient(${props.gridLineColor!.value} 1px, transparent 1px),
+        backgroundImage:
+          gridLineVisible && inEditMode
+            ? `linear-gradient(${props.gridLineColor!.value} 1px, transparent 1px),
         linear-gradient(90deg, ${props.gridLineColor!.value} 1px, transparent 1px)`
-          : "none",
+            : "none",
         backgroundSize: `${props.gridSize!.value * zoom}px ${props.gridSize!.value * zoom}px`,
         backgroundPosition: `${pan.x % (props.gridSize!.value * zoom)}px ${
           pan.y % (props.gridSize!.value * zoom)
         }px`,
       }}
     >
+      {dragPreview && (
+        <div
+          style={{
+            position: "absolute",
+            left: pan.x + dragPreview.x * zoom,
+            top: pan.y + dragPreview.y * zoom,
+            width: dragPreview.widget.editableProperties.width?.value ?? 100,
+            height: dragPreview.widget.editableProperties.height?.value ?? 50,
+            border: "2px dashed #00aaff",
+            pointerEvents: "none",
+            transform: `scale(${zoom})`,
+            zIndex: 1000,
+          }}
+        />
+      )}
       <div
         id="centerRef"
         className={`centerRef ${
@@ -314,56 +357,16 @@ const GridZoneComp: React.FC<WidgetUpdate> = ({ data }) => {
           transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoom})`,
         }}
       >
-        <WidgetRenderer
-          scale={zoom}
-          ensureGridCoordinate={ensureGridCoordinate}
-          setIsDragging={setIsDragging}
-          isPanning={isPanning}
-        />
+        <WidgetRenderer scale={zoom} ensureGridCoordinate={ensureGridCoordinate} />
       </div>
-      {!disableSelecto && (
-        <Selecto
-          ref={selectoRef}
-          container={document.getElementById("gridContainer")}
-          rootContainer={document.getElementById("gridContainer")}
-          selectableTargets={[".selectable"]}
-          hitRate={100}
-          selectByClick
-          preventDragFromInside
-          preventRightClick={false}
-          preventClickEventOnDragStart
-          preventClickEventOnDrag
-          toggleContinueSelect={["ctrl"]}
-          onSelectEnd={(e) => {
-            if (e.selected.length == 0) {
-              setContextMenuVisible(false);
-            }
-            if (selectedWidgetIDs.length > 1 && e.inputEvent.button == 2) {
-              return;
-            }
-            if (e.added.length === 0 && e.removed.length === 0) {
-              selectoRef.current?.setSelectedTargets([]);
-              setSelectedWidgetIDs([]);
-            } else {
-              const selectedIDs = e.selected.map((el) => el.id);
-              setSelectedWidgetIDs(selectedIDs);
-            }
-          }}
-        />
-      )}
-      <ToolbarButtons
-        onMouseEnter={() => setMouseOverMenu(true)}
-        onMouseLeave={() => setMouseOverMenu(false)}
-      />
+      <SelectionManager gridRef={gridRef} zoom={zoom} pan={pan} />
+      <ToolbarButtons />
       <ContextMenu
         pos={contextMenuPos}
         mousePos={mousePosRef.current}
         visible={contextMenuVisible}
-        onMouseEnter={() => setMouseOverMenu(true)}
-        onMouseLeave={() => setMouseOverMenu(false)}
         onClose={() => {
           setContextMenuVisible(false);
-          setMouseOverMenu(false);
         }}
       />
     </div>

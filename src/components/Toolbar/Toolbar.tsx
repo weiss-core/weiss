@@ -14,17 +14,15 @@ import FlipToBack from "@mui/icons-material/FlipToBack";
 import AlignVerticalCenter from "@mui/icons-material/AlignVerticalCenter";
 import AlignHorizontalCenter from "@mui/icons-material/AlignHorizontalCenter";
 import DragIndicator from "@mui/icons-material/DragIndicator";
+import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
+import CustomGroupIcon from "@components/CustomIcons/GroupIcon";
+import CustomUngroupIcon from "@components/CustomIcons/UngroupIcon";
 import { EDIT_MODE } from "@src/constants/constants";
 import { Rnd } from "react-rnd";
 import { grey } from "@mui/material/colors";
 import "./Toolbar.css";
 
-export interface ToolBarProps {
-  onMouseEnter: () => void;
-  onMouseLeave: () => void;
-}
-
-const ToolbarButtons: React.FC<ToolBarProps> = ({ onMouseEnter, onMouseLeave }) => {
+const ToolbarButtons: React.FC = () => {
   const {
     mode,
     selectedWidgetIDs,
@@ -40,6 +38,9 @@ const ToolbarButtons: React.FC<ToolBarProps> = ({ onMouseEnter, onMouseLeave }) 
     alignLeft,
     alignRight,
     alignVerticalCenter,
+    deleteWidget,
+    groupSelected,
+    ungroupSelected,
   } = useEditorContext();
 
   if (mode !== EDIT_MODE) return null;
@@ -59,12 +60,12 @@ const ToolbarButtons: React.FC<ToolBarProps> = ({ onMouseEnter, onMouseLeave }) 
   return (
     <Rnd
       className="toolBar"
-      default={{ x: 80, y: 15, width: 350, height: 40 }}
+      default={{ x: 80, y: 15, width: 440, height: 40 }}
       bounds="window"
       enableResizing={false}
       dragHandleClassName="dragHandle"
     >
-      <Box className="toolbarBox" onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave}>
+      <Box className="toolbarBox" onClick={(e) => e.stopPropagation()}>
         <Box
           className="dragHandle"
           sx={{ cursor: "move", px: 1, display: "flex", alignItems: "center" }}
@@ -100,6 +101,31 @@ const ToolbarButtons: React.FC<ToolBarProps> = ({ onMouseEnter, onMouseLeave }) 
           <span>
             <IconButton size="small" onClick={sendToBack} disabled={noneSelected} sx={iconSx}>
               <FlipToBack fontSize="small" />
+            </IconButton>
+          </span>
+        </Tooltip>
+
+        <Tooltip title="Group widgets">
+          <span>
+            <IconButton
+              size="small"
+              onClick={groupSelected}
+              disabled={lessThanTwoSelected}
+              sx={iconSx}
+            >
+              <CustomGroupIcon fontSize="small" />
+            </IconButton>
+          </span>
+        </Tooltip>
+        <Tooltip title="Ungroup widgets">
+          <span>
+            <IconButton
+              size="small"
+              onClick={ungroupSelected}
+              disabled={lessThanTwoSelected}
+              sx={iconSx}
+            >
+              <CustomUngroupIcon fontSize="small" />
             </IconButton>
           </span>
         </Tooltip>
@@ -168,6 +194,14 @@ const ToolbarButtons: React.FC<ToolBarProps> = ({ onMouseEnter, onMouseLeave }) 
               sx={iconSx}
             >
               <AlignHorizontalCenter fontSize="small" />
+            </IconButton>
+          </span>
+        </Tooltip>
+
+        <Tooltip title="Delete widget">
+          <span>
+            <IconButton size="small" onClick={deleteWidget} disabled={noneSelected} sx={iconSx}>
+              <DeleteOutlineIcon fontSize="small" />
             </IconButton>
           </span>
         </Tooltip>

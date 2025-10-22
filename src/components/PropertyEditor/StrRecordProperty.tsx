@@ -32,11 +32,12 @@ const StrRecordProperty: React.FC<StrRecordPropertyProps> = ({
     const newEntries = [...items];
     const [, val] = newEntries[index];
     newEntries[index] = [newKey, val];
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     onChange(propName, Object.fromEntries(newEntries));
   };
 
   const handleKeyBlur = (index: number) => {
-    const entries = Object.entries(value as Record<string, string>);
+    const entries = Object.entries(value);
     const [key, val] = entries[index];
     if (!key.trim()) return;
 
@@ -53,6 +54,7 @@ const StrRecordProperty: React.FC<StrRecordPropertyProps> = ({
     const newEntries = [...items];
     const [key] = newEntries[index];
     newEntries[index] = [key, newVal];
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     onChange(propName, Object.fromEntries(newEntries));
   };
 
@@ -63,11 +65,13 @@ const StrRecordProperty: React.FC<StrRecordPropertyProps> = ({
     } else {
       newEntries.push(["", ""]);
     }
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     onChange(propName, Object.fromEntries(newEntries));
   };
 
   const handleRemove = (index: number) => {
     const newEntries = items.filter((_, i) => i !== index);
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     onChange(propName, Object.fromEntries(newEntries.length > 0 ? newEntries : [["", ""]]));
   };
 

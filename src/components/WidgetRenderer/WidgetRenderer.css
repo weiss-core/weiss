@@ -11,4 +11,14 @@
 
 .groupBox {
   box-sizing: border-box;
+  overflow: visible; /* allow selection margin to be seen */
+  outline: 1px dashed rgba(80, 80, 80, 0.199);
+}
+
+.selectionGroup {
+  position: absolute;
+  outline: 2px dashed var(--highlighted);
+  background-color: rgba(59, 130, 246, 0.1);
+  z-index: var(--front-ui-zidx);
+  box-sizing: border-box;
 }

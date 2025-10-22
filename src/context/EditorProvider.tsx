@@ -26,7 +26,8 @@ export const EditorProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     widgetManager.editorWidgets,
     widgetManager.setSelectedWidgetIDs,
     widgetManager.updateWidgetProperties,
-    widgetManager.loadWidgets
+    widgetManager.loadWidgets,
+    widgetManager.formatWdgToExport
   );
 
   const value = React.useMemo<EditorContextType>(

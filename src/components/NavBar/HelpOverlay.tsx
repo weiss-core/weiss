@@ -1,7 +1,8 @@
 import React, { useState, useRef } from "react";
 import { IconButton, Fade, Box, Typography, Tooltip, Divider } from "@mui/material";
 import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
-import { FRONT_UI_ZIDX } from "@src/constants/constants";
+import OpenInNewIcon from "@mui/icons-material/OpenInNew";
+import { APP_SRC_URL, FRONT_UI_ZIDX } from "@src/constants/constants";
 
 interface ShortcutRowProps {
   action: string;
@@ -46,7 +47,7 @@ const renderBinding = (binding: string, idx: number) => {
           </Typography>
         ) : (
           <KeyPill key={i} label={token} />
-        ),
+        )
       )}
     </Box>
   );
@@ -140,8 +141,17 @@ const HelpOverlay: React.FC = () => {
             using the right menu. Add PV names as needed. Enter runtime mode when ready. <br />
             <br />
             <i>
-              (Help is not yet very helpful 🙁, work in progress! Feel free to reach out if you need
-              assistance)
+              If you find any problems, please create a{" "}
+              <a
+                href={`${APP_SRC_URL}/issues/new`}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ color: "white" }}
+              >
+                new GitHub issue
+                <OpenInNewIcon sx={{ fontSize: 12, ml: 0.5 }} />
+              </a>
+              .
             </i>
           </Typography>
 
@@ -156,6 +166,9 @@ const HelpOverlay: React.FC = () => {
           <ShortcutRow action="Paste widget" keys="Ctrl + V" />
           <ShortcutRow action="Delete widget" keys="Delete" />
           <ShortcutRow action="Select all" keys="Ctrl + A" />
+          <ShortcutRow action="Group" keys="Ctrl + G" />
+          <ShortcutRow action="Ungroup" keys="Ctrl + U" />
+          <ShortcutRow action="Export layout" keys="Ctrl + S" />
 
           <Divider sx={{ my: 2, borderColor: "rgba(255,255,255,0.2)" }} />
 
@@ -164,7 +177,7 @@ const HelpOverlay: React.FC = () => {
           </Typography>
           <ShortcutRow action="Center screen" keys={["Middle Mouse", "Shift + C"]} />
           <ShortcutRow action="Zoom" keys="Scroll Wheel" />
-          <ShortcutRow action="Pan screen" keys={["Middle Mouse", "Alt + Click"]} />
+          <ShortcutRow action="Pan screen" keys={["Middle Mouse", "Alt + Drag"]} />
         </Box>
       </Fade>
     </>

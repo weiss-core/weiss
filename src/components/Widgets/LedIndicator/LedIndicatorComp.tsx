@@ -1,6 +1,6 @@
 import React from "react";
 import type { WidgetUpdate } from "@src/types/widgets";
-import { EDIT_MODE, RUNTIME_MODE } from "@src/constants/constants";
+import { EDIT_MODE } from "@src/constants/constants";
 import { useEditorContext } from "@src/context/useEditorContext";
 import LightPanel from "@ReactAutomationStudio/components/BaseComponents/LightPanel";
 

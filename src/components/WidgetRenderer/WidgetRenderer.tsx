@@ -1,205 +1,255 @@
-import React, { useEffect, type ReactNode } from "react";
+import React, { type ReactNode } from "react";
 import WidgetRegistry from "@components/WidgetRegistry/WidgetRegistry";
 import { useEditorContext } from "@src/context/useEditorContext";
-import type { MultiWidgetPropertyUpdates, Widget } from "@src/types/widgets";
-import { Rnd, type Position, type RndDragEvent, type DraggableData } from "react-rnd";
-import { EDIT_MODE, FRONT_UI_ZIDX } from "@src/constants/constants";
+import type { Widget, GridPosition, MultiWidgetPropertyUpdates } from "@src/types/widgets";
+import { Rnd, type DraggableData, type RndDragEvent } from "react-rnd";
+import { GRID_ID } from "@src/constants/constants";
 import "./WidgetRenderer.css";
+
+const DRAG_END_DELAY = 80; //ms
 
 interface RendererProps {
   scale: number;
   ensureGridCoordinate: (coord: number) => number;
-  setIsDragging: React.Dispatch<React.SetStateAction<boolean>>;
-  isPanning: boolean;
 }
 
-/**
- * WidgetRenderer is responsible for rendering all editor widgets and handling their interactions.
- *
- * @features
- * - Rendering individual widgets from the WidgetRegistry
- * - Supporting multi-selection and group manipulation
- * - Dragging and resizing widgets with snapping to grid
- * - Updating widget properties in the editor context
- *
- * @param scale Current zoom level of the grid
- * @param ensureGridCoordinate Function to snap items to grid (if snap activated)
- * @param setIsDragging Callback to indicate dragging state
- */
-const WidgetRenderer: React.FC<RendererProps> = ({
-  scale,
-  ensureGridCoordinate,
-  setIsDragging,
-  isPanning,
-}) => {
+const WidgetRenderer: React.FC<RendererProps> = ({ scale, ensureGridCoordinate }) => {
   const {
-    mode,
+    inEditMode,
     editorWidgets,
-    updateWidgetProperties,
-    batchWidgetUpdate,
     selectedWidgetIDs,
-    selectedWidgets,
-    groupBounds,
+    batchWidgetUpdate,
+    selectionBounds,
+    setIsDragging,
+    isPanning,
   } = useEditorContext();
 
-  const isMultipleSelect = selectedWidgetIDs.length > 1;
+  /** Core widget content renderer */
+  const renderWidgetContent = (w: Widget): ReactNode => {
+    const Comp = WidgetRegistry[w.widgetName]?.component;
+    return Comp ? <Comp data={w} /> : null;
+  };
 
-  function renderWidget(widget: Widget): ReactNode {
-    const Comp = WidgetRegistry[widget.widgetName]?.component;
-    return Comp ? <Comp data={widget} /> : <div>Unknown widget</div>;
-  }
+  /** Recursively apply delta for drag */
+  const applyDelta = (
+    widget: Widget,
+    dx: number,
+    dy: number,
+    updates: MultiWidgetPropertyUpdates
+  ) => {
+    updates[widget.id] = {
+      x: ensureGridCoordinate(widget.editableProperties.x!.value + dx),
+      y: ensureGridCoordinate(widget.editableProperties.y!.value + dy),
+    };
+    widget.children?.forEach((child) => applyDelta(child, dx, dy, updates));
+  };
+
+  /** Recursively apply proportional resize for groups or selection */
+  const applyResize = (
+    widget: Widget,
+    parentOldX: number,
+    parentOldY: number,
+    parentOldWidth: number,
+    parentOldHeight: number,
+    parentNewX: number,
+    parentNewY: number,
+    parentNewWidth: number,
+    parentNewHeight: number,
+    updates: MultiWidgetPropertyUpdates
+  ) => {
+    const { x, y, width, height } = widget.editableProperties;
+    if (!x || !y || !width || !height) return;
+
+    const scaleX = parentOldWidth === 0 ? 1 : parentNewWidth / parentOldWidth;
+    const scaleY = parentOldHeight === 0 ? 1 : parentNewHeight / parentOldHeight;
+
+    const newX = parentNewX + (x.value - parentOldX) * scaleX;
+    const newY = parentNewY + (y.value - parentOldY) * scaleY;
+    const newWidth = width.value * scaleX;
+    const newHeight = height.value * scaleY;
+
+    updates[widget.id] = {
+      x: ensureGridCoordinate(newX),
+      y: ensureGridCoordinate(newY),
+      width: ensureGridCoordinate(newWidth),
+      height: ensureGridCoordinate(newHeight),
+    };
+
+    widget.children?.forEach((child) =>
+      applyResize(
+        child,
+        x.value,
+        y.value,
+        width.value,
+        height.value,
+        newX,
+        newY,
+        newWidth,
+        newHeight,
+        updates
+      )
+    );
+  };
 
   const handleDragStop = (_e: RndDragEvent, d: DraggableData, w: Widget) => {
-    if (w.editableProperties.x?.value == d.x && w.editableProperties.y?.value == d.y) return;
-    setIsDragging(false);
-    updateWidgetProperties(w.id, {
-      x: ensureGridCoordinate(d.x),
-      y: ensureGridCoordinate(d.y),
-    });
-  };
+    const dx = d.x - w.editableProperties.x!.value;
+    const dy = d.y - w.editableProperties.y!.value;
+    if (dx === 0 && dy === 0) return;
 
-  const handleResizeStop = (ref: HTMLElement, position: Position, w: Widget) => {
-    setIsDragging(false);
-    const newWidth = ensureGridCoordinate(parseInt(ref.style.width));
-    const newHeight = ensureGridCoordinate(parseInt(ref.style.height));
-    if (
-      w.editableProperties.width?.value == newWidth &&
-      w.editableProperties.height?.value == newHeight
-    )
-      return;
-    const newX = ensureGridCoordinate(position.x);
-    const newY = ensureGridCoordinate(position.y);
-    updateWidgetProperties(w.id, { width: newWidth, height: newHeight, x: newX, y: newY });
-  };
-
-  const handleGroupDragStop = (dx: number, dy: number) => {
-    setIsDragging(false);
+    setTimeout(() => setIsDragging(false), DRAG_END_DELAY);
 
     const updates: MultiWidgetPropertyUpdates = {};
-    selectedWidgets.forEach((widget) => {
-      const xProp = widget.editableProperties.x;
-      const yProp = widget.editableProperties.y;
-      if (!xProp || !yProp) return;
-
-      const newX = ensureGridCoordinate(xProp.value + dx);
-      const newY = ensureGridCoordinate(yProp.value + dy);
-
-      updates[widget.id] = { x: newX, y: newY };
-    });
-
+    applyDelta(w, dx, dy, updates);
     batchWidgetUpdate(updates);
   };
 
-  const handleGroupResizeStop = (ref: HTMLElement) => {
-    setIsDragging(false);
-    if (!groupBounds) return;
-    const newGroupWidth = ref.offsetWidth;
-    const newGroupHeight = ref.offsetHeight;
+  const handleResizeStop = (ref: HTMLElement, position: GridPosition, w: Widget) => {
+    setTimeout(() => setIsDragging(false), DRAG_END_DELAY);
 
-    const scaleX = newGroupWidth / groupBounds.width;
-    const scaleY = newGroupHeight / groupBounds.height;
+    const oldX = w.editableProperties.x!.value;
+    const oldY = w.editableProperties.y!.value;
+    const oldWidth = w.editableProperties.width!.value;
+    const oldHeight = w.editableProperties.height!.value;
+
+    const newX = position.x;
+    const newY = position.y;
+    const newWidth = parseInt(ref.style.width);
+    const newHeight = parseInt(ref.style.height);
 
     const updates: MultiWidgetPropertyUpdates = {};
-
-    selectedWidgets.forEach((w) => {
-      const widthProp = w.editableProperties.width;
-      const heightProp = w.editableProperties.height;
-      const xProp = w.editableProperties.x;
-      const yProp = w.editableProperties.y;
-
-      if (!widthProp || !heightProp || !xProp || !yProp) return;
-
-      const newWidth = ensureGridCoordinate(widthProp.value * scaleX);
-      const newHeight = ensureGridCoordinate(heightProp.value * scaleY);
-
-      const relativeX = xProp.value - groupBounds.x;
-      const relativeY = yProp.value - groupBounds.y;
-
-      const newX = ensureGridCoordinate(groupBounds.x + relativeX * scaleX);
-      const newY = ensureGridCoordinate(groupBounds.y + relativeY * scaleY);
-
-      updates[w.id] = { width: newWidth, height: newHeight, x: newX, y: newY };
-    });
-
+    applyResize(w, oldX, oldY, oldWidth, oldHeight, newX, newY, newWidth, newHeight, updates);
     batchWidgetUpdate(updates);
   };
+
+  const renderRecursive = (w: Widget, parentX = 0, parentY = 0, isChild = false): ReactNode => {
+    if (w.id === GRID_ID) return null;
+    const isSelected = selectedWidgetIDs.includes(w.id);
+    if (isSelected && selectedWidgetIDs.length > 1) return null;
+
+    const x = w.editableProperties.x!.value - parentX;
+    const y = w.editableProperties.y!.value - parentY;
+    const width = w.editableProperties.width!.value;
+    const height = w.editableProperties.height!.value;
+
+    const canDrag = inEditMode && !isPanning && !isChild;
+    const canResize = inEditMode && !isPanning && !isChild;
+    const isGroup = w.children?.length;
+
+    return (
+      <Rnd
+        key={w.id}
+        id={w.id}
+        bounds="window"
+        scale={scale}
+        disableDragging={!canDrag}
+        enableResizing={canResize}
+        size={{ width, height }}
+        position={{ x, y }}
+        className={
+          inEditMode ? `selectable ${isSelected ? "selected" : isGroup ? "groupBox" : ""}` : ""
+        }
+        onDrag={() => setIsDragging(true)}
+        onDragStop={(e, d) => handleDragStop(e, d, w)}
+        onResizeStart={() => setIsDragging(true)}
+        onResizeStop={(_e, _dir, ref, _delta, pos) => handleResizeStop(ref, pos, w)}
+      >
+        {renderWidgetContent(w)}
+        {w.children?.map((child) =>
+          renderRecursive(child, w.editableProperties.x!.value, w.editableProperties.y!.value, true)
+        )}
+      </Rnd>
+    );
+  };
+
+  /** Render selection group for multi-select */
+  const renderSelectionGroup = () => {
+    if (!selectionBounds || selectedWidgetIDs.length <= 1) return null;
+
+    const selectedWidgets = editorWidgets.filter((w) => selectedWidgetIDs.includes(w.id));
+    const canDrag = inEditMode && !isPanning;
+    const canResize = inEditMode && !isPanning;
+
+    const renderRecursiveForSelection = (w: Widget, parentX = 0, parentY = 0): ReactNode => {
+      const x = w.editableProperties.x!.value - parentX;
+      const y = w.editableProperties.y!.value - parentY;
+      const width = w.editableProperties.width!.value;
+      const height = w.editableProperties.height!.value;
+      const isGroup = w.children?.length;
+
+      return (
+        <div
+          key={w.id}
+          className={`selectable ${isGroup ? "groupBox" : ""}`}
+          style={{ position: "absolute", left: x, top: y, width, height }}
+        >
+          {renderWidgetContent(w)}
+          {w.children?.map((child) =>
+            renderRecursiveForSelection(
+              child,
+              w.editableProperties.x!.value,
+              w.editableProperties.y!.value
+            )
+          )}
+        </div>
+      );
+    };
+
+    return (
+      <Rnd
+        bounds="window"
+        className="selectionGroup"
+        scale={scale}
+        size={{ width: selectionBounds.width, height: selectionBounds.height }}
+        position={{ x: selectionBounds.x, y: selectionBounds.y }}
+        enableResizing={canResize}
+        disableDragging={!canDrag}
+        onDrag={() => setIsDragging(true)}
+        onDragStop={(_e, d) => {
+          const dx = d.x - selectionBounds.x;
+          const dy = d.y - selectionBounds.y;
+          const updates: MultiWidgetPropertyUpdates = {};
+          selectedWidgets.forEach((w) => applyDelta(w, dx, dy, updates));
+          batchWidgetUpdate(updates);
+          setTimeout(() => setIsDragging(false), DRAG_END_DELAY);
+        }}
+        onResizeStart={() => setIsDragging(true)}
+        onResizeStop={(_e, _dir, ref, _delta, pos) => {
+          const oldWidth = selectionBounds.width;
+          const oldHeight = selectionBounds.height;
+          const updates: MultiWidgetPropertyUpdates = {};
+          selectedWidgets.forEach((w) =>
+            applyResize(
+              w,
+              selectionBounds.x,
+              selectionBounds.y,
+              oldWidth,
+              oldHeight,
+              pos.x,
+              pos.y,
+              ref.offsetWidth,
+              ref.offsetHeight,
+              updates
+            )
+          );
+          batchWidgetUpdate(updates);
+          setTimeout(() => setIsDragging(false), DRAG_END_DELAY);
+        }}
+      >
+        {selectedWidgets.map((w) =>
+          renderRecursiveForSelection(w, selectionBounds.x, selectionBounds.y)
+        )}
+      </Rnd>
+    );
+  };
+
+  const topLevelWidgets = editorWidgets.filter((w) => w.id !== GRID_ID);
 
   return (
     <>
-      {isMultipleSelect && groupBounds && (
-        <Rnd
-          id="groupBox"
-          bounds="window"
-          scale={scale}
-          disableDragging={mode != EDIT_MODE || isPanning}
-          size={{ width: groupBounds.width, height: groupBounds.height }}
-          position={{ x: groupBounds.x, y: groupBounds.y }}
-          onDrag={() => setIsDragging(true)}
-          onDragStop={(_e, d) => {
-            const dx = d.x - groupBounds.x;
-            const dy = d.y - groupBounds.y;
-            handleGroupDragStop(dx, dy);
-          }}
-          onClick={(e: React.MouseEvent) => e.stopPropagation()}
-          onResize={() => setIsDragging(true)}
-          onResizeStop={(_e, _direction, ref) => handleGroupResizeStop(ref)}
-          style={{
-            outline: `${selectedWidgetIDs.length > 1 ? "1px dashed" : "none"}`,
-            zIndex: FRONT_UI_ZIDX - 1,
-          }}
-        >
-          {selectedWidgets.map((w) => {
-            return (
-              <div
-                key={w.id}
-                className="selectable selected"
-                style={{
-                  width: w.editableProperties.width!.value,
-                  height: w.editableProperties.height!.value,
-                  left: w.editableProperties.x!.value - groupBounds.x,
-                  top: w.editableProperties.y!.value - groupBounds.y,
-                  pointerEvents: isPanning ? "none" : "auto",
-                }}
-              >
-                {renderWidget(w)}
-              </div>
-            );
-          })}
-        </Rnd>
-      )}
-      {editorWidgets.map((w) => {
-        const isInGroupBox = selectedWidgetIDs.includes(w.id) && isMultipleSelect;
-        const isOnlySelected = selectedWidgetIDs.includes(w.id) && !isMultipleSelect;
-        return (
-          <Rnd
-            key={w.id}
-            size={{
-              width: w.editableProperties.width?.value ?? 0,
-              height: w.editableProperties.height?.value ?? 0,
-            }}
-            position={{
-              x: w.editableProperties.x?.value ?? 0,
-              y: w.editableProperties.y?.value ?? 0,
-            }}
-            bounds="window"
-            scale={scale}
-            id={w.id}
-            className={`selectable ${isOnlySelected ? "selected" : ""}`}
-            disableDragging={mode != EDIT_MODE || isPanning}
-            enableResizing={mode == EDIT_MODE && !isPanning}
-            onDrag={() => setIsDragging(true)}
-            onDragStop={(_e, d) => handleDragStop(_e, d, w)}
-            onResizeStart={() => setIsDragging(true)}
-            onClick={(e: React.MouseEvent) => e.stopPropagation()}
-            onResizeStop={(_e, _direction, ref, _delta, position) =>
-              handleResizeStop(ref, position, w)
-            }
-          >
-            {isInGroupBox ? null : renderWidget(w)}
-          </Rnd>
-        );
-      })}
+      {topLevelWidgets.map((w) => renderRecursive(w))}
+      {renderSelectionGroup()}
     </>
   );
 };
+
 export default WidgetRenderer;
