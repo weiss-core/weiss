@@ -25,7 +25,6 @@ export const EditorProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const ui = useUIManager(
     widgetManager.editorWidgets,
     widgetManager.setSelectedWidgetIDs,
-    widgetManager.updateWidgetProperties,
     widgetManager.loadWidgets,
     widgetManager.formatWdgToExport
   );

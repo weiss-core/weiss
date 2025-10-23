@@ -14,7 +14,6 @@ import type { ExportedWidget, Widget } from "@src/types/widgets";
  *
  * @param editorWidgets Current list of widgets from the widget manager.
  * @param setSelectedWidgetIDs Function to update currently selected widgets.
- * @param updateWidgetProperties Function to update widget properties.
  * @param loadWidgets Function to load widgets into the editor (used for localStorage).
  * @param formatWdgToExport Function to format (reduce) widgets to exporting format.
  * @returns An object containing UI state, setters, and mode updater.
@@ -22,7 +21,6 @@ import type { ExportedWidget, Widget } from "@src/types/widgets";
 export default function useUIManager(
   editorWidgets: ReturnType<typeof useWidgetManager>["editorWidgets"],
   setSelectedWidgetIDs: ReturnType<typeof useWidgetManager>["setSelectedWidgetIDs"],
-  updateWidgetProperties: ReturnType<typeof useWidgetManager>["updateWidgetProperties"],
   loadWidgets: ReturnType<typeof useWidgetManager>["loadWidgets"],
   formatWdgToExport: ReturnType<typeof useWidgetManager>["formatWdgToExport"]
 ) {
