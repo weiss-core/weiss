@@ -129,13 +129,13 @@ export default function NavBar() {
   const handleImportGithub = () => {
     handleMenuClose();
     console.log("TODO: trigger GitHub OAuth + file browser workflow");
-    window.alert("Not implemented");
+    window.alert("Not implemented. Coming soon!");
   };
 
   const handleImportGitlab = () => {
     handleMenuClose();
     console.log("TODO: trigger GitLab OAuth + file browser workflow");
-    window.alert("Not implemented");
+    window.alert("Not implemented. Coming soon!");
   };
 
   return (
