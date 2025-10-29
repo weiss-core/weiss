@@ -1,17 +1,27 @@
 services:
+  weiss-demoioc:
+    build:
+      context: "./examples/exampleIOC/"
+    image: weiss-demoioc:${APP_VERSION}
+    container_name: weiss-demoioc
+    restart: always
+    network_mode: host
+    tty: true
+    stdin_open: true
+
   weiss-dev:
     build:
       context: "."
       target: dev
       args:
         GIT_REPO: ${GIT_REPO}
-        GIT_TAG: ${GIT_TAG}
+        APP_VERSION: ${APP_VERSION}
     volumes:
       - .:/app # Mount the source code for development
       - /app/node_modules # Prevent host node_modules from interfering
-    image: weiss-dev:${GIT_TAG}
+    image: weiss-dev:${APP_VERSION}
     container_name: weiss-dev
-    network_mode: "host"
+    network_mode: host
     environment:
       - NODE_ENV=development
     depends_on:
@@ -21,7 +31,7 @@ services:
       context: ./pvaPyWS
     volumes:
       - ./pvaPyWS:/app
-    image: weiss-pvapyws:${GIT_TAG}
+    image: weiss-pvapyws:${APP_VERSION}
     container_name: weiss-pvapyws
     ports:
       - "8080:8080"
