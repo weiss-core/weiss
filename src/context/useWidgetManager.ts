@@ -106,6 +106,15 @@ export function useWidgetManager() {
   );
 
   /**
+   * Get a widget by its ID.
+   * @param id Widget ID
+   * @returns Widget object or undefined
+   */
+  const getWidget = useCallback(
+    (id: string) => getWidgetNested(editorWidgets, id),
+    [editorWidgets]
+  );
+  /**
    * Apply multiple property updates to widgets.
    * @param updates Object mapping widget IDs to property updates
    * @param keepHistory Whether to store this change in undo stack
@@ -136,17 +145,7 @@ export function useWidgetManager() {
 
       updateEditorWidgetList((prev) => updateWidgets(prev, updates), keepHistory);
     },
-    [updateEditorWidgetList]
-  );
-
-  /**
-   * Get a widget by its ID.
-   * @param id Widget ID
-   * @returns Widget object or undefined
-   */
-  const getWidget = useCallback(
-    (id: string) => getWidgetNested(editorWidgets, id),
-    [editorWidgets]
+    [updateEditorWidgetList, getWidget]
   );
 
   /**
@@ -678,45 +677,57 @@ export function useWidgetManager() {
    */
   const updatePVData = useCallback(
     (newPVData: PVData) => {
-      updateEditorWidgetList(
-        (prev) =>
-          prev.map((w) => {
-            // single PV case
-            if (w.editableProperties.pvName?.value === newPVData.pv) {
-              return {
-                ...w,
-                pvData: {
-                  ...w.pvData,
-                  ...newPVData,
-                  value: newPVData.value ?? w.pvData?.value,
-                },
+      const updateWidgetRecursive = (widget: Widget): Widget => {
+        let updatedWidget = widget;
+        // --- single PV case ---
+        if (widget.editableProperties.pvName?.value === newPVData.pv) {
+          updatedWidget = {
+            ...widget,
+            pvData: {
+              ...widget.pvData,
+              ...newPVData,
+              value: newPVData.value ?? widget.pvData?.value,
+            },
+          };
+        }
+        // --- multi PV case ---
+        else if (widget.editableProperties.pvNames) {
+          const updatedMultiPvData: MultiPvData = { ...widget.multiPvData };
+          let hasUpdate = false;
+
+          for (const pv of Object.values(widget.editableProperties.pvNames.value)) {
+            if (pv === newPVData.pv) {
+              updatedMultiPvData[pv] = {
+                ...widget.multiPvData?.[pv],
+                ...newPVData,
+                value: newPVData.value ?? widget.multiPvData?.[pv]?.value,
               };
+              hasUpdate = true;
             }
+          }
 
-            // multi PV case
-            if (w.editableProperties.pvNames) {
-              const updatedMultiPvData: MultiPvData = { ...w.multiPvData };
+          if (hasUpdate) {
+            updatedWidget = {
+              ...widget,
+              multiPvData: updatedMultiPvData,
+            };
+          }
+        }
 
-              for (const pv of Object.values(w.editableProperties.pvNames.value)) {
-                if (pv === newPVData.pv) {
-                  updatedMultiPvData[pv] = {
-                    ...w.multiPvData?.[pv],
-                    ...newPVData,
-                    value: newPVData.value ?? w.multiPvData?.[pv]?.value,
-                  };
-                }
-              }
+        // --- recurse into children ---
+        if (widget.children && widget.children.length > 0) {
+          const children = widget.children;
+          const updatedChildren = children.map(updateWidgetRecursive);
 
-              return {
-                ...w,
-                multiPvData: updatedMultiPvData,
-              };
-            }
+          if (updatedChildren.some((c, i) => c !== children[i])) {
+            updatedWidget = { ...updatedWidget, children: updatedChildren };
+          }
+        }
 
-            return w;
-          }),
-        false
-      );
+        return updatedWidget;
+      };
+
+      updateEditorWidgetList((prev) => prev.map(updateWidgetRecursive), false);
     },
     [updateEditorWidgetList]
   );
@@ -765,25 +776,34 @@ export function useWidgetManager() {
   const PVMap = useMemo(() => {
     const map = new Map<string, string>();
 
-    for (const w of editorWidgets) {
-      const single = w.editableProperties?.pvName?.value;
-      if (single) {
-        const substitutedSingle = substituteMacros(single);
-        if (substitutedSingle) {
-          map.set(single, substitutedSingle);
+    const collectPVs = (widgets: typeof editorWidgets) => {
+      for (const w of widgets) {
+        const single = w.editableProperties?.pvName?.value;
+        if (single) {
+          const substitutedSingle = substituteMacros(single);
+          if (substitutedSingle) {
+            map.set(single, substitutedSingle);
+          }
+        }
+
+        const multiPV = w.editableProperties?.pvNames?.value;
+        if (multiPV) {
+          Object.values(multiPV).forEach((pv) => {
+            const substituted = substituteMacros(pv);
+            if (substituted) {
+              map.set(pv, substituted);
+            }
+          });
+        }
+
+        // Recurse into children if present
+        if (w.children && w.children.length > 0) {
+          collectPVs(w.children);
         }
       }
+    };
 
-      const multiPV = w.editableProperties?.pvNames?.value;
-      if (multiPV) {
-        Object.values(multiPV).forEach((pv) => {
-          const substituted = substituteMacros(pv);
-          if (substituted) {
-            map.set(pv, substituted);
-          }
-        });
-      }
-    }
+    collectPVs(editorWidgets);
     return map;
   }, [editorWidgets, substituteMacros]);
 
