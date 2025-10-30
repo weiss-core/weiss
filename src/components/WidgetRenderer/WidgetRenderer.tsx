@@ -1,10 +1,11 @@
-import React, { type ReactNode } from "react";
+import React, { useMemo, type ReactNode } from "react";
 import WidgetRegistry from "@components/WidgetRegistry/WidgetRegistry";
 import { useEditorContext } from "@src/context/useEditorContext";
 import type { Widget, MultiWidgetPropertyUpdates, DOMRectLike } from "@src/types/widgets";
 import { Rnd, type DraggableData, type Position, type RndDragEvent } from "react-rnd";
 import { GRID_ID } from "@src/constants/constants";
 import "./WidgetRenderer.css";
+import type { PVData } from "@src/types/pvaPyWS";
 
 const DRAG_END_DELAY = 80; //ms
 
@@ -24,7 +25,36 @@ const WidgetRenderer: React.FC<RendererProps> = ({ scale, ensureGridCoordinate }
     isPanning,
     updateWidgetProperties,
     selectedWidgets,
+    pvState,
   } = useEditorContext();
+
+  const widgetsForRender = useMemo(() => {
+    const mergeWidget = (w: Widget): Widget => {
+      if (inEditMode) return w;
+      let pvData: PVData | undefined = undefined;
+      let multiPvData: Record<string, PVData> | undefined = undefined;
+
+      if (w.editableProperties.pvName?.value) {
+        pvData = pvState[w.editableProperties.pvName.value];
+      }
+      if (w.editableProperties.pvNames?.value) {
+        multiPvData = {};
+        Object.values(w.editableProperties.pvNames.value).forEach((pv) => {
+          const data = pvState[pv];
+          if (data) multiPvData![pv] = data;
+        });
+      }
+
+      return {
+        ...w,
+        pvData,
+        multiPvData,
+        children: w.children?.map(mergeWidget),
+      };
+    };
+
+    return editorWidgets.map(mergeWidget);
+  }, [editorWidgets, pvState, inEditMode]);
 
   /** Core widget content renderer */
   const renderWidgetContent = (w: Widget): ReactNode => {
@@ -199,7 +229,7 @@ const WidgetRenderer: React.FC<RendererProps> = ({ scale, ensureGridCoordinate }
     );
   };
 
-  const topLevelWidgets = editorWidgets.filter((w) => w.id !== GRID_ID);
+  const topLevelWidgets = widgetsForRender.filter((w) => w.id !== GRID_ID);
 
   return (
     <>

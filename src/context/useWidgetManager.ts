@@ -8,6 +8,7 @@ import type {
   ExportedWidget,
   DOMRectLike,
 } from "@src/types/widgets";
+import type { PVData } from "@src/types/pvaPyWS";
 import { GridZone } from "@components/GridZone";
 import { GRID_ID, MAX_HISTORY } from "@src/constants/constants";
 import WidgetRegistry from "@components/WidgetRegistry/WidgetRegistry";
@@ -21,7 +22,6 @@ import {
   getWidgetNested,
   updateWidgets,
 } from "./widgetHelpers";
-import type { MultiPvData, PVData } from "../types/pvaPyWS";
 
 /**
  * Hook to manage the editor's widgets and their state.
@@ -39,6 +39,7 @@ export function useWidgetManager() {
   const [redoStack, setRedoStack] = useState<Widget[][]>([]);
   const [editorWidgets, setEditorWidgets] = useState<Widget[]>([GridZone]);
   const [selectedWidgetIDs, setSelectedWidgetIDs] = useState<string[]>([]);
+  const [pvState, setPVState] = useState<Record<string, PVData>>({});
   const clipboard = useRef<Widget[]>([]);
   const copiedSelectionBounds = useRef({ x: 0, y: 0, width: 0, height: 0 });
 
@@ -672,83 +673,21 @@ export function useWidgetManager() {
     [updateEditorWidgetList]
   );
   /**
-   * Update a widget's PV data (single or multi-PV).
-   * @param newPVData Updated PV data
+   * Update PV data for a specific PV.
+   * @param newPVData New PV data object
    */
-  const updatePVData = useCallback(
-    (newPVData: PVData) => {
-      const updateWidgetRecursive = (widget: Widget): Widget => {
-        let updatedWidget = widget;
-        // --- single PV case ---
-        if (widget.editableProperties.pvName?.value === newPVData.pv) {
-          updatedWidget = {
-            ...widget,
-            pvData: {
-              ...widget.pvData,
-              ...newPVData,
-              value: newPVData.value ?? widget.pvData?.value,
-            },
-          };
-        }
-        // --- multi PV case ---
-        else if (widget.editableProperties.pvNames) {
-          const updatedMultiPvData: MultiPvData = { ...widget.multiPvData };
-          let hasUpdate = false;
-
-          for (const pv of Object.values(widget.editableProperties.pvNames.value)) {
-            if (pv === newPVData.pv) {
-              updatedMultiPvData[pv] = {
-                ...widget.multiPvData?.[pv],
-                ...newPVData,
-                value: newPVData.value ?? widget.multiPvData?.[pv]?.value,
-              };
-              hasUpdate = true;
-            }
-          }
-
-          if (hasUpdate) {
-            updatedWidget = {
-              ...widget,
-              multiPvData: updatedMultiPvData,
-            };
-          }
-        }
-
-        // --- recurse into children ---
-        if (widget.children && widget.children.length > 0) {
-          const children = widget.children;
-          const updatedChildren = children.map(updateWidgetRecursive);
-
-          if (updatedChildren.some((c, i) => c !== children[i])) {
-            updatedWidget = { ...updatedWidget, children: updatedChildren };
-          }
-        }
-
-        return updatedWidget;
-      };
-
-      updateEditorWidgetList((prev) => prev.map(updateWidgetRecursive), false);
-    },
-    [updateEditorWidgetList]
-  );
+  const updatePVData = useCallback((newPVData: PVData) => {
+    setPVState((prev) => {
+      return { ...prev, [newPVData.pv]: newPVData };
+    });
+  }, []);
 
   /**
    * Clear/reset all PV data from widgets.
    */
   const clearPVData = useCallback(() => {
-    updateEditorWidgetList(
-      (prev) =>
-        prev.map((w) => {
-          if (w.pvData) {
-            return { ...w, pvData: {} as PVData };
-          } else if (w.multiPvData) {
-            return { ...w, multiPvData: {} as Record<string, PVData> };
-          }
-          return w;
-        }),
-      false
-    );
-  }, [updateEditorWidgetList]);
+    setPVState({});
+  }, []);
 
   /**
    * Macros to be substituted on pv names.
@@ -847,6 +786,7 @@ export function useWidgetManager() {
     updatePVData,
     clearPVData,
     PVMap,
+    pvState,
     macros,
     allWidgetIDs,
     formatWdgToExport,
