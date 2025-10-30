@@ -1,14 +1,14 @@
-record(calc, "test:seconds") {
-  field(DESC, "time elapsed")
-  field(INPA, "test:seconds")
+record(calc, "$(P)$(R)Secs-Mon") {
+  field(DESC, "IOC uptime")
+  field(INPA, "$(P)$(R)Secs-Mon")
   field(CALC, "A+0.1")
   field(SCAN, ".1 second")
   field(PREC, "3")
   field(EGU, "s")
 }
 
-record(ao, "test:freq"){
-  field(DESC, "sin frequency")
+record(ao, "$(P)$(R)Freq-SP") {
+  field(DESC, "Sin Frequency")
   field(VAL, "0.5")
   field(DRVH, "1") # Limited freq due to 10Hz update on seconds
   field(HOPR, "1")
@@ -17,8 +17,8 @@ record(ao, "test:freq"){
   field(EGU, "Hz")
 }
 
-record(ao, "test:ampl"){
-  field(DESC, "sin amplitude")
+record(ao, "$(P)$(R)Ampl-SP") {
+  field(DESC, "Sin Amplitude")
   field(VAL, "5000")
   field(DRVH, "10000")
   field(HOPR, "10000")
@@ -26,18 +26,18 @@ record(ao, "test:ampl"){
   field(LOPR, "0")
 }
 
-record(ai, "test:ampl-rb"){
-  field(DESC, "sin amplitude")
-  field(INP, "test:ampl CPP")
+record(ai, "$(P)$(R)Ampl-Mon") {
+  field(DESC, "Sin Amplitude (MDEL=-1)")
+  field(INP, "$(P)$(R)Ampl-SP")
   field(SCAN, ".1 second")
   field(MDEL, "-1")
 }
 
-record(calc, "test:sin"){
+record(calc, "$(P)$(R)Sin-Mon") {
   field(DESC, "Sine wave")
-  field(INPA, "test:seconds CP")
-  field(INPB, "test:ampl")
-  field(INPC, "test:freq")
+  field(INPA, "$(P)$(R)Secs-Mon CP")
+  field(INPB, "$(P)$(R)Ampl-SP")
+  field(INPC, "$(P)$(R)Freq-SP")
   field(CALC, "B*SIN(2*PI*C*A)")
   field(PREC, "3")
   field(VAL, "0")
@@ -45,18 +45,18 @@ record(calc, "test:sin"){
   field(MDEL, "-1")
 }
 
-record(compress, "test:sinArr"){
+record(compress, "$(P)$(R)SinArr-Mon") {
   field(DESC, "Sine array")
   field(ALG, "Circular Buffer")
-  field(INP, "test:sin CP")
+  field(INP, "$(P)$(R)Sin-Mon CP")
   field(NSAM, "80")
 }
 
-record(calc, "test:cos"){
+record(calc, "$(P)$(R)Cos-Mon") {
   field(DESC, "Cosine wave")
-  field(INPA, "test:seconds CP")
-  field(INPB, "test:ampl")
-  field(INPC, "test:freq")
+  field(INPA, "$(P)$(R)Secs-Mon CP")
+  field(INPB, "$(P)$(R)Ampl-SP")
+  field(INPC, "$(P)$(R)Freq-SP")
   field(CALC, "B*COS(2*PI*C*A)")
   field(PREC, "3")
   field(VAL, "0")
@@ -64,45 +64,74 @@ record(calc, "test:cos"){
   field(MDEL, "-1")
 }
 
-record(compress, "test:cosArr"){
+record(compress, "$(P)$(R)CosArr-Mon") {
   field(DESC, "Cosine array")
   field(ALG, "Circular Buffer")
-  field(INP, "test:cos CP")
+  field(INP, "$(P)$(R)Cos-Mon CP")
   field(NSAM, "80")
 }
 
-record(bo, "test:bo") {
+record(bo, "$(P)$(R)bo") {
   field(DESC, "Binary output")
   field(ZNAM, "Off")
   field(ONAM, "On")
-  field(OUT, "test:bi PP")
+  field(OUT, "$(P)$(R)bi PP")
 }
 
-record(bi, "test:bi") {
+record(bi, "$(P)$(R)bi") {
   field(DESC, "Binary input")
   field(ZNAM, "Off")
   field(ONAM, "On")
   field(PINI, "YES")
 }
 
-record(ao, "test:ao") {
+record(ao, "$(P)$(R)ao") {
   field(DESC, "Analog output")
-  field(OUT, "test:ai PP")
+  field(OUT, "$(P)$(R)ai PP")
 }
 
-record(ai, "test:ai") {
+record(ai, "$(P)$(R)ai") {
   field(DESC, "Analog input")
   field(VAL, "0")
   field(PINI, "YES")
 }
 
-record(stringout, "test:strout") {
+record(stringout, "$(P)$(R)stringout") {
   field(DESC, "String output")
-  field(OUT, "test:strin PP")
+  field(OUT, "$(P)$(R)stringin PP")
 }
 
-record(stringin, "test:strin") {
+record(stringin, "$(P)$(R)stringin") {
   field(DESC, "String input")
   field(VAL, "hello world!")
   field(PINI, "YES")
+}
+
+record(mbbo, "$(P)$(R)mbbo") {
+  field(DESC, "Selection out")
+  field(OUT,  "$(P)$(R)mbbi")
+  field(ZRVL, "0")
+  field(ZRST, "Option 0")
+  field(ONVL, "1")
+  field(ONST, "Option 1")
+  field(TWVL, "2")
+  field(TWST, "Option 2")
+  field(THVL, "3")
+  field(THST, "Option 3")
+  field(FRVL, "4")
+  field(FRST, "Option 4")
+}
+
+record(mbbo, "$(P)$(R)mbbi") {
+  field(DESC, "Selection in")
+  field(ZRVL, "0")
+  field(ZRST, "Option 0")
+  field(ONVL, "1")
+  field(ONST, "Option 1")
+  field(TWVL, "2")
+  field(TWST, "Option 2")
+  field(THVL, "3")
+  field(THST, "Option 3")
+  field(FRVL, "4")
+  field(FRST, "Option 4")
 }
