@@ -62,7 +62,7 @@ export const PROPERTY_SCHEMAS = {
   // Specific Properties
   // BitIndicators
   orientation:     defineProp({ selType: "select", label: "Orientation", value: "Vertical" as string, options: ["Vertical", "Horizontal"], category: "Layout" }),
-  nBits:           defineProp({ selType: "number", label: "Number of bits", value: 1 as number, category: "Layout" }),
+  nBits:           defineProp({ selType: "number", label: "Number of bits", value: 8 as number, category: "Layout" }),
   invertBitOrder:  defineProp({ selType: "boolean", label: "Invert bit order", value: false as boolean, category: "Layout" }),
   onColor:         defineProp({ selType: "colorSel", label: "On Color", value: COLORS.onColor, category: "Style" }),
   offColor:        defineProp({ selType: "colorSel", label: "Off Color", value: COLORS.offColor, category: "Style" }),
@@ -83,6 +83,7 @@ export const PROPERTY_SCHEMAS = {
   ringWidth:       defineProp({ selType: "number", label: "Ring width", value: 40 as number, category: "Style" }),
   //Other
   valuePlcmnt:     defineProp({ selType: "select", label: "Value placement", value: "top" as string, options: ["top", "bottom", "end", "start"], category: "Layout" }),
+  labelPlcmnt:     defineProp({ selType: "select", label: "Label placement", value: "end" as string, options: ["top", "bottom", "end", "start"], category: "Layout" }),
   limitsFromPV:    defineProp({ selType: "boolean", label: "Limits From PV", value: true as boolean, category: "EPICS" }),
   min:             defineProp({ selType: "number", label: "Minimum value", value: 0 as number, category: "EPICS" }),
   max:             defineProp({ selType: "number", label: "Maximum value", value: 0 as number, category: "EPICS" }),

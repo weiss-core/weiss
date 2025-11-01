@@ -1,31 +1,32 @@
-import { BitIndicatorComp } from "./BitIndicatorComp";
+import { MultiBitIndicatorComp } from "./MultiBitIndicatorComp";
 import { PROPERTY_SCHEMAS, COMMON_PROPS, TEXT_PROPS } from "../../../types/widgetProperties";
 import type { Widget } from "../../../types/widgets";
-import FlakyIcon from "@mui/icons-material/Flaky";
 import type { PVData } from "../../../types/pvaPyWS";
+import CustomMultiBitIcon from "@src/components/CustomIcons/MultiBitIcon";
 
 const { borderRadius, backgroundColor, ...FILTERED_COMMON_PROPS } = COMMON_PROPS;
 
-export const BitIndicator: Widget = {
-  id: "__BitIndicator__",
-  component: BitIndicatorComp,
-  widgetName: "BitIndicator",
-  widgetIcon: FlakyIcon,
+export const MultiBitIndicator: Widget = {
+  id: "__MultiBitIndicator__",
+  component: MultiBitIndicatorComp,
+  widgetName: "MultiBitIndicator",
+  widgetIcon: CustomMultiBitIcon,
   widgetLabel: "Bit Indicator",
   category: "Monitoring",
   pvData: {} as PVData,
   editableProperties: {
     ...FILTERED_COMMON_PROPS,
     width: { ...PROPERTY_SCHEMAS.width, value: 40 },
-    height: { ...PROPERTY_SCHEMAS.height, value: 40 },
-    label: { ...PROPERTY_SCHEMAS.label, value: "Bit Label" },
+    height: { ...PROPERTY_SCHEMAS.height, value: 300 },
     onColor: PROPERTY_SCHEMAS.onColor,
     offColor: PROPERTY_SCHEMAS.offColor,
+    nBits: PROPERTY_SCHEMAS.nBits,
     square: PROPERTY_SCHEMAS.square,
+    orientation: PROPERTY_SCHEMAS.orientation,
+    invertBitOrder: PROPERTY_SCHEMAS.invertBitOrder,
+    spacing: PROPERTY_SCHEMAS.spacing,
     pvName: PROPERTY_SCHEMAS.pvName,
     alarmBorder: PROPERTY_SCHEMAS.alarmBorder,
-    labelFromPV: PROPERTY_SCHEMAS.labelFromPV,
-    labelPlcmnt: PROPERTY_SCHEMAS.labelPlcmnt,
     ...TEXT_PROPS,
   },
 } as const;

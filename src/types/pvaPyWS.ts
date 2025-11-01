@@ -91,6 +91,7 @@ export interface ValueAlarm {
  * @property pv - Name of the PV
  * @property type - Type of the message (update, write, subscribe, unsubscribe)
  * @property value - Current value of the PV (scalar or array)
+ * @property valueText - Corresponding value text of PV (if applicable)
  * @property alarm - Optional EPICS NT alarm structure
  * @property timeStamp - Optional EPICS NT timestamp structure
  * @property display - Optional EPICS NT display structure
@@ -107,6 +108,7 @@ export interface WSMessage {
   pv: string;
   type: WSMessageType;
   value?: PVValue;
+  valueText?: string;
   alarm?: Alarm;
   timeStamp?: TimeStamp;
   display?: Display;
@@ -124,6 +126,7 @@ export interface WSMessage {
  * Processed PV data ready for client-side consumption
  * @property pv - Name of the PV
  * @property value - Value of the PV (scalar or array)
+ * @property valueText - Corresponding value text of PV (if applicable)
  * @property alarm - Optional EPICS NT alarm structure
  * @property timeStamp - Optional EPICS NT timestamp structure
  * @property display - Optional EPICS NT display structure
@@ -133,6 +136,7 @@ export interface WSMessage {
 export interface PVData {
   pv: string;
   value: PVValue;
+  valueText: string;
   alarm?: Alarm;
   timeStamp: TimeStamp;
   display?: Display;
