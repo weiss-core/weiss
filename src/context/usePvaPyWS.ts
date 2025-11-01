@@ -14,14 +14,12 @@ import { WS_URL } from "../constants/constants";
  * @param PVMap Map of original PVs to macro-substituted PVs
  * @param updatePVData Callback to update PV data in the widget manager
  */
-export default function usePvaPyWS(
-  PVMap: ReturnType<typeof useWidgetManager>["PVMap"],
-  updatePVData: ReturnType<typeof useWidgetManager>["updatePVData"]
-) {
+export default function usePvaPyWS(PVMap: ReturnType<typeof useWidgetManager>["PVMap"]) {
   /** WebSocket client instance */
   const ws = useRef<WSClient | null>(null);
   const [isWSConnected, setWSConnected] = useState(false);
   const pvCache = useRef<Record<string, PVData>>({});
+  const [pvState, setPVState] = useState<Record<string, PVData>>({});
 
   /** Precompute reverse map for fast lookup (substituted: original) */
   const reversePVMap = useMemo(() => {
@@ -60,9 +58,11 @@ export default function usePvaPyWS(
         valueAlarm: prev.valueAlarm ?? msg.valueAlarm,
       };
       pvCache.current[msg.pv] = pvData;
-      updatePVData(pvData);
+      setPVState((prev) => {
+        return { ...prev, [pvData.pv]: pvData };
+      });
     },
-    [updatePVData, reversePVMap]
+    [reversePVMap]
   );
 
   /**
@@ -117,6 +117,7 @@ export default function usePvaPyWS(
     ws.current.close();
     ws.current = null;
     setWSConnected(false);
+    setPVState({});
   }, [setWSConnected, substitutedList]);
 
   return {
@@ -125,5 +126,6 @@ export default function usePvaPyWS(
     startNewSession,
     stopSession,
     writePVValue,
+    pvState,
   };
 }

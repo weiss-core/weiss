@@ -8,7 +8,6 @@ import type {
   ExportedWidget,
   DOMRectLike,
 } from "@src/types/widgets";
-import type { PVData } from "@src/types/pvaPyWS";
 import { GridZone } from "@components/GridZone";
 import { GRID_ID, MAX_HISTORY } from "@src/constants/constants";
 import WidgetRegistry from "@components/WidgetRegistry/WidgetRegistry";
@@ -39,7 +38,6 @@ export function useWidgetManager() {
   const [redoStack, setRedoStack] = useState<Widget[][]>([]);
   const [editorWidgets, setEditorWidgets] = useState<Widget[]>([GridZone]);
   const [selectedWidgetIDs, setSelectedWidgetIDs] = useState<string[]>([]);
-  const [pvState, setPVState] = useState<Record<string, PVData>>({});
   const clipboard = useRef<Widget[]>([]);
   const copiedSelectionBounds = useRef({ x: 0, y: 0, width: 0, height: 0 });
 
@@ -672,22 +670,6 @@ export function useWidgetManager() {
     },
     [updateEditorWidgetList]
   );
-  /**
-   * Update PV data for a specific PV.
-   * @param newPVData New PV data object
-   */
-  const updatePVData = useCallback((newPVData: PVData) => {
-    setPVState((prev) => {
-      return { ...prev, [newPVData.pv]: newPVData };
-    });
-  }, []);
-
-  /**
-   * Clear/reset all PV data from widgets.
-   */
-  const clearPVData = useCallback(() => {
-    setPVState({});
-  }, []);
 
   /**
    * Macros to be substituted on pv names.
@@ -783,10 +765,7 @@ export function useWidgetManager() {
     distributeVertical,
     downloadWidgets,
     loadWidgets,
-    updatePVData,
-    clearPVData,
     PVMap,
-    pvState,
     macros,
     allWidgetIDs,
     formatWdgToExport,

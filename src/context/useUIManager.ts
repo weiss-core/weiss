@@ -22,7 +22,6 @@ import usePvaPyWS from "./usePvaPyWS";
 export default function useUIManager(
   ws: ReturnType<typeof usePvaPyWS>["ws"],
   startNewSession: ReturnType<typeof usePvaPyWS>["startNewSession"],
-  clearPVData: ReturnType<typeof useWidgetManager>["clearPVData"],
   editorWidgets: ReturnType<typeof useWidgetManager>["editorWidgets"],
   setSelectedWidgetIDs: ReturnType<typeof useWidgetManager>["setSelectedWidgetIDs"],
   loadWidgets: ReturnType<typeof useWidgetManager>["loadWidgets"],
@@ -42,7 +41,6 @@ export default function useUIManager(
    *
    * Edit mode:
    * - Closes WebSocket connection.
-   * - Clears all PV values.
    *
    * Runtime mode:
    * - Clears widget selection.
@@ -59,7 +57,6 @@ export default function useUIManager(
       if (isEdit) {
         ws.current?.close();
         ws.current = null;
-        clearPVData();
       } else {
         setSelectedWidgetIDs([]);
         setWdgPickerOpen(false);
@@ -67,7 +64,7 @@ export default function useUIManager(
       }
       setMode(newMode);
     },
-    [clearPVData, setSelectedWidgetIDs, startNewSession, ws]
+    [setSelectedWidgetIDs, startNewSession, ws]
   );
 
   /**
