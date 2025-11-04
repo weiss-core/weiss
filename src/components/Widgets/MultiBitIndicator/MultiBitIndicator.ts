@@ -1,30 +1,32 @@
 import { MultiBitIndicatorComp } from "./MultiBitIndicatorComp";
-import { PROPERTY_SCHEMAS, COMMON_PROPS } from "@src/types/widgetProperties";
-import type { Widget } from "@src/types/widgets";
-import CustomMultiBitIcon from "@components/CustomIcons/MultiBitIcon";
+import { PROPERTY_SCHEMAS, COMMON_PROPS, TEXT_PROPS } from "../../../types/widgetProperties";
+import type { Widget } from "../../../types/widgets";
+import type { PVData } from "../../../types/epicsWS";
+import CustomMultiBitIcon from "@src/components/CustomIcons/MultiBitIcon";
 
 const { borderRadius, backgroundColor, ...FILTERED_COMMON_PROPS } = COMMON_PROPS;
 
 export const MultiBitIndicator: Widget = {
-  id: "__BitIndicator__",
+  id: "__MultiBitIndicator__",
   component: MultiBitIndicatorComp,
   widgetName: "MultiBitIndicator",
   widgetIcon: CustomMultiBitIcon,
-  widgetLabel: "Multi-Bit Indicator",
+  widgetLabel: "Bit Indicator",
   category: "Monitoring",
+  pvData: {} as PVData,
   editableProperties: {
     ...FILTERED_COMMON_PROPS,
-    width: { ...PROPERTY_SCHEMAS.width, value: 80 },
-    height: { ...PROPERTY_SCHEMAS.height, value: 220 },
+    width: { ...PROPERTY_SCHEMAS.width, value: 40 },
+    height: { ...PROPERTY_SCHEMAS.height, value: 300 },
     onColor: PROPERTY_SCHEMAS.onColor,
     offColor: PROPERTY_SCHEMAS.offColor,
     nBits: PROPERTY_SCHEMAS.nBits,
-    horizontal: PROPERTY_SCHEMAS.horizontal,
+    square: PROPERTY_SCHEMAS.square,
+    orientation: PROPERTY_SCHEMAS.orientation,
     invertBitOrder: PROPERTY_SCHEMAS.invertBitOrder,
+    spacing: PROPERTY_SCHEMAS.spacing,
     pvName: PROPERTY_SCHEMAS.pvName,
     alarmBorder: PROPERTY_SCHEMAS.alarmBorder,
-    labelFromPV: { ...PROPERTY_SCHEMAS.labelFromPV, value: false },
-    bitLabelPlcmnt: PROPERTY_SCHEMAS.bitLabelPlcmnt,
-    bitLabels: PROPERTY_SCHEMAS.bitLabels,
+    ...TEXT_PROPS,
   },
 } as const;

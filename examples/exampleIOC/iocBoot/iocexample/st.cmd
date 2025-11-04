@@ -7,7 +7,9 @@ cd "${TOP}"
 dbLoadDatabase "dbd/example.dbd"
 example_registerRecordDeviceDriver pdbbase
 
-dbLoadRecords("./exampleApp/Db/example.db")
+epicsEnvSet("P", "Demo:")
+epicsEnvSet("R", "Weiss:")
+dbLoadRecords("./exampleApp/Db/example.db", "P=$(P), R=$(R)")
 
 cd "${TOP}/iocBoot/${IOC}"
 iocInit

@@ -25,7 +25,6 @@
     /* alias path */
     "baseUrl": ".",
     "paths": {
-      "@ReactAutomationStudio/*": ["submodules/React-Automation-Studio/ReactApp/src/*"],
       "@src/*": ["src/*"],
       "@components/*": ["src/components/*"]
     }

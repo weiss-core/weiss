@@ -114,17 +114,47 @@ export function getNestedMoveUpdates(
   widget: Widget,
   dx: number,
   dy: number,
-  updates: MultiWidgetPropertyUpdates
+  scaleX: number,
+  scaleY: number,
+  updates: MultiWidgetPropertyUpdates,
+  parentOldX?: number,
+  parentOldY?: number,
+  parentNewX?: number,
+  parentNewY?: number
 ) {
-  const xProp = widget.editableProperties.x?.value ?? 0;
-  const yProp = widget.editableProperties.y?.value ?? 0;
+  const oldX = widget.editableProperties.x?.value ?? 0;
+  const oldY = widget.editableProperties.y?.value ?? 0;
+  const oldW = widget.editableProperties.width?.value ?? 0;
+  const oldH = widget.editableProperties.height?.value ?? 0;
+
+  let newX: number;
+  let newY: number;
+
+  if (parentOldX === undefined || parentOldY === undefined) {
+    // Root widget — move directly
+    newX = oldX + dx;
+    newY = oldY + dy;
+  } else {
+    // Child widget — compute relative to parent’s ORIGINAL frame, then place in parent’s NEW frame
+    const relX = oldX - parentOldX;
+    const relY = oldY - parentOldY;
+    newX = (parentNewX ?? parentOldX) + relX * scaleX;
+    newY = (parentNewY ?? parentOldY) + relY * scaleY;
+  }
+
+  const newW = oldW * scaleX;
+  const newH = oldH * scaleY;
 
   updates[widget.id] = {
-    x: xProp + dx,
-    y: yProp + dy,
+    x: newX,
+    y: newY,
+    width: newW,
+    height: newH,
   };
 
   if (widget.children?.length) {
-    widget.children.forEach((child) => getNestedMoveUpdates(child, dx, dy, updates));
+    for (const child of widget.children) {
+      getNestedMoveUpdates(child, dx, dy, scaleX, scaleY, updates, oldX, oldY, newX, newY);
+    }
   }
 }

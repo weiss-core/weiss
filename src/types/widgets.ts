@@ -1,5 +1,6 @@
 import type { SvgIconProps } from "@mui/material/SvgIcon";
 import { PROPERTY_SCHEMAS } from "./widgetProperties";
+import type { MultiPvData, PVData } from "./epicsWS";
 
 /**
  * Selector types for widget properties.
@@ -100,6 +101,8 @@ export interface Widget {
   id: string;
   widgetLabel: string;
   widgetIcon?: WidgetIconType;
+  pvData?: PVData;
+  multiPvData?: MultiPvData;
   children?: Widget[];
   widgetName: string;
   component: React.FC<WidgetUpdate>;

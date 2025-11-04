@@ -1,96 +1,43 @@
 services:
-  ################ base-env ######################
-  weiss-base-env:
-    image: weiss-base-env
-    build:
-      context: ./
-      dockerfile: docker/base-env/Dockerfile
-
-  ############### pvserver ######################
-  weiss-pvserver:
-    build:
-      context: ./
-      dockerfile: docker/pvserver/Dockerfile
-    restart: always
-    network_mode: host
-    tty: true
-    stdin_open: true
-    env_file: .env
-    environment:
-      - ALARM_DATABASE=localhost
-      - ALARM_DATABASE_REPLICA_SET_NAME=devrs
-      - LOADSAVE_DATABASE=localhost
-      - LOADSAVE_DATABASE_REPLICA_SET_NAME=devrs
-      - ADMIN_DATABASE=localhost
-      - ADMIN_DATABASE_REPLICA_SET_NAME=devrs
-      - DEMO_ARCHIVER=http://localhost:17668
-      - pvServerLogLevel=INFO
-      - pvServerLogFile=/pvServer/log/pvServerLogFile
-      - pvServerPort=9001
-      - pvServerURL=http://127.0.0.1
-      - EPICS_CA_ADDR_LIST="localhost"
-      - EPICS_PVA_ADDR_LIST="localhost"
-    volumes:
-      - ./docker/mount/certificates:/certificates/
-      - ./docker/mount/users:/pvServer/userAuthentication/users
-      - ./docker/mount/log/:/pvServer/log
-      - ./docker/mount/build:/pvServer/build
-    depends_on:
-      - weiss-base-env
-
-  ############### demoioc ######################
   weiss-demoioc:
     build:
-      context: ./
-      dockerfile: docker/demoioc/Dockerfile
-      args:
-        GIT_REPO: ${GIT_REPO:-https://github.com/AndreFavotto/weiss.git}
-        APP_VERSION: ${APP_VERSION:-main}
+      context: "./examples/exampleIOC/"
+    image: weiss-demoioc:${APP_VERSION}
+    container_name: weiss-demoioc
     restart: always
     network_mode: host
     tty: true
     stdin_open: true
-    env_file: .env
-    depends_on:
-      - weiss-base-env
 
-  ############### nginx ######################
-  weiss-nginx:
-    image: nginx:1.27.0
-    restart: always
-    network_mode: host
-    depends_on:
-      - weiss-pvserver
-    entrypoint:
-      - /custom/setupNginx.dev.sh
-      - /docker-entrypoint.sh
-    command: ["nginx", "-g", "daemon off;"]
-    volumes:
-      - ./docker/mount/nginx/setupNginx.dev.sh:/custom/setupNginx.dev.sh
-      - ./docker/mount/nginx/nginx.dev.conf:/custom/nginx.dev.conf
-      - ./docker/mount/nginx/nginx.httpredirect.conf:/custom/nginx.httpredirect.conf
-      - ./docker/mount/certificates:/etc/nginx/certificates
-    env_file: .env
-
-  ############### frontend ######################
   weiss-dev:
     build:
       context: "."
-      dockerfile: docker/weiss/Dockerfile
       target: dev
       args:
-        GIT_REPO: ${GIT_REPO:-https://github.com/AndreFavotto/weiss.git}
-        APP_VERSION: ${APP_VERSION:-main}
+        GIT_REPO: ${GIT_REPO}
+        APP_VERSION: ${APP_VERSION}
     volumes:
-      - .:/app
+      - .:/app # Mount the source code for development
       - /app/node_modules # Prevent host node_modules from interfering
     image: weiss-dev:${APP_VERSION}
     container_name: weiss-dev
+    network_mode: host
     restart: always
-    ports:
-      - "3001:3000"
     environment:
       - NODE_ENV=development
     depends_on:
-      - weiss-pvserver
-      - weiss-nginx
+      - weiss-epicsws
+  weiss-epicsws:
+    build:
+      context: ./epicsWS
+    volumes:
+      - ./epicsWS:/app
+    image: weiss-epicsws:${APP_VERSION}
+    container_name: weiss-epicsws
+    ports:
+      - "8080:8080"
+    restart: always
+    environment:
+      EPICS_DEFAULT_PROTOCOL: ${EPICS_DEFAULT_PROTOCOL}
+      EPICS_CA_ADDR_LIST: ${EPICS_CA_ADDR_LIST}
+      EPICS_PVA_ADDR_LIST: ${EPICS_PVA_ADDR_LIST}

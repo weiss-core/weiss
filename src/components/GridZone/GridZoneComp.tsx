@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import type { GridPosition, Widget, WidgetUpdate } from "@src/types/widgets";
 import WidgetRegistry from "@components/WidgetRegistry/WidgetRegistry";
 import { useEditorContext } from "@src/context/useEditorContext.tsx";
-import { EDIT_MODE, GRID_ID, MAX_ZOOM, MIN_ZOOM } from "@src/constants/constants.ts";
+import { GRID_ID, MAX_ZOOM, MIN_ZOOM } from "@src/constants/constants.ts";
 import ContextMenu from "@components/ContextMenu/ContextMenu";
 import "./GridZone.css";
 import WidgetRenderer from "@components/WidgetRenderer/WidgetRenderer.tsx";
@@ -46,6 +46,7 @@ const GridZoneComp: React.FC<WidgetUpdate> = ({ data }) => {
     ungroupSelected,
     isPanning,
     setIsPanning,
+    inEditMode,
   } = useEditorContext();
 
   const gridRef = useRef<HTMLDivElement>(null);
@@ -66,7 +67,6 @@ const GridZoneComp: React.FC<WidgetUpdate> = ({ data }) => {
   const gridSize = props.gridSize!.value;
   const snapToGrid = props.snapToGrid?.value;
   const gridLineVisible = props.gridLineVisible?.value;
-  const inEditMode = mode === EDIT_MODE;
 
   const ensureGridCoordinate = useCallback(
     (coord: number) => {
@@ -350,16 +350,14 @@ const GridZoneComp: React.FC<WidgetUpdate> = ({ data }) => {
       )}
       <div
         id="centerRef"
-        className={`centerRef ${
-          mode === EDIT_MODE && props.centerVisible?.value ? "centerMark" : ""
-        }`}
+        className={`centerRef ${inEditMode && props.centerVisible?.value ? "centerMark" : ""}`}
         style={{
           transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoom})`,
         }}
       >
         <WidgetRenderer scale={zoom} ensureGridCoordinate={ensureGridCoordinate} />
       </div>
-      <SelectionManager gridRef={gridRef} zoom={zoom} pan={pan} />
+      {inEditMode && <SelectionManager gridRef={gridRef} zoom={zoom} pan={pan} />}
       <ToolbarButtons />
       <ContextMenu
         pos={contextMenuPos}

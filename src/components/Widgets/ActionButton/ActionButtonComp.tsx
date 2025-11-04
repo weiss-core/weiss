@@ -1,33 +1,33 @@
 import React from "react";
-import { useEditorContext } from "@src/context/useEditorContext";
-import type { WidgetUpdate } from "@src/types/widgets";
-import { EDIT_MODE, FLEX_ALIGN_MAP } from "@src/constants/constants";
-import ActionButton from "@ReactAutomationStudio/components/BaseComponents/ActionButton";
+import { Button } from "@mui/material";
+import { useEditorContext } from "../../../context/useEditorContext";
+import type { WidgetUpdate } from "../../../types/widgets";
+import { FLEX_ALIGN_MAP, RUNTIME_MODE } from "../../../constants/constants";
+import AlarmBorder from "../../AlarmBorder/AlarmBorder";
 
 const ActionButtonComp: React.FC<WidgetUpdate> = ({ data }) => {
-  const { mode, macros } = useEditorContext();
+  const { mode, writePVValue } = useEditorContext();
   const p = data.editableProperties;
-  const inEditMode = mode == EDIT_MODE;
+  const pvData = data.pvData;
+
+  const handleClick = (_e: React.MouseEvent) => {
+    if (mode === RUNTIME_MODE) {
+      if (p.pvName?.value && p.actionValue?.value !== undefined) {
+        writePVValue(p.pvName.value, p.actionValue.value);
+      }
+    }
+  };
+
   if (!p.visible?.value) return null;
 
   return (
-    <ActionButton
-      key={mode}
-      editMode={inEditMode}
-      pv={p.pvName?.value}
-      macros={macros}
-      actionValue={p.actionValue?.value}
-      actionString={p.label?.value}
-      tooltip={p.tooltip?.value}
-      showTooltip={true}
-      alarmSensitive={p.alarmBorder?.value}
-      disableContextMenu={inEditMode}
-      muiButtonProps={{
-        sx: {
+    <AlarmBorder alarmData={pvData?.alarm} enable={p.alarmBorder?.value}>
+      <Button
+        title={p.tooltip?.value ?? ""}
+        sx={{
           width: "100%",
           height: "100%",
           display: "flex",
-          textTransform: "none",
           justifyContent: FLEX_ALIGN_MAP[p.textHAlign?.value ?? "left"],
           alignItems: FLEX_ALIGN_MAP[p.textVAlign?.value ?? "middle"],
           backgroundColor: p.backgroundColor?.value,
@@ -40,12 +40,15 @@ const ActionButtonComp: React.FC<WidgetUpdate> = ({ data }) => {
           borderStyle: p.borderStyle?.value,
           borderWidth: p.borderWidth?.value,
           borderColor: p.borderColor?.value,
-        },
-        disableRipple: mode == EDIT_MODE,
-        disabled: p.disabled!.value,
-        variant: "contained",
-      }}
-    />
+        }}
+        disableRipple={mode !== RUNTIME_MODE}
+        disabled={p.disabled!.value}
+        variant="contained"
+        onClick={(e) => handleClick(e)}
+      >
+        {p.label!.value}
+      </Button>
+    </AlarmBorder>
   );
 };
 

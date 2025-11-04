@@ -1,10 +1,11 @@
-import React, { type ReactNode } from "react";
+import React, { useMemo, type ReactNode } from "react";
 import WidgetRegistry from "@components/WidgetRegistry/WidgetRegistry";
 import { useEditorContext } from "@src/context/useEditorContext";
-import type { Widget, GridPosition, MultiWidgetPropertyUpdates } from "@src/types/widgets";
-import { Rnd, type DraggableData, type RndDragEvent } from "react-rnd";
+import type { Widget, MultiWidgetPropertyUpdates, DOMRectLike } from "@src/types/widgets";
+import { Rnd, type DraggableData, type Position, type RndDragEvent } from "react-rnd";
 import { GRID_ID } from "@src/constants/constants";
 import "./WidgetRenderer.css";
+import type { PVData } from "@src/types/epicsWS";
 
 const DRAG_END_DELAY = 80; //ms
 
@@ -22,7 +23,38 @@ const WidgetRenderer: React.FC<RendererProps> = ({ scale, ensureGridCoordinate }
     selectionBounds,
     setIsDragging,
     isPanning,
+    updateWidgetProperties,
+    selectedWidgets,
+    pvState,
   } = useEditorContext();
+
+  const widgetsForRender = useMemo(() => {
+    const mergeWidget = (w: Widget): Widget => {
+      if (inEditMode) return w;
+      let pvData: PVData | undefined = undefined;
+      let multiPvData: Record<string, PVData> | undefined = undefined;
+
+      if (w.editableProperties.pvName?.value) {
+        pvData = pvState[w.editableProperties.pvName.value];
+      }
+      if (w.editableProperties.pvNames?.value) {
+        multiPvData = {};
+        Object.values(w.editableProperties.pvNames.value).forEach((pv) => {
+          const data = pvState[pv];
+          if (data) multiPvData![pv] = data;
+        });
+      }
+
+      return {
+        ...w,
+        pvData,
+        multiPvData,
+        children: w.children?.map(mergeWidget),
+      };
+    };
+
+    return editorWidgets.map(mergeWidget);
+  }, [editorWidgets, pvState, inEditMode]);
 
   /** Core widget content renderer */
   const renderWidgetContent = (w: Widget): ReactNode => {
@@ -30,94 +62,70 @@ const WidgetRenderer: React.FC<RendererProps> = ({ scale, ensureGridCoordinate }
     return Comp ? <Comp data={w} /> : null;
   };
 
-  /** Recursively apply delta for drag */
-  const applyDelta = (
-    widget: Widget,
-    dx: number,
-    dy: number,
-    updates: MultiWidgetPropertyUpdates
-  ) => {
-    updates[widget.id] = {
-      x: ensureGridCoordinate(widget.editableProperties.x!.value + dx),
-      y: ensureGridCoordinate(widget.editableProperties.y!.value + dy),
-    };
-    widget.children?.forEach((child) => applyDelta(child, dx, dy, updates));
-  };
-
-  /** Recursively apply proportional resize for groups or selection */
-  const applyResize = (
-    widget: Widget,
-    parentOldX: number,
-    parentOldY: number,
-    parentOldWidth: number,
-    parentOldHeight: number,
-    parentNewX: number,
-    parentNewY: number,
-    parentNewWidth: number,
-    parentNewHeight: number,
-    updates: MultiWidgetPropertyUpdates
-  ) => {
-    const { x, y, width, height } = widget.editableProperties;
-    if (!x || !y || !width || !height) return;
-
-    const scaleX = parentOldWidth === 0 ? 1 : parentNewWidth / parentOldWidth;
-    const scaleY = parentOldHeight === 0 ? 1 : parentNewHeight / parentOldHeight;
-
-    const newX = parentNewX + (x.value - parentOldX) * scaleX;
-    const newY = parentNewY + (y.value - parentOldY) * scaleY;
-    const newWidth = width.value * scaleX;
-    const newHeight = height.value * scaleY;
-
-    updates[widget.id] = {
-      x: ensureGridCoordinate(newX),
-      y: ensureGridCoordinate(newY),
-      width: ensureGridCoordinate(newWidth),
-      height: ensureGridCoordinate(newHeight),
-    };
-
-    widget.children?.forEach((child) =>
-      applyResize(
-        child,
-        x.value,
-        y.value,
-        width.value,
-        height.value,
-        newX,
-        newY,
-        newWidth,
-        newHeight,
-        updates
-      )
-    );
-  };
-
   const handleDragStop = (_e: RndDragEvent, d: DraggableData, w: Widget) => {
-    const dx = d.x - w.editableProperties.x!.value;
-    const dy = d.y - w.editableProperties.y!.value;
-    if (dx === 0 && dy === 0) return;
+    if (w.editableProperties.x?.value == d.x && w.editableProperties.y?.value == d.y) return;
+    setIsDragging(false);
+    updateWidgetProperties(w.id, {
+      x: ensureGridCoordinate(d.x),
+      y: ensureGridCoordinate(d.y),
+    });
+  };
 
-    setTimeout(() => setIsDragging(false), DRAG_END_DELAY);
+  const handleResizeStop = (ref: HTMLElement, position: Position, w: Widget) => {
+    setIsDragging(false);
+    const newWidth = ensureGridCoordinate(parseInt(ref.style.width));
+    const newHeight = ensureGridCoordinate(parseInt(ref.style.height));
+    const newX = ensureGridCoordinate(position.x);
+    const newY = ensureGridCoordinate(position.y);
+
+    if (
+      w.editableProperties.width?.value === newWidth &&
+      w.editableProperties.height?.value === newHeight
+    )
+      return;
+
+    updateWidgetProperties(w.id, { width: newWidth, height: newHeight, x: newX, y: newY });
+  };
+
+  const handleSelGroupResizeStop = (ref: HTMLElement, bounds: DOMRectLike, widgets: Widget[]) => {
+    setIsDragging(false);
+    const newGroupWidth = ref.offsetWidth;
+    const newGroupHeight = ref.offsetHeight;
+    const scaleX = newGroupWidth / bounds.width;
+    const scaleY = newGroupHeight / bounds.height;
 
     const updates: MultiWidgetPropertyUpdates = {};
-    applyDelta(w, dx, dy, updates);
+    widgets.forEach((w) => {
+      const { width, height, x, y } = {
+        width: w.editableProperties.width!.value,
+        height: w.editableProperties.height!.value,
+        x: w.editableProperties.x!.value,
+        y: w.editableProperties.y!.value,
+      };
+      const relativeX = x - bounds.x;
+      const relativeY = y - bounds.y;
+      updates[w.id] = {
+        width: ensureGridCoordinate(width * scaleX),
+        height: ensureGridCoordinate(height * scaleY),
+        x: ensureGridCoordinate(bounds.x + relativeX * scaleX),
+        y: ensureGridCoordinate(bounds.y + relativeY * scaleY),
+      };
+    });
     batchWidgetUpdate(updates);
   };
 
-  const handleResizeStop = (ref: HTMLElement, position: GridPosition, w: Widget) => {
+  const handleSelGroupDragStop = (dx: number, dy: number) => {
     setTimeout(() => setIsDragging(false), DRAG_END_DELAY);
-
-    const oldX = w.editableProperties.x!.value;
-    const oldY = w.editableProperties.y!.value;
-    const oldWidth = w.editableProperties.width!.value;
-    const oldHeight = w.editableProperties.height!.value;
-
-    const newX = position.x;
-    const newY = position.y;
-    const newWidth = parseInt(ref.style.width);
-    const newHeight = parseInt(ref.style.height);
-
     const updates: MultiWidgetPropertyUpdates = {};
-    applyResize(w, oldX, oldY, oldWidth, oldHeight, newX, newY, newWidth, newHeight, updates);
+    selectedWidgets.forEach((widget) => {
+      const xProp = widget.editableProperties.x;
+      const yProp = widget.editableProperties.y;
+      if (!xProp || !yProp) return;
+      updates[widget.id] = {
+        x: ensureGridCoordinate(xProp.value + dx),
+        y: ensureGridCoordinate(yProp.value + dy),
+      };
+    });
     batchWidgetUpdate(updates);
   };
 
@@ -207,32 +215,11 @@ const WidgetRenderer: React.FC<RendererProps> = ({ scale, ensureGridCoordinate }
         onDragStop={(_e, d) => {
           const dx = d.x - selectionBounds.x;
           const dy = d.y - selectionBounds.y;
-          const updates: MultiWidgetPropertyUpdates = {};
-          selectedWidgets.forEach((w) => applyDelta(w, dx, dy, updates));
-          batchWidgetUpdate(updates);
-          setTimeout(() => setIsDragging(false), DRAG_END_DELAY);
+          handleSelGroupDragStop(dx, dy);
         }}
         onResizeStart={() => setIsDragging(true)}
-        onResizeStop={(_e, _dir, ref, _delta, pos) => {
-          const oldWidth = selectionBounds.width;
-          const oldHeight = selectionBounds.height;
-          const updates: MultiWidgetPropertyUpdates = {};
-          selectedWidgets.forEach((w) =>
-            applyResize(
-              w,
-              selectionBounds.x,
-              selectionBounds.y,
-              oldWidth,
-              oldHeight,
-              pos.x,
-              pos.y,
-              ref.offsetWidth,
-              ref.offsetHeight,
-              updates
-            )
-          );
-          batchWidgetUpdate(updates);
-          setTimeout(() => setIsDragging(false), DRAG_END_DELAY);
+        onResizeStop={(_e, _dir, ref, _delta) => {
+          handleSelGroupResizeStop(ref, selectionBounds, selectedWidgets);
         }}
       >
         {selectedWidgets.map((w) =>
@@ -242,7 +229,7 @@ const WidgetRenderer: React.FC<RendererProps> = ({ scale, ensureGridCoordinate }
     );
   };
 
-  const topLevelWidgets = editorWidgets.filter((w) => w.id !== GRID_ID);
+  const topLevelWidgets = widgetsForRender.filter((w) => w.id !== GRID_ID);
 
   return (
     <>

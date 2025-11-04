@@ -1,1 +1,1 @@
-export { MultiBitIndicator } from "./MultiBitIndicators";
+export { MultiBitIndicator } from "./MultiBitIndicator";

@@ -6,6 +6,7 @@ import type { EditorContextType } from "./EditorProvider";
  *
  * Provides access to:
  * - Widget management (CRUD operations, property editing, PV tracking)
+ * - WebSocket session for EPICS PVs
  * - UI state (edit mode, property editor, widget selector)
  *
  */
@@ -16,6 +17,7 @@ export const EditorContext = createContext<EditorContextType | undefined>(undefi
  *
  * Provides a strongly-typed interface to the shared editor state, which includes:
  * - Widget management (add/remove/update widgets, PV binding - see {@link useWidgetManager})
+ * - WebSocket session for EPICS PVs (subscribe, write, lifecycle handling - see {@link useEpicsWS})
  * - UI state (edit vs. runtime mode, property editor focus - see {@link useUIManager})
  *
  * @throws {Error} If used outside of an `EditorProvider` component.

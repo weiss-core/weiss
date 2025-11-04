@@ -1,6 +1,5 @@
 export { ActionButton } from "./ActionButton";
-export { ToggleButton } from "./ToggleButton";
-export { LedIndicator } from "./LedIndicator";
+export { BitIndicator } from "./BitIndicator";
 export { MultiBitIndicator } from "./MultiBitIndicator";
 export { InputField } from "./InputField";
 export { TextUpdate } from "./TextUpdate";
@@ -8,8 +7,3 @@ export { Ellipse } from "./Ellipse";
 export { Rectangle } from "./Rectangle";
 export { TextLabel } from "./TextLabel";
 export { GraphY } from "./GraphY";
-export { Slider } from "./Slider";
-export { Gauge } from "./Gauge";
-export { CheckBox } from "./CheckBox";
-export { ProgressBar } from "./ProgressBar";
-export { DropDown } from "./DropDown";

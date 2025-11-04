@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
-import type { WidgetUpdate } from "@src/types/widgets";
-import { useEditorContext } from "@src/context/useEditorContext";
-import { EDIT_MODE, FLEX_ALIGN_MAP, INPUT_TEXT_ALIGN_MAP } from "@src/constants/constants";
+import type { WidgetUpdate } from "../../../types/widgets";
+import { useEditorContext } from "../../../context/useEditorContext";
+import { EDIT_MODE, FLEX_ALIGN_MAP, INPUT_TEXT_ALIGN_MAP } from "../../../constants/constants";
 
 const TextLabelComp: React.FC<WidgetUpdate> = ({ data }) => {
   const { mode, updateWidgetProperties } = useEditorContext();
@@ -19,8 +19,8 @@ const TextLabelComp: React.FC<WidgetUpdate> = ({ data }) => {
 
   if (!p.visible?.value) return null;
 
-  const inEditMode = mode === EDIT_MODE;
-  const showEditableInput = inEditMode && editing;
+  const isEditMode = mode === EDIT_MODE;
+  const showEditableInput = isEditMode && editing;
 
   return (
     <div
@@ -46,13 +46,13 @@ const TextLabelComp: React.FC<WidgetUpdate> = ({ data }) => {
         value={p.label?.value}
         readOnly={!showEditableInput}
         onDoubleClick={() => {
-          if (inEditMode) setEditing(true);
+          if (isEditMode) setEditing(true);
         }}
         onBlur={() => setEditing(false)}
         onChange={(e) => updateWidgetProperties(data.id, { label: e.target.value })}
         style={{
           textAlign: INPUT_TEXT_ALIGN_MAP[p.textHAlign?.value ?? "left"],
-          pointerEvents: inEditMode ? "auto" : "none",
+          pointerEvents: isEditMode ? "auto" : "none",
           fontSize: p.fontSize?.value,
           fontFamily: p.fontFamily?.value,
           fontWeight: p.fontBold?.value ? "bold" : "normal",

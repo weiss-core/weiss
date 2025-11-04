@@ -1,8 +1,9 @@
 import { InputFieldComp } from "./InputFieldComp";
-import { COLORS } from "@src/constants/constants";
-import type { Widget } from "@src/types/widgets";
+import { COLORS } from "../../../constants/constants";
+import type { Widget } from "../../../types/widgets";
 import InputIcon from "@mui/icons-material/Input";
-import { PROPERTY_SCHEMAS, COMMON_PROPS, TEXT_PROPS } from "@src/types/widgetProperties";
+import { PROPERTY_SCHEMAS, COMMON_PROPS, TEXT_PROPS } from "../../../types/widgetProperties";
+import type { PVData } from "../../../types/epicsWS";
 
 export const InputField: Widget = {
   id: "__InputField__",
@@ -11,6 +12,7 @@ export const InputField: Widget = {
   widgetIcon: InputIcon,
   widgetLabel: "Input Field",
   category: "Controls",
+  pvData: {} as PVData,
   editableProperties: {
     ...COMMON_PROPS,
     ...TEXT_PROPS,

@@ -105,18 +105,6 @@ export function useWidgetManager() {
   );
 
   /**
-   * Apply multiple property updates to widgets.
-   * @param updates Object mapping widget IDs to property updates
-   * @param keepHistory Whether to store this change in undo stack
-   */
-  const batchWidgetUpdate = useCallback(
-    (updates: MultiWidgetPropertyUpdates, keepHistory = true) => {
-      updateEditorWidgetList((prev) => updateWidgets(prev, updates), keepHistory);
-    },
-    [updateEditorWidgetList]
-  );
-
-  /**
    * Get a widget by its ID.
    * @param id Widget ID
    * @returns Widget object or undefined
@@ -124,6 +112,39 @@ export function useWidgetManager() {
   const getWidget = useCallback(
     (id: string) => getWidgetNested(editorWidgets, id),
     [editorWidgets]
+  );
+  /**
+   * Apply multiple property updates to widgets.
+   * @param updates Object mapping widget IDs to property updates
+   * @param keepHistory Whether to store this change in undo stack
+   */
+  const batchWidgetUpdate = useCallback(
+    (updates: MultiWidgetPropertyUpdates, keepHistory = true) => {
+      const parentIds = Object.keys(updates);
+      // propagate size/position changes for children widgets
+      for (const id of parentIds) {
+        const w = getWidget(id);
+        if (!w?.children?.length) continue;
+        const update = updates[id];
+        const hasPosChange =
+          "x" in update || "y" in update || "height" in update || "width" in update;
+        if (!hasPosChange) continue;
+        const oldX = w.editableProperties.x!.value;
+        const oldY = w.editableProperties.y!.value;
+        const oldWidth = w.editableProperties.width!.value;
+        const oldHeight = w.editableProperties.height!.value;
+        const newX = (update.x ?? oldX) as number;
+        const newY = (update.y ?? oldY) as number;
+        const newWidth = (update.width ?? oldWidth) as number;
+        const newHeight = (update.height ?? oldHeight) as number;
+        const scaleX = oldWidth ? newWidth / oldWidth : 1;
+        const scaleY = oldHeight ? newHeight / oldHeight : 1;
+        getNestedMoveUpdates(w, newX - oldX, newY - oldY, scaleX, scaleY, updates);
+      }
+
+      updateEditorWidgetList((prev) => updateWidgets(prev, updates), keepHistory);
+    },
+    [updateEditorWidgetList, getWidget]
   );
 
   /**
@@ -260,16 +281,11 @@ export function useWidgetManager() {
    */
   const alignLeft = useCallback(() => {
     if (selectedWidgets.length < 2) return;
-
     const leftX = Math.min(...selectedWidgets.map((w) => w.editableProperties.x?.value ?? 0));
     const updates: MultiWidgetPropertyUpdates = {};
-
     selectedWidgets.forEach((w) => {
-      const oldX = w.editableProperties.x?.value ?? 0;
-      const dx = leftX - oldX;
-      if (dx !== 0) getNestedMoveUpdates(w, dx, 0, updates);
+      updates[w.id] = { x: leftX };
     });
-
     batchWidgetUpdate(updates);
   }, [selectedWidgets, batchWidgetUpdate]);
 
@@ -278,23 +294,16 @@ export function useWidgetManager() {
    */
   const alignRight = useCallback(() => {
     if (selectedWidgets.length < 2) return;
-
     const rightX = Math.max(
       ...selectedWidgets.map(
         (w) => (w.editableProperties.x?.value ?? 0) + (w.editableProperties.width?.value ?? 0)
       )
     );
-
     const updates: MultiWidgetPropertyUpdates = {};
-
     selectedWidgets.forEach((w) => {
-      const width = w.editableProperties.width?.value ?? 0;
-      const oldX = w.editableProperties.x?.value ?? 0;
-      const newX = rightX - width;
-      const dx = newX - oldX;
-      if (dx !== 0) getNestedMoveUpdates(w, dx, 0, updates);
+      if (!w.editableProperties.x || !w.editableProperties.width) return;
+      updates[w.id] = { x: rightX - w.editableProperties.width.value };
     });
-
     batchWidgetUpdate(updates);
   }, [selectedWidgets, batchWidgetUpdate]);
 
@@ -303,16 +312,11 @@ export function useWidgetManager() {
    */
   const alignTop = useCallback(() => {
     if (selectedWidgets.length < 2) return;
-
     const topY = Math.min(...selectedWidgets.map((w) => w.editableProperties.y?.value ?? 0));
     const updates: MultiWidgetPropertyUpdates = {};
-
     selectedWidgets.forEach((w) => {
-      const oldY = w.editableProperties.y?.value ?? 0;
-      const dy = topY - oldY;
-      if (dy !== 0) getNestedMoveUpdates(w, 0, dy, updates);
+      updates[w.id] = { y: topY };
     });
-
     batchWidgetUpdate(updates);
   }, [selectedWidgets, batchWidgetUpdate]);
 
@@ -321,23 +325,16 @@ export function useWidgetManager() {
    */
   const alignBottom = useCallback(() => {
     if (selectedWidgets.length < 2) return;
-
     const bottomY = Math.max(
       ...selectedWidgets.map(
         (w) => (w.editableProperties.y?.value ?? 0) + (w.editableProperties.height?.value ?? 0)
       )
     );
-
     const updates: MultiWidgetPropertyUpdates = {};
-
     selectedWidgets.forEach((w) => {
-      const height = w.editableProperties.height?.value ?? 0;
-      const oldY = w.editableProperties.y?.value ?? 0;
-      const newY = bottomY - height;
-      const dy = newY - oldY;
-      if (dy !== 0) getNestedMoveUpdates(w, 0, dy, updates);
+      if (!w.editableProperties.y || !w.editableProperties.height) return;
+      updates[w.id] = { y: bottomY - w.editableProperties.height.value };
     });
-
     batchWidgetUpdate(updates);
   }, [selectedWidgets, batchWidgetUpdate]);
 
@@ -346,7 +343,6 @@ export function useWidgetManager() {
    */
   const alignHorizontalCenter = useCallback(() => {
     if (selectedWidgets.length < 2) return;
-
     const minX = Math.min(...selectedWidgets.map((w) => w.editableProperties.x?.value ?? 0));
     const maxX = Math.max(
       ...selectedWidgets.map(
@@ -356,15 +352,10 @@ export function useWidgetManager() {
     const centerX = (minX + maxX) / 2;
 
     const updates: MultiWidgetPropertyUpdates = {};
-
     selectedWidgets.forEach((w) => {
-      const width = w.editableProperties.width?.value ?? 0;
-      const oldX = w.editableProperties.x?.value ?? 0;
-      const newX = centerX - width / 2;
-      const dx = newX - oldX;
-      if (dx !== 0) getNestedMoveUpdates(w, dx, 0, updates);
+      if (!w.editableProperties.x || !w.editableProperties.width) return;
+      updates[w.id] = { x: centerX - w.editableProperties.width.value / 2 };
     });
-
     batchWidgetUpdate(updates);
   }, [selectedWidgets, batchWidgetUpdate]);
 
@@ -373,7 +364,6 @@ export function useWidgetManager() {
    */
   const alignVerticalCenter = useCallback(() => {
     if (selectedWidgets.length < 2) return;
-
     const minY = Math.min(...selectedWidgets.map((w) => w.editableProperties.y?.value ?? 0));
     const maxY = Math.max(
       ...selectedWidgets.map(
@@ -383,15 +373,10 @@ export function useWidgetManager() {
     const centerY = (minY + maxY) / 2;
 
     const updates: MultiWidgetPropertyUpdates = {};
-
     selectedWidgets.forEach((w) => {
-      const height = w.editableProperties.height?.value ?? 0;
-      const oldY = w.editableProperties.y?.value ?? 0;
-      const newY = centerY - height / 2;
-      const dy = newY - oldY;
-      if (dy !== 0) getNestedMoveUpdates(w, 0, dy, updates);
+      if (!w.editableProperties.y || !w.editableProperties.height) return;
+      updates[w.id] = { y: centerY - w.editableProperties.height.value / 2 };
     });
-
     batchWidgetUpdate(updates);
   }, [selectedWidgets, batchWidgetUpdate]);
 
@@ -687,28 +672,61 @@ export function useWidgetManager() {
   );
 
   /**
-   * List of all PVs held by widgets.
-   */
-  const PVList = useMemo(() => {
-    const set = new Set<string>();
-    for (const w of editorWidgets) {
-      if (w.editableProperties?.pvName?.value) {
-        set.add(w.editableProperties.pvName.value);
-      }
-      const multiPV = w.editableProperties?.pvNames?.value;
-      if (multiPV) {
-        Object.values(multiPV).forEach((pv) => {
-          if (pv) set.add(pv);
-        });
-      }
-    }
-    return Array.from(set);
-  }, [editorWidgets]);
-
-  /**
    * Macros to be substituted on pv names.
    */
   const macros = getWidget(GRID_ID)?.editableProperties.macros?.value;
+
+  /**
+   * Helper to substitute macros of the form $(NAME) in a PV string.
+   * If a macro key is not found in macros, the original macro text is kept.
+   */
+  const substituteMacros = useCallback(
+    (pv: string): string => {
+      return pv.replace(/\$\(([^)]+)\)/g, (macro) => {
+        if (!macros) return macro;
+        const replacement = macros[macro];
+        return replacement ?? macro;
+      });
+    },
+    [macros]
+  );
+
+  /**
+   * Map of all PVs held by widgets: { widget PV: macros-substituted PV }
+   */
+  const PVMap = useMemo(() => {
+    const map = new Map<string, string>();
+
+    const collectPVs = (widgets: typeof editorWidgets) => {
+      for (const w of widgets) {
+        const single = w.editableProperties?.pvName?.value;
+        if (single) {
+          const substitutedSingle = substituteMacros(single);
+          if (substitutedSingle) {
+            map.set(single, substitutedSingle);
+          }
+        }
+
+        const multiPV = w.editableProperties?.pvNames?.value;
+        if (multiPV) {
+          Object.values(multiPV).forEach((pv) => {
+            const substituted = substituteMacros(pv);
+            if (substituted) {
+              map.set(pv, substituted);
+            }
+          });
+        }
+
+        // Recurse into children if present
+        if (w.children && w.children.length > 0) {
+          collectPVs(w.children);
+        }
+      }
+    };
+
+    collectPVs(editorWidgets);
+    return map;
+  }, [editorWidgets, substituteMacros]);
 
   return {
     editorWidgets,
@@ -747,7 +765,7 @@ export function useWidgetManager() {
     distributeVertical,
     downloadWidgets,
     loadWidgets,
-    PVList,
+    PVMap,
     macros,
     allWidgetIDs,
     formatWdgToExport,

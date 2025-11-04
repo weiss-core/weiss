@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { EDIT_MODE, type Mode } from "@src/constants/constants";
 import { useWidgetManager } from "./useWidgetManager";
 import type { ExportedWidget, Widget } from "@src/types/widgets";
+import useEpicsWS from "./useEpicsWS";
 
 /**
  * Hook that manages global UI state for WEISS.
@@ -14,15 +15,15 @@ import type { ExportedWidget, Widget } from "@src/types/widgets";
  *
  * @param editorWidgets Current list of widgets from the widget manager.
  * @param setSelectedWidgetIDs Function to update currently selected widgets.
- * @param updateWidgetProperties Function to update widget properties.
  * @param loadWidgets Function to load widgets into the editor (used for localStorage).
  * @param formatWdgToExport Function to format (reduce) widgets to exporting format.
  * @returns An object containing UI state, setters, and mode updater.
  */
 export default function useUIManager(
+  ws: ReturnType<typeof useEpicsWS>["ws"],
+  startNewSession: ReturnType<typeof useEpicsWS>["startNewSession"],
   editorWidgets: ReturnType<typeof useWidgetManager>["editorWidgets"],
   setSelectedWidgetIDs: ReturnType<typeof useWidgetManager>["setSelectedWidgetIDs"],
-  updateWidgetProperties: ReturnType<typeof useWidgetManager>["updateWidgetProperties"],
   loadWidgets: ReturnType<typeof useWidgetManager>["loadWidgets"],
   formatWdgToExport: ReturnType<typeof useWidgetManager>["formatWdgToExport"]
 ) {
@@ -40,12 +41,13 @@ export default function useUIManager(
    *
    * Edit mode:
    * - Closes WebSocket connection.
-   * - Clears all PV values.
    *
    * Runtime mode:
    * - Clears widget selection.
    * - Closes widget selector.
-   * - Starts WebSocket connection.
+   * - Starts a new PV session.
+   *
+   * Also updates the visibility of grid lines in the editor.
    *
    * @param newMode The mode to switch to ("edit" | "runtime").
    */
@@ -53,15 +55,16 @@ export default function useUIManager(
     (newMode: Mode) => {
       const isEdit = newMode == EDIT_MODE;
       if (isEdit) {
-        // connection to pv server is managed by RAS widgets directly
-        // add actions on mode transition?
+        ws.current?.close();
+        ws.current = null;
       } else {
         setSelectedWidgetIDs([]);
         setWdgPickerOpen(false);
+        startNewSession();
       }
       setMode(newMode);
     },
-    [setSelectedWidgetIDs]
+    [setSelectedWidgetIDs, startNewSession, ws]
   );
 
   /**

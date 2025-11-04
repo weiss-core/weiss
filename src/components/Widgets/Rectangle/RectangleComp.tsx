@@ -1,6 +1,6 @@
 // Rectangle.tsx
 import React from "react";
-import type { WidgetUpdate } from "@src/types/widgets";
+import type { WidgetUpdate } from "../../../types/widgets";
 
 const RectangleComp: React.FC<WidgetUpdate> = ({ data }) => {
   const p = data.editableProperties;
