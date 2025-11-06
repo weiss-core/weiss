@@ -14,14 +14,15 @@ const BitIndicatorComp: React.FC<WidgetUpdate> = ({ data }) => {
   const offColor = p.offColor?.value;
   const value = pvData?.value ?? 0;
   const bitOn = value === 1;
-  const runtimeText = p.useStringVal?.value ? pvData?.valueText ?? "" : (value as string) ?? "";
+  const useStr = p.useStringVal?.value;
+  const runtimeText = useStr ? pvData?.valueText ?? "" : (value as string) ?? "";
   const labelFromPV = p.labelFromPV?.value;
   const offLabel = p.offLabel?.value ?? "";
   const onLabel = p.onLabel?.value ?? "";
 
   let text = "";
   if (inEditMode) {
-    text = labelFromPV ? "PV Label" : offLabel;
+    text = labelFromPV ? `PV ${useStr ? "Label" : "Value"}` : offLabel;
   } else {
     text = labelFromPV ? runtimeText : bitOn ? onLabel : offLabel;
   }
