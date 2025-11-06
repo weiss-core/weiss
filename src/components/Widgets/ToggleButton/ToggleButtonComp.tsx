@@ -12,13 +12,14 @@ const ToggleButtonComp: React.FC<WidgetUpdate> = ({ data }) => {
   const value = pvData?.value;
   const validValue = value === 1 || value === 0;
   const bitOn = value === 1;
+  const enumOption = validValue && pvData?.enumChoices ? pvData?.enumChoices[value] : "";
   const useStr = p.useStringVal?.value;
 
   const onColor = p.onColor?.value;
   const offColor = p.offColor?.value;
   const bitColor = bitOn ? onColor : offColor;
 
-  const runtimeText = useStr ? pvData?.valueText ?? "" : (value as string) ?? "";
+  const runtimeText = useStr ? enumOption ?? "" : (value as string) ?? "";
   const labelFromPV = p.labelFromPV?.value;
   const offLabel = p.offLabel?.value ?? "";
   const onLabel = p.onLabel?.value ?? "";
