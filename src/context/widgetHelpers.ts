@@ -5,6 +5,7 @@ import type {
   WidgetProperties,
   PropertyKey,
   DOMRectLike,
+  PropertyValue,
 } from "@src/types/widgets";
 
 /**
@@ -47,7 +48,13 @@ export function updateWidgets(widgets: Widget[], updates: MultiWidgetPropertyUpd
           console.warn(`Tried updating inexistent property ${propName} on ${w.id}`);
           continue;
         }
-        updatedProps[propName].value = v;
+        let newValue: PropertyValue = v;
+        if (typeof newValue === "number") {
+          const limits = updatedProps[propName].limits;
+          if (limits?.min !== undefined) newValue = Math.max(newValue, limits.min);
+          if (limits?.max !== undefined) newValue = Math.min(newValue, limits.max);
+        }
+        updatedProps[propName].value = newValue;
       }
       newWidget = { ...newWidget, editableProperties: updatedProps };
     }

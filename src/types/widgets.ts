@@ -28,6 +28,11 @@ export type PropertySelectorType =
 /** Allowed values for a widget property: string, number, boolean, or string dictionary */
 export type PropertyValue = string | number | boolean | string[] | Record<string, string>;
 
+export interface PropertyLimits {
+  min?: number;
+  max?: number;
+}
+
 /**
  * Represents a single widget property.
  * @template T Type of the property value
@@ -43,6 +48,7 @@ export interface WidgetProperty<T extends PropertyValue = PropertyValue> {
   value: T;
   category: string;
   options?: string[];
+  limits?: PropertyLimits;
 }
 
 /** Keys of the PROPERTY_SCHEMAS object */

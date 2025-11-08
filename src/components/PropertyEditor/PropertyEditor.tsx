@@ -218,11 +218,12 @@ const PropertyEditor: React.FC = () => {
           </ListSubheader>
           {!collapsed &&
             Object.entries(props).map(([propName, prop]) => {
-              const { selType, label, value, options } = prop;
+              const { selType, label, value, options, limits } = prop;
               const commonProps = {
                 propName: propName as PropertyKey,
                 label,
                 value,
+                limits,
                 onChange: handlePropChange,
               };
               switch (selType) {

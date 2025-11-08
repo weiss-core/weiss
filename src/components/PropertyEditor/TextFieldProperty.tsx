@@ -1,7 +1,7 @@
 // src/components/PropertyFields/TextFieldProperty.tsx
 import React from "react";
 import { TextField, ListItem } from "@mui/material";
-import type { PropertyKey, PropertyValue } from "@src/types/widgets";
+import type { PropertyKey, PropertyLimits, PropertyValue } from "@src/types/widgets";
 import LocalValueWrapper from "./LocalValueWrapper";
 
 interface TextFieldPropertyProps {
@@ -9,11 +9,12 @@ interface TextFieldPropertyProps {
   label: string;
   value: PropertyValue;
   selType: "text" | "number";
+  limits?: PropertyLimits;
   onChange: (propName: PropertyKey, newValue: PropertyValue) => void;
 }
 
 const TextFieldProperty: React.FC<TextFieldPropertyProps> = (props) => {
-  const { propName, label, value, selType, onChange } = props;
+  const { propName, label, value, selType, limits, onChange } = props;
   return (
     <ListItem key={propName} disablePadding sx={{ px: 2, py: 1 }}>
       <LocalValueWrapper
@@ -26,16 +27,41 @@ const TextFieldProperty: React.FC<TextFieldPropertyProps> = (props) => {
             size="small"
             type={selType}
             value={localVal}
-            onChange={(e) =>
-              setLocalVal(selType === "number" ? Number(e.target.value) : e.target.value)
-            }
+            onChange={(e) => {
+              let val: number | string = e.target.value;
+              if (selType === "number") {
+                if (val === "") {
+                  // Allow empty string temporarily so user can edit freely
+                  setLocalVal(val);
+                  return;
+                }
+                const numVal = Number(val);
+                if (!isNaN(numVal)) {
+                  let limitedVal = numVal;
+                  if (limits?.min !== undefined) limitedVal = Math.max(limitedVal, limits.min);
+                  if (limits?.max !== undefined) limitedVal = Math.min(limitedVal, limits.max);
+                  val = limitedVal;
+                }
+              }
+              setLocalVal(val);
+            }}
             onKeyDown={(e) => {
               if (e.key === "Enter") {
                 e.preventDefault();
+                if (selType === "number" && localVal === "") {
+                  setLocalVal(value);
+                  onChange(propName, value);
+                  return;
+                }
                 if (localVal !== value) onChange(propName, localVal);
               }
             }}
             onBlur={() => {
+              if (selType === "number" && localVal === "") {
+                setLocalVal(value);
+                onChange(propName, value);
+                return;
+              }
               if (localVal !== value) onChange(propName, localVal);
             }}
           />

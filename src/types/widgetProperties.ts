@@ -24,20 +24,20 @@ export const PROPERTY_SCHEMAS = {
   // Layout
   x:               defineProp({ selType: "number", label: "X", value: 100 as number, category: "Layout" }),
   y:               defineProp({ selType: "number", label: "Y", value: 100 as number, category: "Layout" }),
-  width:           defineProp({ selType: "number", label: "Width", value: 100 as number, category: "Layout" }),
-  height:          defineProp({ selType: "number", label: "Height", value: 40 as number, category: "Layout" }),
+  width:           defineProp({ selType: "number", label: "Width", value: 100 as number, limits: { min: 1 }, category: "Layout" }),
+  height:          defineProp({ selType: "number", label: "Height", value: 40 as number, limits: { min: 1 }, category: "Layout" }),
   label:           defineProp({ selType: "text", label: "Label", value: "" as string, category: "Layout" }),
   tooltip:         defineProp({ selType: "text", label: "Tooltip", value: "" as string, category: "Layout" }),
   visible:         defineProp({ selType: "boolean", label: "Visible", value: true as boolean, category: "Layout" }),
   // Style
   backgroundColor: defineProp({ selType: "colorSel", label: "Background Color", value: COLORS.backgroundColor, category: "Style" }),
   borderColor:     defineProp({ selType: "colorSel", label: "Border Color", value: COLORS.textColor, category: "Style" }),
-  borderWidth:     defineProp({ selType: "number", label: "Border Width", value: 1 as number, category: "Style" }),
-  borderRadius:    defineProp({ selType: "number", label: "Border Radius", value: 2 as number, category: "Style" }),
+  borderWidth:     defineProp({ selType: "number", label: "Border Width", value: 1 as number, limits: { min: 0 }, category: "Style" }),
+  borderRadius:    defineProp({ selType: "number", label: "Border Radius", value: 2 as number, limits: { min: 0 }, category: "Style" }),
   borderStyle:     defineProp({ selType: "select", label: "Border Style", value: "none" as string, options: ["solid", "dashed", "dotted", "none"], category: "Style" }),
   // Font
   textColor:       defineProp({ selType: "colorSel", label: "Text Color", value: COLORS.textColor, category: "Font" }),
-  fontSize:        defineProp({ selType: "number", label: "Font Size", value: 14 as number, category: "Font" }),
+  fontSize:        defineProp({ selType: "number", label: "Font Size", value: 14 as number, limits: { min: 1 }, category: "Font" }),
   fontFamily:      defineProp({ selType: "select", label: "Font Family", value: "sans-serif" as string, options: ["serif", "sans-serif", "monospace", "fantasy", "cursive"], category: "Font" }),
   fontBold:        defineProp({ selType: "boolean", label: "Bold text", value: false as boolean, category: "Font" }),
   fontItalic:      defineProp({ selType: "boolean", label: "Italic text", value: false as boolean, category: "Font" }),
@@ -46,7 +46,7 @@ export const PROPERTY_SCHEMAS = {
   // Grid options
   gridLineColor:   defineProp({ selType: "colorSel", label: "Grid Line Color", value: COLORS.gridLineColor, category: "Style" }),
   gridLineVisible: defineProp({ selType: "boolean", label: "Grid Visible", value: true as boolean, category: "Grid" }),
-  gridSize:        defineProp({ selType: "number", label: "Grid Size", value: 20 as number, category: "Grid" }),
+  gridSize:        defineProp({ selType: "number", label: "Grid Size", value: 20 as number, limits: { min: 1 }, category: "Grid" }),
   snapToGrid:      defineProp({ selType: "boolean", label: "Snap items", value: true as boolean, category: "Grid" }),
   centerVisible:   defineProp({ selType: "boolean", label: "Center mark visible", value: true as boolean, category: "Grid" }),
   // EPICS
@@ -62,11 +62,11 @@ export const PROPERTY_SCHEMAS = {
   // Specific Properties
   // BitIndicators
   orientation:     defineProp({ selType: "select", label: "Orientation", value: "Vertical" as string, options: ["Vertical", "Horizontal"], category: "Layout" }),
-  nBits:           defineProp({ selType: "number", label: "Number of bits", value: 8 as number, category: "Layout" }),
+  nBits:           defineProp({ selType: "number", label: "Number of bits", value: 8 as number, limits: { min: 1 }, category: "Layout" }),
   invertBitOrder:  defineProp({ selType: "boolean", label: "Invert bit order", value: false as boolean, category: "Layout" }),
   onColor:         defineProp({ selType: "colorSel", label: "On Color", value: COLORS.onColor, category: "Style" }),
   offColor:        defineProp({ selType: "colorSel", label: "Off Color", value: COLORS.offColor, category: "Style" }),
-  spacing:         defineProp({ selType: "number", label: "Spacing", value: 1 as number, category: "Style" }),
+  spacing:         defineProp({ selType: "number", label: "Spacing", value: 1 as number, limits: { min: 0 }, category: "Style" }),
   square:          defineProp({ selType: "boolean", label: "Square", value: false as boolean, category: "Style" }),
   useStringVal:    defineProp({ selType: "boolean", label: "Use string value", value: true as boolean, category: "Layout" }),
   offLabel:        defineProp({ selType: "text", label: "Off Label", value: "" as string, category: "Layout" }),
@@ -80,11 +80,8 @@ export const PROPERTY_SCHEMAS = {
   logscaleY:       defineProp({ selType: "boolean", label: "Apply log to Y", value: false as boolean, category: "Layout" }),
   showLegend:      defineProp({ selType: "boolean", label: "Show legend", value: true as boolean, category: "Layout" }),
   useTimestamp:    defineProp({ selType: "boolean", label: "Use timestamp", value: false as boolean, category: "Layout" }),
-  plotBufferSize:  defineProp({ selType: "number", label: "Buffer size (if scalar PVs)", value: 80 as number, category: "Layout" }),
+  plotBufferSize:  defineProp({ selType: "number", label: "Buffer size (if scalar PVs)", value: 80 as number, limits: { min: 1 }, category: "Layout" }),
   plotLineStyle:   defineProp({ selType: "select", label: "Line style", value: "lines" as "lines+markers"|"lines"|"markers", options: ["lines+markers", "lines", "markers"], category: "Style" }),
-  stepSize:        defineProp({ selType: "number", label: "Step size", value: 1 as number, category: "Layout" }),
-  //Gauge
-  ringWidth:       defineProp({ selType: "number", label: "Ring width", value: 40 as number, category: "Style" }),
   //Other
   valuePlcmnt:     defineProp({ selType: "select", label: "Value placement", value: "top" as string, options: ["top", "bottom", "end", "start", "middle"], category: "Layout" }),
   labelPlcmnt:     defineProp({ selType: "select", label: "Label placement", value: "end" as string, options: ["top", "bottom", "end", "start", "middle"], category: "Layout" }),
