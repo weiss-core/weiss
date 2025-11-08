@@ -17,7 +17,7 @@ export const MultiBitIndicator: Widget = {
   editableProperties: {
     ...FILTERED_COMMON_PROPS,
     width: { ...PROPERTY_SCHEMAS.width, value: 40 },
-    height: { ...PROPERTY_SCHEMAS.height, value: 300 },
+    height: { ...PROPERTY_SCHEMAS.height, value: 320 },
     onColor: PROPERTY_SCHEMAS.onColor,
     offColor: PROPERTY_SCHEMAS.offColor,
     nBits: PROPERTY_SCHEMAS.nBits,

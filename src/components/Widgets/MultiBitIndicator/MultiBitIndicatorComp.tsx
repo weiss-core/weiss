@@ -10,12 +10,23 @@ const MultiBitIndicatorComp: React.FC<WidgetUpdate> = ({ data }) => {
 
   if (!p.visible?.value) return null;
 
-  const bitsCount = p.nBits?.value ?? 1;
   const onColor = p.onColor?.value;
   const offColor = p.offColor?.value;
   const invertOrder = p.invertBitOrder?.value;
   const orientation = p.orientation?.value;
-  const value = inEditMode ? 0 : Number(pvData?.value ?? 0);
+  const value = inEditMode ? 0 : Number(pvData?.value);
+  const bitsCount = p.nBits?.value ?? 1;
+  const isHorizontal = p.orientation?.value === "Horizontal";
+  const gap = Number(p.spacing?.value ?? 0);
+  const containerWidth = Number(p.width?.value ?? 0);
+  const containerHeight = Number(p.height?.value ?? 0);
+  const mainAvailable = (isHorizontal ? containerWidth : containerHeight) - (bitsCount - 1) * gap;
+  const maxCircleSize = Math.min(
+    mainAvailable / bitsCount,
+    isHorizontal ? containerHeight : containerWidth
+  );
+
+  const bitSize = Math.max(maxCircleSize, 0);
 
   let bitIndexes = Array.from({ length: bitsCount }, (_, i) => i);
   if (invertOrder) {
@@ -27,9 +38,10 @@ const MultiBitIndicatorComp: React.FC<WidgetUpdate> = ({ data }) => {
       <div
         key={i}
         style={{
-          width: orientation === "Horizontal" ? `${100 / bitsCount}%` : "100%",
-          height: orientation === "Vertical" ? `${100 / bitsCount}%` : "100%",
-          display: "flex",
+          width: bitSize,
+          height: bitSize,
+          flexShrink: 0,
+          aspectRatio: "1 / 1",
           borderRadius: p.square?.value ? 0 : "50%",
           boxSizing: "border-box",
           background: inEditMode
