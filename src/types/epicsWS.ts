@@ -85,42 +85,11 @@ export interface ValueAlarm {
   highAlarmSeverity?: number;
   hysteresis?: number;
 }
-
-/**
- * Structure of a WebSocket message exchanged with the PV server
- * @property pv - Name of the PV
- * @property type - Type of the message (update, write, subscribe, unsubscribe)
- * @property value - Current value of the PV (scalar or array)
- * @property valueText - Corresponding value text of PV (if applicable)
- * @property alarm - Optional EPICS NT alarm structure
- * @property timeStamp - Optional EPICS NT timestamp structure
- * @property display - Optional EPICS NT display structure
- * @property control - Optional EPICS NT control structure
- * @property valueAlarm - Optional EPICS NT valueAlarm structure
- * @property raw - Optional raw server message data
- * @property b64arr - Optional base64-encoded array data
- * @property b64dtype - Optional data type of the base64-encoded array
- */
-export interface WSMessage {
-  pv: string;
-  type: WSMessageType;
-  value?: PVValue;
-  valueText?: string;
-  alarm?: Alarm;
-  timeStamp?: TimeStamp;
-  display?: Display;
-  control?: Control;
-  valueAlarm?: ValueAlarm;
-  raw?: [Record<string, unknown>];
-  b64arr?: string;
-  b64dtype?: string;
-}
-
 /**
  * Processed PV data ready for client-side consumption
  * @property pv - Name of the PV
  * @property value - Value of the PV (scalar or array)
- * @property valueText - Corresponding value text of PV (if applicable)
+ * @property enumChoices - List of string options if enum PV
  * @property alarm - Optional EPICS NT alarm structure
  * @property timeStamp - Optional EPICS NT timestamp structure
  * @property display - Optional EPICS NT display structure
@@ -130,12 +99,25 @@ export interface WSMessage {
 export interface PVData {
   pv: string;
   value: PVValue;
-  valueText: string;
+  enumChoices?: string[];
   alarm?: Alarm;
   timeStamp: TimeStamp;
   display?: Display;
   control?: Control;
   valueAlarm?: ValueAlarm;
+}
+
+/**
+ * Structure of a WebSocket message exchanged with the PV server
+ * @extends PVData
+ * @property type - Type of the message (update, write, subscribe, unsubscribe)
+ * @property b64arr - Optional base64-encoded array data
+ * @property b64dtype - Optional data type of the base64-encoded array
+ */
+export interface WSMessage extends PVData {
+  type: WSMessageType;
+  b64arr?: string;
+  b64dtype?: string;
 }
 
 /** Collection of PVData objects, keyed by PV name */

@@ -56,7 +56,7 @@ class ValueAlarm:
 class PVData:
   pv: Optional[str] = None
   value: Optional[Union[float, List[float], List[int], List[str]]] = None
-  valueText: Optional[str] = None
+  enumChoices: Optional[str] = None
   alarm: Optional[Alarm] = None
   timeStamp: Optional[TimeStamp] = None
   display: Optional[Display] = None
@@ -74,7 +74,7 @@ def encode_base64_array(array, dtype):
 
 
 def parse_pv(pv_obj: PvObject) -> PVData:
-  b64arr = b64dtype = value = valueText = None
+  b64arr = b64dtype = value = enumChoices = None
   pv_dict = pv_obj.get()
   
   # Value
@@ -88,7 +88,7 @@ def parse_pv(pv_obj: PvObject) -> PVData:
     index = valueField.get("index")
     choices = valueField.get("choices")
     if(index is not None and choices is not None):
-      valueText = choices[index]
+      enumChoices = choices
       value = index
   ## epics:nt/NTScalarArray
   elif isinstance(valueField, (list, np.ndarray)):
@@ -163,7 +163,7 @@ def parse_pv(pv_obj: PvObject) -> PVData:
 
   return PVData(
     value=value,
-    valueText=valueText,
+    enumChoices=enumChoices,
     alarm=alarm,
     timeStamp=timestamp,
     display=display,
@@ -171,5 +171,4 @@ def parse_pv(pv_obj: PvObject) -> PVData:
     valueAlarm=value_alarm,
     b64arr=b64arr,
     b64dtype=b64dtype,
-    raw=pv_dict,
   )

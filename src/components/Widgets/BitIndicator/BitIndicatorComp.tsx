@@ -12,11 +12,24 @@ const BitIndicatorComp: React.FC<WidgetUpdate> = ({ data }) => {
 
   const onColor = p.onColor?.value;
   const offColor = p.offColor?.value;
-  const labelPlacement = p.labelPlcmnt?.value;
-  const value = inEditMode ? 0 : Number(pvData?.value ?? 0);
+  const value = pvData?.value ?? 0;
   const bitOn = value === 1;
-  const valueText = pvData?.valueText;
-  const label = p.labelFromPV?.value ? (inEditMode ? "PV label" : valueText) : p.label?.value;
+  const validValue = value === 1 || value === 0;
+
+  const useStr = p.useStringVal?.value;
+  const enumOption = validValue && pvData?.enumChoices ? pvData?.enumChoices[value] : "";
+  const pvText = useStr ? enumOption ?? "" : (value as string) ?? "";
+
+  const labelFromPV = p.labelFromPV?.value;
+  const offLabel = p.offLabel?.value ?? "";
+  const onLabel = p.onLabel?.value ?? "";
+
+  let renderedText = "";
+  if (inEditMode) {
+    renderedText = labelFromPV ? `PV ${useStr ? "Label" : "Value"}` : offLabel;
+  } else {
+    renderedText = labelFromPV ? pvText : bitOn ? onLabel : offLabel;
+  }
 
   const background = inEditMode
     ? `linear-gradient(-45deg, ${onColor} 50%, ${offColor} 50%)`
@@ -24,73 +37,43 @@ const BitIndicatorComp: React.FC<WidgetUpdate> = ({ data }) => {
     ? onColor
     : offColor;
 
-  const isVertical = labelPlacement === "top" || labelPlacement === "bottom";
-  const isLabelFirst = labelPlacement === "start" || labelPlacement === "top";
-  const hasLabel = Boolean(label);
+  const containerWidth = p.width!.value;
+  const containerHeight = p.height!.value;
+  const circleSize = Math.min(containerWidth, containerHeight);
 
-  // Layout direction and size balance
-  const flexDirection = isVertical ? "column" : "row";
-  const circleFlexBasis = hasLabel ? "70%" : "100%";
-  const labelFlexBasis = hasLabel ? "auto" : "0";
+  const containerStyle: React.CSSProperties = {
+    width: containerWidth,
+    height: containerHeight,
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    boxSizing: "border-box",
+    position: "relative",
+  };
+
+  const circleStyle: React.CSSProperties = {
+    width: circleSize,
+    height: circleSize,
+    borderRadius: p.square?.value ? 0 : "50%",
+    background,
+    borderStyle: p.borderStyle?.value,
+    borderWidth: p.borderWidth?.value,
+    borderColor: p.borderColor?.value,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    boxSizing: "border-box",
+    fontSize: p.fontSize?.value ?? 12,
+    color: p.textColor?.value ?? "inherit",
+    textAlign: "center",
+  };
 
   return (
     <AlarmBorder alarmData={pvData?.alarm} enable={p.alarmBorder?.value}>
-      <div
-        title={p.tooltip?.value ?? ""}
-        style={{
-          width: p.width?.value,
-          height: p.height?.value,
-          display: "flex",
-          flexDirection,
-          justifyContent: "center",
-          alignItems: "center",
-          gap: hasLabel ? 6 : 0,
-          boxSizing: "border-box",
-        }}
-      >
-        {isLabelFirst && hasLabel && (
-          <span
-            style={{
-              flexBasis: labelFlexBasis,
-              fontSize: p.fontSize?.value ?? 12,
-              color: p.textColor?.value ?? "inherit",
-              textAlign: "center",
-              whiteSpace: "nowrap",
-            }}
-          >
-            {label}
-          </span>
-        )}
-
-        <div
-          style={{
-            flexBasis: circleFlexBasis,
-            flexGrow: 1,
-            flexShrink: 1,
-            width: isVertical ? "100%" : undefined,
-            height: isVertical ? undefined : "100%",
-            borderRadius: p.square?.value ? 0 : "50%",
-            background,
-            borderStyle: p.borderStyle?.value,
-            borderWidth: p.borderWidth?.value,
-            borderColor: p.borderColor?.value,
-            boxSizing: "border-box",
-          }}
-        />
-
-        {!isLabelFirst && hasLabel && (
-          <span
-            style={{
-              flexBasis: labelFlexBasis,
-              fontSize: p.fontSize?.value ?? 12,
-              color: p.textColor?.value ?? "inherit",
-              textAlign: "center",
-              whiteSpace: "nowrap",
-            }}
-          >
-            {label}
-          </span>
-        )}
+      <div style={containerStyle} title={p.tooltip?.value ?? ""}>
+        <div style={circleStyle}>
+          {<span style={{ whiteSpace: "nowrap" }}>{renderedText}</span>}
+        </div>
       </div>
     </AlarmBorder>
   );

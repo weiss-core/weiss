@@ -153,7 +153,6 @@ const GraphYComp: React.FC<WidgetUpdate> = ({ data }) => {
           const y0 = eventData["yaxis.range[0]"];
           const y1 = eventData["yaxis.range[1]"];
 
-          // Only update ranges when user zooms/pans — not on reset/autoscale
           setLayout((prev) => ({
             ...prev,
             xaxis:

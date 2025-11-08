@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useRef, useState } from "react";
 import { WSClient } from "../WSClient/WSClient";
-import type { PVData, WSMessage } from "../types/epicsWS";
+import type { PVData, PVValue, WSMessage } from "../types/epicsWS";
 import type { useWidgetManager } from "./useWidgetManager";
 import { WS_URL } from "../constants/constants";
 
@@ -51,7 +51,7 @@ export default function useEpicsWS(PVMap: ReturnType<typeof useWidgetManager>["P
       const pvData: PVData = {
         pv: originalPV,
         value: msg.value ?? prev.value,
-        valueText: msg.valueText ?? prev.valueText,
+        enumChoices: msg.enumChoices ?? prev.enumChoices,
         alarm: msg.alarm ?? prev.alarm,
         timeStamp: msg.timeStamp ?? prev.timeStamp,
         display: prev.display ?? msg.display,
@@ -98,7 +98,7 @@ export default function useEpicsWS(PVMap: ReturnType<typeof useWidgetManager>["P
    * Input is the original PV name (from widgets).
    */
   const writePVValue = useCallback(
-    (pv: string, newValue: number | string) => {
+    (pv: string, newValue: PVValue) => {
       const substituted = PVMap.get(pv);
       if (substituted) {
         ws.current?.write(substituted, newValue);

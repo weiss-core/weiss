@@ -6,18 +6,15 @@ import {
   TEXT_PROPS,
 } from "../../../types/widgetProperties";
 import type { Widget } from "../../../types/widgets";
-import TimelineIcon from "@mui/icons-material/Timeline";
+import StackedLineChartIcon from "@mui/icons-material/StackedLineChart";
 import type { MultiPvData } from "../../../types/epicsWS";
-
-export const YAxisPVLabel = "Y Axis PV";
-export const XAxisPVLabel = "X Axis PV (optional)";
 
 export const GraphY: Widget = {
   id: "__GraphYComp__",
   component: GraphYComp,
   widgetName: "GraphY",
-  widgetIcon: TimelineIcon,
-  widgetLabel: "Graphic GraphY",
+  widgetIcon: StackedLineChartIcon,
+  widgetLabel: "Graph Y",
   category: "Monitoring",
   multiPvData: {} as MultiPvData,
   editableProperties: {

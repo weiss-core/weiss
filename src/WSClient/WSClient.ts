@@ -1,4 +1,4 @@
-import type { WSMessage } from "../types/epicsWS";
+import type { PVValue, WSMessage } from "../types/epicsWS";
 
 type ConnectHandler = (connected: boolean) => void;
 type MessageHandler = (message: WSMessage) => void;
@@ -193,7 +193,7 @@ export class WSClient {
    * @param pv The PV name.
    * @param value The value to write.
    */
-  write(pv: string, value: number | string): void {
+  write(pv: string, value: PVValue): void {
     if (!this.connected) return;
     this.socket.send(JSON.stringify({ type: "write", pv, value }));
   }

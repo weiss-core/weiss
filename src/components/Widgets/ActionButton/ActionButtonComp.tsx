@@ -2,16 +2,16 @@ import React from "react";
 import { Button } from "@mui/material";
 import { useEditorContext } from "../../../context/useEditorContext";
 import type { WidgetUpdate } from "../../../types/widgets";
-import { FLEX_ALIGN_MAP, RUNTIME_MODE } from "../../../constants/constants";
+import { FLEX_ALIGN_MAP } from "../../../constants/constants";
 import AlarmBorder from "../../AlarmBorder/AlarmBorder";
 
 const ActionButtonComp: React.FC<WidgetUpdate> = ({ data }) => {
-  const { mode, writePVValue } = useEditorContext();
+  const { inEditMode, writePVValue } = useEditorContext();
   const p = data.editableProperties;
   const pvData = data.pvData;
 
   const handleClick = (_e: React.MouseEvent) => {
-    if (mode === RUNTIME_MODE) {
+    if (!inEditMode) {
       if (p.pvName?.value && p.actionValue?.value !== undefined) {
         writePVValue(p.pvName.value, p.actionValue.value);
       }
@@ -40,8 +40,9 @@ const ActionButtonComp: React.FC<WidgetUpdate> = ({ data }) => {
           borderStyle: p.borderStyle?.value,
           borderWidth: p.borderWidth?.value,
           borderColor: p.borderColor?.value,
+          textTransform: "none",
         }}
-        disableRipple={mode !== RUNTIME_MODE}
+        disableRipple={inEditMode}
         disabled={p.disabled!.value}
         variant="contained"
         onClick={(e) => handleClick(e)}

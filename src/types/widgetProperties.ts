@@ -68,6 +68,10 @@ export const PROPERTY_SCHEMAS = {
   offColor:        defineProp({ selType: "colorSel", label: "Off Color", value: COLORS.offColor, category: "Style" }),
   spacing:         defineProp({ selType: "number", label: "Spacing", value: 1 as number, category: "Style" }),
   square:          defineProp({ selType: "boolean", label: "Square", value: false as boolean, category: "Style" }),
+  useStringVal:    defineProp({ selType: "boolean", label: "Use string value", value: true as boolean, category: "Layout" }),
+  offLabel:        defineProp({ selType: "text", label: "Off Label", value: "" as string, category: "Layout" }),
+  onLabel:         defineProp({ selType: "text", label: "On Label", value: "" as string, category: "Layout" }),
+
   // Graph
   lineColors:      defineProp({ selType: "colorSelList", label: "Line Color", value: [COLORS.graphLineColor] as string[], category: "Style" }),
   plotTitle:       defineProp({ selType: "text", label: "Title", value: "Title" as string, category: "Layout" }),
@@ -82,8 +86,8 @@ export const PROPERTY_SCHEMAS = {
   //Gauge
   ringWidth:       defineProp({ selType: "number", label: "Ring width", value: 40 as number, category: "Style" }),
   //Other
-  valuePlcmnt:     defineProp({ selType: "select", label: "Value placement", value: "top" as string, options: ["top", "bottom", "end", "start"], category: "Layout" }),
-  labelPlcmnt:     defineProp({ selType: "select", label: "Label placement", value: "end" as string, options: ["top", "bottom", "end", "start"], category: "Layout" }),
+  valuePlcmnt:     defineProp({ selType: "select", label: "Value placement", value: "top" as string, options: ["top", "bottom", "end", "start", "middle"], category: "Layout" }),
+  labelPlcmnt:     defineProp({ selType: "select", label: "Label placement", value: "end" as string, options: ["top", "bottom", "end", "start", "middle"], category: "Layout" }),
   limitsFromPV:    defineProp({ selType: "boolean", label: "Limits From PV", value: true as boolean, category: "EPICS" }),
   min:             defineProp({ selType: "number", label: "Minimum value", value: 0 as number, category: "EPICS" }),
   max:             defineProp({ selType: "number", label: "Maximum value", value: 0 as number, category: "EPICS" }),

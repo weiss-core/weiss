@@ -16,9 +16,8 @@ export const BitIndicator: Widget = {
   pvData: {} as PVData,
   editableProperties: {
     ...FILTERED_COMMON_PROPS,
-    width: { ...PROPERTY_SCHEMAS.width, value: 40 },
+    width: { ...PROPERTY_SCHEMAS.width, value: 95 },
     height: { ...PROPERTY_SCHEMAS.height, value: 40 },
-    label: { ...PROPERTY_SCHEMAS.label, value: "Bit Label" },
     onColor: PROPERTY_SCHEMAS.onColor,
     offColor: PROPERTY_SCHEMAS.offColor,
     square: PROPERTY_SCHEMAS.square,
@@ -26,6 +25,9 @@ export const BitIndicator: Widget = {
     alarmBorder: PROPERTY_SCHEMAS.alarmBorder,
     labelFromPV: PROPERTY_SCHEMAS.labelFromPV,
     labelPlcmnt: PROPERTY_SCHEMAS.labelPlcmnt,
+    useStringVal: PROPERTY_SCHEMAS.useStringVal,
+    offLabel: PROPERTY_SCHEMAS.offLabel,
+    onLabel: PROPERTY_SCHEMAS.onLabel,
     ...TEXT_PROPS,
   },
 } as const;

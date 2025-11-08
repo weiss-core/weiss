@@ -1,4 +1,5 @@
 export { ActionButton } from "./ActionButton";
+export { ToggleButton } from "./ToggleButton";
 export { BitIndicator } from "./BitIndicator";
 export { MultiBitIndicator } from "./MultiBitIndicator";
 export { InputField } from "./InputField";
