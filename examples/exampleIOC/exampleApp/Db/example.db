@@ -109,7 +109,7 @@ record(stringin, "$(P)$(R)stringin") {
 
 record(mbbo, "$(P)$(R)mbbo") {
   field(DESC, "Selection out")
-  field(OUT,  "$(P)$(R)mbbi")
+  field(OUT,  "$(P)$(R)mbbi PP")
   field(ZRVL, "0")
   field(ZRST, "Option 0")
   field(ONVL, "1")
