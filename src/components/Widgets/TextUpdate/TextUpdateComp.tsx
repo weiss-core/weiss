@@ -39,6 +39,7 @@ const TextUpdateComp: React.FC<WidgetUpdate> = ({ data }) => {
           display: "flex",
           paddingLeft: 5,
           paddingRight: 5,
+          boxSizing: "border-box",
           justifyContent: FLEX_ALIGN_MAP[p.textHAlign?.value ?? "left"],
           alignItems: FLEX_ALIGN_MAP[p.textVAlign?.value ?? "middle"],
           backgroundColor: p.backgroundColor?.value,

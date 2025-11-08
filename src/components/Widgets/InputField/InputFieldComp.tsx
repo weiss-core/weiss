@@ -10,7 +10,8 @@ const InputFieldComp: React.FC<WidgetUpdate> = ({ data }) => {
 
   const p = data.editableProperties;
   const pvData = data.pvData;
-  const units = p.unitsFromPV?.value && pvData?.display?.units ? pvData.display.units : p.units?.value;
+  const units =
+    p.unitsFromPV?.value && pvData?.display?.units ? pvData.display.units : p.units?.value;
   const isEditMode = mode === EDIT_MODE;
 
   useEffect(() => {

@@ -122,7 +122,7 @@ record(mbbo, "$(P)$(R)mbbo") {
   field(FRST, "Option 4")
 }
 
-record(mbbo, "$(P)$(R)mbbi") {
+record(mbbi, "$(P)$(R)mbbi") {
   field(DESC, "Selection in")
   field(ZRVL, "0")
   field(ZRST, "Option 0")
