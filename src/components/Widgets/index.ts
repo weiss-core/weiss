@@ -9,3 +9,4 @@ export { Rectangle } from "./Rectangle";
 export { TextLabel } from "./TextLabel";
 export { GraphY } from "./GraphY";
 export { SelectionBox } from "./SelectionBox";
+export { Slider } from "./Slider";

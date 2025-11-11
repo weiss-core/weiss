@@ -22,7 +22,7 @@ export const MultiBitIndicator: Widget = {
     offColor: PROPERTY_SCHEMAS.offColor,
     nBits: PROPERTY_SCHEMAS.nBits,
     square: PROPERTY_SCHEMAS.square,
-    orientation: PROPERTY_SCHEMAS.orientation,
+    horizontal: PROPERTY_SCHEMAS.horizontal,
     invertBitOrder: PROPERTY_SCHEMAS.invertBitOrder,
     spacing: PROPERTY_SCHEMAS.spacing,
     pvName: PROPERTY_SCHEMAS.pvName,

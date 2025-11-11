@@ -61,7 +61,7 @@ export const PROPERTY_SCHEMAS = {
   actionValue:     defineProp({ selType: "text", label: "Action Value", value: 1 as number | string, category: "EPICS" }),
   // Specific Properties
   // BitIndicators
-  orientation:     defineProp({ selType: "select", label: "Orientation", value: "Vertical" as string, options: ["Vertical", "Horizontal"], category: "Layout" }),
+  horizontal:      defineProp({ selType: "boolean", label: "Horizontal", value: false, category: "Layout" }),
   nBits:           defineProp({ selType: "number", label: "Number of bits", value: 8 as number, limits: { min: 1 }, category: "Layout" }),
   invertBitOrder:  defineProp({ selType: "boolean", label: "Invert bit order", value: false as boolean, category: "Layout" }),
   onColor:         defineProp({ selType: "colorSel", label: "On Color", value: COLORS.onColor, category: "Style" }),
@@ -83,6 +83,8 @@ export const PROPERTY_SCHEMAS = {
   plotLineStyle:   defineProp({ selType: "select", label: "Line style", value: "lines" as "lines+markers"|"lines"|"markers", options: ["lines+markers", "lines", "markers"], category: "Style" }),
   // Selector
   enumChoices:     defineProp({ selType: "strList", label: "Enum Choices", value: [""] as string[], category: "Other" }),
+  // Slider
+  stepSize:        defineProp({ selType: "number", label: "Step Size", value: 0 as number, limits: { min: 1 }, category: "Layout" }),
   //Other
   valuePlcmnt:     defineProp({ selType: "select", label: "Value placement", value: "top" as string, options: ["top", "bottom", "end", "start", "middle"], category: "Layout" }),
   labelPlcmnt:     defineProp({ selType: "select", label: "Label placement", value: "end" as string, options: ["top", "bottom", "end", "start", "middle"], category: "Layout" }),

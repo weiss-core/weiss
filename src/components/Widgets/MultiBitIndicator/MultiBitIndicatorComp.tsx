@@ -13,10 +13,9 @@ const MultiBitIndicatorComp: React.FC<WidgetUpdate> = ({ data }) => {
   const onColor = p.onColor?.value;
   const offColor = p.offColor?.value;
   const invertOrder = p.invertBitOrder?.value;
-  const orientation = p.orientation?.value;
   const value = inEditMode ? 0 : Number(pvData?.value);
   const bitsCount = p.nBits?.value ?? 1;
-  const isHorizontal = p.orientation?.value === "Horizontal";
+  const isHorizontal = p.horizontal?.value;
   const gap = Number(p.spacing?.value ?? 0);
   const containerWidth = Number(p.width?.value ?? 0);
   const containerHeight = Number(p.height?.value ?? 0);
@@ -66,7 +65,7 @@ const MultiBitIndicatorComp: React.FC<WidgetUpdate> = ({ data }) => {
           height: p.height?.value,
           display: "flex",
           gap: p.spacing?.value,
-          flexDirection: orientation === "Horizontal" ? "row" : "column",
+          flexDirection: isHorizontal ? "row" : "column",
           justifyContent: "center",
           boxSizing: "border-box",
           alignItems: "center",
