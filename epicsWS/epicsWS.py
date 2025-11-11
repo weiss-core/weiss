@@ -76,7 +76,7 @@ async def send_update(pv_name: str, pv_obj, provider: str):
         try:
             await ws.send(data)
         except Exception:
-            print(f"Error sending update to {ws}")
+            print(f"[epicsWS]: Error sending update to {ws}")
 
 
 async def message_handler(ws: WebSocketServerProtocol):
@@ -99,7 +99,7 @@ async def message_handler(ws: WebSocketServerProtocol):
             if clients[CA_PROVIDER_KEY] is None:
                 clients[CA_PROVIDER_KEY] = CaprotoClient(ca_callback)
             return clients[CA_PROVIDER_KEY]
-        raise ValueError(f"Unsupported protocol: {protocol}")
+        raise ValueError(f"[epicsWS]: Unsupported protocol: {protocol}")
 
     try:
         async for message in ws:
@@ -140,10 +140,10 @@ async def message_handler(ws: WebSocketServerProtocol):
                 await ws.send(json.dumps({"type": "error", "message": "Unknown message type"}))
 
     except Exception as e:
-        print(f"error handling message from {client_id}: {e}")
+        print(f"[epicsWS]: Error handling message from {client_id}: {e}")
 
     finally:
-        print(f"client disconnected: {client_id}")
+        print(f"[epicsWS]: Client disconnected: {client_id}")
         for pv, clients_set in list(subscriptions.items()):
             clients_set.discard(ws)
             if not clients_set:
@@ -156,7 +156,7 @@ async def message_handler(ws: WebSocketServerProtocol):
 
 async def main():
     async with websockets.serve(message_handler, "0.0.0.0", 8080):
-        print("WebSocket server running on ws://localhost:8080")
+        print("[epicsWS]: WebSocket server running on ws://localhost:8080")
         await asyncio.Future()
 
 

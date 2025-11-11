@@ -68,13 +68,13 @@ class P4PClient:
         """Write a value to a PV (async)."""
         mon = self._channels.get(pv)
         if not mon:
-            print(f"Trying to write to not subscribed PV {pv}. Ignoring.")
+            print(f"[p4p]: Trying to write to not subscribed PV {pv}. Ignoring.")
             return
 
         try:
             self._ctxt.put(pv, value)
         except Exception as e:
-            print(f"Write to PV {pv} failed: {e}")
+            print(f"[p4p]: Write to PV {pv} failed: {e}")
 
     def close(self):
         """Close all subscriptions and context."""

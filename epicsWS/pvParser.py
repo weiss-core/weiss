@@ -7,9 +7,8 @@ import numpy as np
 from p4p.wrapper import Value as p4pValue
 
 
-# ------------------- Data Structures -------------------
-
-
+# NormativeType data definitions
+# See: https://docs.epics-controls.org/en/latest/pv-access/Normative-Types-Specification.html
 @dataclass
 class Alarm:
     severity: int = 0
@@ -70,9 +69,6 @@ class PVData:
     b64dtype: Optional[str] = None
 
 
-# ------------------- Utility -------------------
-
-
 def encode_base64_array(array: Union[List, np.ndarray], dtype: str) -> str:
     arr = np.asarray(array, dtype=dtype)
     if not arr.dtype.isnative or arr.dtype.byteorder != "<":
@@ -105,9 +101,6 @@ def encode_array(arr: Any) -> tuple[Optional[str], Optional[str]]:
     return None, None
 
 
-# ------------------- Parser -------------------
-
-
 class PVParser:
     @staticmethod
     def from_p4p(pv_obj, pv_name: Optional[str] = None) -> PVData:
@@ -116,7 +109,6 @@ class PVParser:
 
         value_field = pv_obj.get("value")
 
-        # --- Handle value field ---
         if isinstance(value_field, (int, float, str)):
             value = value_field
         elif (
@@ -129,14 +121,12 @@ class PVParser:
         elif isinstance(value_field, (list, np.ndarray)):
             b64arr, b64dtype = encode_array(value_field)
 
-        # --- Alarm ---
         a = pv_obj.get("alarm", {})
         alarm = Alarm(
             severity=a.get("severity", 0),
             status=a.get("status", 0),
         )
 
-        # --- Timestamp ---
         ts = pv_obj.get("timeStamp", {})
         timestamp = TimeStamp(
             secondsPastEpoch=ts.get("secondsPastEpoch", 0),
@@ -144,7 +134,6 @@ class PVParser:
             userTag=ts.get("userTag", 0),
         )
 
-        # --- Display ---
         d = pv_obj.get("display", {})
         display = Display(
             limitLow=d.get("limitLow"),
@@ -156,7 +145,6 @@ class PVParser:
             choices=d.get("choices"),
         )
 
-        # --- Control ---
         c = pv_obj.get("control", {})
         control = Control(
             limitLow=c.get("limitLow"),
@@ -164,7 +152,6 @@ class PVParser:
             minStep=c.get("minStep"),
         )
 
-        # --- Value alarm ---
         va = pv_obj.get("valueAlarm", {})
 
         def safe_get(k: str):
@@ -199,49 +186,52 @@ class PVParser:
 
     @staticmethod
     def from_caproto(pv_obj: dict, pv_name: str) -> PVData:
-        """Converts a dict-based CA response to PVData."""
-        value = pv_obj.get("value")
-        b64arr, b64dtype = (
-            encode_array(value) if isinstance(value, (list, np.ndarray)) else (None, None)
-        )
+        """Converts a dict-based CA response to PVData, ensuring JSON-serializable values."""
 
-        enumChoices = pv_obj.get("enum_strings")
+        def normalize_value(v):
+            """Converts numpy types and arrays to JSON-serializable Python types."""
+            if isinstance(v, np.generic):
+                return v.item()
+            elif isinstance(v, np.ndarray):
+                return v.tolist()
+            return v
 
-        # --- Alarm ---
+        value = normalize_value(pv_obj.get("value"))
+
+        b64arr, b64dtype = encode_array(value) if isinstance(value, list) else (None, None)
+
+        enumChoices = pv_obj.get("enum_strs")
+
         alarm = Alarm(
-            severity=pv_obj.get("severity", 0),
-            status=pv_obj.get("status", 0),
+            severity=normalize_value(pv_obj.get("severity", 0)),
+            status=normalize_value(pv_obj.get("status", 0)),
             message=str(pv_obj.get("status", "NO_ALARM")),
         )
 
-        # --- Timestamp ---
-        ts = pv_obj.get("timestamp", 0.0) or 0.0
+        ts = normalize_value(pv_obj.get("timestamp", 0.0)) or 0.0
         sec = int(ts)
         nsec = int((ts - sec) * 1e9)
         timestamp = TimeStamp(secondsPastEpoch=sec, nanoseconds=nsec)
 
-        # --- Display ---
         display = Display(
-            limitLow=pv_obj.get("lower_disp_limit"),
-            limitHigh=pv_obj.get("upper_disp_limit"),
+            limitLow=normalize_value(pv_obj.get("lower_disp_limit")),
+            limitHigh=normalize_value(pv_obj.get("upper_disp_limit")),
             units=pv_obj.get("units"),
-            precision=pv_obj.get("precision"),
-            choices=pv_obj.get("enum_strings"),
+            precision=normalize_value(pv_obj.get("precision")),
+            choices=enumChoices,
         )
 
-        # --- Control ---
         control = Control(
-            limitLow=pv_obj.get("lower_ctrl_limit"),
-            limitHigh=pv_obj.get("upper_ctrl_limit"),
+            limitLow=normalize_value(pv_obj.get("lower_ctrl_limit")),
+            limitHigh=normalize_value(pv_obj.get("upper_ctrl_limit")),
         )
 
-        # --- Value alarm ---
         value_alarm = ValueAlarm(
-            lowAlarmLimit=pv_obj.get("lower_alarm_limit"),
-            highAlarmLimit=pv_obj.get("upper_alarm_limit"),
-            lowWarningLimit=pv_obj.get("lower_warning_limit"),
-            highWarningLimit=pv_obj.get("upper_warning_limit"),
-            hysteresis=pv_obj.get("hyst"),
+            lowAlarmLimit=normalize_value(pv_obj.get("lower_alarm_limit")),
+            highAlarmLimit=normalize_value(pv_obj.get("upper_alarm_limit")),
+            lowWarningLimit=normalize_value(pv_obj.get("lower_warning_limit")),
+            highWarningLimit=normalize_value(pv_obj.get("upper_warning_limit")),
+            hysteresis=normalize_value(pv_obj.get("hyst")),
         )
 
         return PVData(
