@@ -132,7 +132,7 @@ async def message_handler(ws: WebSocketServerProtocol):
                 pv = msg.get("pv")
                 value = msg.get("value")
                 if pv and value is not None:
-                    protocol, pv_name = parse_protocol(pv_name)
+                    protocol, pv_name = parse_protocol(pv)
                     client = get_client(protocol)
                     client.write_to_pv(pv_name, value)
 
