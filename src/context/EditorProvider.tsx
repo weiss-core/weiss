@@ -27,8 +27,7 @@ export const EditorProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const widgetManager = useWidgetManager();
   const ws = useEpicsWS(widgetManager.PVMap);
   const ui = useUIManager(
-    ws.ws,
-    ws.startNewSession,
+    ws,
     widgetManager.editorWidgets,
     widgetManager.setSelectedWidgetIDs,
     widgetManager.loadWidgets,

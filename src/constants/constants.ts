@@ -53,7 +53,7 @@ export const FRONT_UI_ZIDX = parseInt(
 );
 
 /** URL of the project source repository */
-export const APP_SRC_URL = "https://github.com/AndreFavotto/weiss";
+export const APP_SRC_URL = "https://github.com/weiss-core/weiss.git";
 
 /** WebSocket server URL for PV communication */
 export const WS_URL = "ws://localhost:8080";

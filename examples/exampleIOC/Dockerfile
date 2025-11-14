@@ -1,6 +1,6 @@
 FROM debian:11-slim AS epicsbuilder
 
-ENV EPICS_VERSION=7.0.8
+ENV EPICS_VERSION=7.0.9
 ENV EPICS_BASE=/epics/base
 
 WORKDIR /epics
@@ -24,7 +24,7 @@ WORKDIR /epics
 
 COPY --from=epicsbuilder /epics /epics
 
-ENV EPICS_VERSION=7.0.8
+ENV EPICS_VERSION=7.0.9
 ENV EPICS_BASE=/epics/base
 ENV EPICS_HOST_ARCH=linux-x86_64
 ENV PATH=${EPICS_BASE}/bin/${EPICS_HOST_ARCH}:${PATH}

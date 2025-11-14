@@ -1,8 +1,8 @@
 import React, { useEffect, useState, useRef } from "react";
-import type { WidgetUpdate } from "../../../types/widgets";
+import type { WidgetUpdate } from "@src/types/widgets";
 import Plot from "react-plotly.js";
-import { useEditorContext } from "../../../context/useEditorContext";
-import { COLORS } from "../../../constants/constants";
+import { useEditorContext } from "@src/context/useEditorContext";
+import { COLORS } from "@src/constants/constants";
 import type { TimeStamp } from "@src/types/epicsWS";
 
 const GraphYComp: React.FC<WidgetUpdate> = ({ data }) => {
@@ -126,9 +126,16 @@ const GraphYComp: React.FC<WidgetUpdate> = ({ data }) => {
       },
       paper_bgcolor: p.backgroundColor?.value,
       plot_bgcolor: p.backgroundColor?.value,
-      margin: { b: 50, l: 50, t: 50, r: 30 },
+      margin: { b: 35, l: 35, t: 50, r: 30 },
       width: p.width?.value,
       height: p.height?.value,
+      legend: {
+        orientation: "h",
+        x: 1,
+        xanchor: "right",
+        y: 0.975,
+        bgcolor: "00000000",
+      },
     }));
   }, [p]);
 

@@ -1,8 +1,8 @@
 import React from "react";
 import type { ReactNode, CSSProperties } from "react";
-import type { Alarm } from "../../types/epicsWS";
-import { COLORS } from "../../constants/constants";
-import { useEditorContext } from "../../context/useEditorContext";
+import type { Alarm } from "@src/types/epicsWS";
+import { COLORS } from "@src/constants/constants";
+import { useEditorContext } from "@src/context/useEditorContext";
 
 interface AlarmBorderProps {
   alarmData?: Alarm;
@@ -21,11 +21,11 @@ interface AlarmBorderProps {
  */
 const AlarmBorder: React.FC<AlarmBorderProps> = ({ alarmData, children, enable }) => {
   const { inEditMode } = useEditorContext();
-  const getBorderColor = (): string | null => {
+  const getBorderColor = (): string | undefined => {
     if (!alarmData) return COLORS.disconnected;
     switch (alarmData.severity) {
       case 0: // NO_ALARM
-        return null;
+        return undefined;
       case 1: // MINOR
         return COLORS.minor;
       case 2: // MAJOR
@@ -42,20 +42,14 @@ const AlarmBorder: React.FC<AlarmBorderProps> = ({ alarmData, children, enable }
   const style: CSSProperties = {
     width: "100%",
     height: "100%",
-    border: borderColor
-      ? `3px ${borderColor === COLORS.disconnected ? "dashed" : "solid"} ${borderColor}`
-      : undefined,
+    borderColor: borderColor,
+    borderWidth: borderColor ? "3px" : 0,
+    borderStyle: borderColor === COLORS.disconnected ? "dashed" : "solid",
     borderRadius: "2px",
     boxSizing: "border-box",
   };
 
-  return enable && !inEditMode ? (
-    <div style={style} title={alarmData?.message}>
-      {children}
-    </div>
-  ) : (
-    children
-  );
+  return enable && !inEditMode ? <div style={style}>{children}</div> : children;
 };
 
 export default AlarmBorder;

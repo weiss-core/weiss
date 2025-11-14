@@ -1,6 +1,6 @@
-import { COLORS } from "../../../constants/constants";
-import type { Widget } from "../../../types/widgets";
-import { PROPERTY_SCHEMAS, COMMON_PROPS } from "../../../types/widgetProperties";
+import { COLORS } from "@src/constants/constants";
+import type { Widget } from "@src/types/widgets";
+import { PROPERTY_SCHEMAS, COMMON_PROPS } from "@src/types/widgetProperties";
 import { RectangleComp } from "./RectangleComp";
 import RectangleIcon from "@mui/icons-material/Rectangle";
 

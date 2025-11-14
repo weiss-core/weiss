@@ -1,6 +1,6 @@
-import type { PVValue, WSMessage } from "../types/epicsWS";
+import type { PVValue, WSMessage } from "@src/types/epicsWS";
 
-type ConnectHandler = (connected: boolean) => void;
+type ConnectionHandler = (connected: boolean) => void;
 type MessageHandler = (message: WSMessage) => void;
 
 /**
@@ -44,24 +44,22 @@ function isWSMessage(obj: unknown): obj is WSMessage {
  */
 export class WSClient {
   private url: string;
-  private connect_handler: ConnectHandler;
+  private connection_handler: ConnectionHandler;
   private message_handler: MessageHandler;
 
   private connected = false;
   private socket!: WebSocket;
   private values: Record<string, WSMessage> = {};
 
-  reconnect_ms = 5000;
-
   /**
    * Creates a new WSClient instance.
    * @param url The WebSocket server URL.
-   * @param connect_handler Callback for connection status changes.
+   * @param connection_handler Callback for connection status changes.
    * @param message_handler Callback for incoming messages.
    */
-  constructor(url: string, connect_handler: ConnectHandler, message_handler: MessageHandler) {
+  constructor(url: string, connection_handler: ConnectionHandler, message_handler: MessageHandler) {
     this.url = url;
-    this.connect_handler = connect_handler;
+    this.connection_handler = connection_handler;
     this.message_handler = message_handler;
   }
 
@@ -69,7 +67,6 @@ export class WSClient {
    * Opens a new WebSocket connection and sets up event handlers.
    */
   open(): void {
-    this.connect_handler(false);
     this.socket = new WebSocket(this.url);
     this.socket.onopen = (event) => this.handleConnection(event);
     this.socket.onmessage = (event) => this.handleMessage(event.data as string);
@@ -83,7 +80,7 @@ export class WSClient {
    */
   private handleConnection(_event: Event): void {
     this.connected = true;
-    this.connect_handler(true);
+    this.connection_handler(true);
   }
 
   /**
@@ -131,8 +128,7 @@ export class WSClient {
    * @param event The error event.
    */
   private handleError(event: Event): void {
-    console.error("Error from " + this.url);
-    console.error(event);
+    console.error(`WebSocket error: ${event}`);
     this.close();
   }
 
@@ -142,13 +138,15 @@ export class WSClient {
    */
   private handleClose(event: CloseEvent): void {
     this.connected = false;
-    this.connect_handler(false);
+    this.connection_handler(false);
     let message = `Web socket closed (${event.code}`;
     if (event.reason) {
       message += `, ${event.reason}`;
     }
     message += ")";
-    console.log(message);
+    if (event.code !== 1000) {
+      console.error(message);
+    }
   }
 
   /**
@@ -168,7 +166,6 @@ export class WSClient {
     if (!Array.isArray(pvs)) {
       pvs = [pvs];
     }
-    console.log("subscribing", { type: "subscribe", pvs });
     this.socket.send(JSON.stringify({ type: "subscribe", pvs }));
   }
 
@@ -203,6 +200,6 @@ export class WSClient {
    */
   close(): void {
     if (!this.connected) return;
-    this.socket.close();
+    this.socket.close(1000, "Client closing connection normally");
   }
 }

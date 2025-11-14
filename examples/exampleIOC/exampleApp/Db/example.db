@@ -26,11 +26,25 @@ record(ao, "$(P)$(R)Ampl-SP") {
   field(LOPR, "0")
 }
 
-record(ai, "$(P)$(R)Ampl-Mon") {
-  field(DESC, "Sin Amplitude (MDEL=-1)")
-  field(INP, "$(P)$(R)Ampl-SP")
+record(ai, "$(P)$(R)Ampl-RB") {
+  field(DESC, "Sin Amplitude Readback")
+  field(INP, "$(P)$(R)Ampl-SP CP")
+  field(HIHI, "9000")
+  field(HHSV, "MAJOR")
+  field(HIGH, "8000")
+  field(HSV, "MINOR")
+  field(LOLO, "1000")
+  field(LLSV, "MAJOR")
+  field(LOW, "2000")
+  field(LSV, "MINOR")
+}
+
+record(compress, "$(P)$(R)AmplArr-Mon") {
+  field(DESC, "Waves Amplitude Arr")
+  field(ALG, "Circular Buffer")
+  field(INP, "$(P)$(R)Ampl-RB")
   field(SCAN, ".1 second")
-  field(MDEL, "-1")
+  field(NSAM, "100")
 }
 
 record(calc, "$(P)$(R)Sin-Mon") {
@@ -49,7 +63,7 @@ record(compress, "$(P)$(R)SinArr-Mon") {
   field(DESC, "Sine array")
   field(ALG, "Circular Buffer")
   field(INP, "$(P)$(R)Sin-Mon CP")
-  field(NSAM, "80")
+  field(NSAM, "100")
 }
 
 record(calc, "$(P)$(R)Cos-Mon") {
@@ -68,7 +82,7 @@ record(compress, "$(P)$(R)CosArr-Mon") {
   field(DESC, "Cosine array")
   field(ALG, "Circular Buffer")
   field(INP, "$(P)$(R)Cos-Mon CP")
-  field(NSAM, "80")
+  field(NSAM, "100")
 }
 
 record(bo, "$(P)$(R)bo") {
@@ -109,7 +123,7 @@ record(stringin, "$(P)$(R)stringin") {
 
 record(mbbo, "$(P)$(R)mbbo") {
   field(DESC, "Selection out")
-  field(OUT,  "$(P)$(R)mbbi")
+  field(OUT,  "$(P)$(R)mbbi PP")
   field(ZRVL, "0")
   field(ZRST, "Option 0")
   field(ONVL, "1")
@@ -122,7 +136,7 @@ record(mbbo, "$(P)$(R)mbbo") {
   field(FRST, "Option 4")
 }
 
-record(mbbo, "$(P)$(R)mbbi") {
+record(mbbi, "$(P)$(R)mbbi") {
   field(DESC, "Selection in")
   field(ZRVL, "0")
   field(ZRST, "Option 0")

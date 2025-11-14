@@ -1,5 +1,5 @@
 FROM alpine/git:latest AS source_fetch
-ARG GIT_REPO=https://github.com/AndreFavotto/weiss.git
+ARG GIT_REPO=https://github.com/weiss-core/weiss.git
 ARG APP_VERSION=main
 RUN git clone --recursive ${GIT_REPO} /app && cd /app && git checkout ${APP_VERSION}
 

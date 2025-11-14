@@ -1,8 +1,8 @@
 import { useCallback, useMemo, useRef, useState } from "react";
-import { WSClient } from "../WSClient/WSClient";
-import type { PVData, PVValue, WSMessage } from "../types/epicsWS";
+import { WSClient } from "@src/WSClient/WSClient";
+import type { PVData, PVValue, WSMessage } from "@src/types/epicsWS";
 import type { useWidgetManager } from "./useWidgetManager";
-import { WS_URL } from "../constants/constants";
+import { WS_URL } from "@src/constants/constants";
 
 /**
  * Hook that manages a WebSocket session to the PV WebSocket.
@@ -17,7 +17,7 @@ import { WS_URL } from "../constants/constants";
 export default function useEpicsWS(PVMap: ReturnType<typeof useWidgetManager>["PVMap"]) {
   /** WebSocket client instance */
   const ws = useRef<WSClient | null>(null);
-  const [isWSConnected, setWSConnected] = useState(false);
+  const [wsConnected, setWSConnected] = useState(false);
   const pvCache = useRef<Record<string, PVData>>({});
   const [pvState, setPVState] = useState<Record<string, PVData>>({});
 
@@ -123,7 +123,7 @@ export default function useEpicsWS(PVMap: ReturnType<typeof useWidgetManager>["P
 
   return {
     ws,
-    isWSConnected,
+    wsConnected,
     startNewSession,
     stopSession,
     writePVValue,

@@ -1,13 +1,13 @@
 import React from "react";
-import type { WidgetUpdate } from "../../../types/widgets";
-import { FLEX_ALIGN_MAP, RUNTIME_MODE } from "../../../constants/constants";
-import { useEditorContext } from "../../../context/useEditorContext";
-import AlarmBorder from "../../AlarmBorder/AlarmBorder";
+import type { WidgetUpdate } from "@src/types/widgets";
+import { FLEX_ALIGN_MAP } from "@src/constants/constants";
+import { useEditorContext } from "@src/context/useEditorContext";
+import AlarmBorder from "@components/AlarmBorder/AlarmBorder";
 
 const TextUpdateComp: React.FC<WidgetUpdate> = ({ data }) => {
   const p = data.editableProperties;
   const pvData = data.pvData;
-  const { mode } = useEditorContext();
+  const { inEditMode } = useEditorContext();
 
   if (!p.visible?.value) return null;
 
@@ -16,11 +16,15 @@ const TextUpdateComp: React.FC<WidgetUpdate> = ({ data }) => {
 
   let displayValue = pvData?.value;
 
-  if (mode === RUNTIME_MODE && typeof pvData?.value === "number") {
-    if (typeof precision === "number" && precision > 0) {
-      displayValue = pvData.value.toFixed(precision);
+  if (!inEditMode && typeof pvData?.value === "number") {
+    const val = pvData.value;
+    if (typeof precision === "number" && precision > 0 && !pvData.enumChoices) {
+      displayValue = val.toFixed(precision);
+    } else if (pvData.enumChoices && pvData.enumChoices.length > 0) {
+      const validIdx = val <= pvData.enumChoices.length;
+      displayValue = validIdx ? pvData.enumChoices[val] : val;
     }
-  } else if (mode !== RUNTIME_MODE) {
+  } else if (inEditMode) {
     displayValue = p.pvName?.value ?? p.label?.value ?? "";
   }
 
@@ -35,6 +39,7 @@ const TextUpdateComp: React.FC<WidgetUpdate> = ({ data }) => {
           display: "flex",
           paddingLeft: 5,
           paddingRight: 5,
+          boxSizing: "border-box",
           justifyContent: FLEX_ALIGN_MAP[p.textHAlign?.value ?? "left"],
           alignItems: FLEX_ALIGN_MAP[p.textVAlign?.value ?? "middle"],
           backgroundColor: p.backgroundColor?.value,

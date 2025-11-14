@@ -1,8 +1,8 @@
 import { BitIndicatorComp } from "./BitIndicatorComp";
-import { PROPERTY_SCHEMAS, COMMON_PROPS, TEXT_PROPS } from "../../../types/widgetProperties";
-import type { Widget } from "../../../types/widgets";
+import { PROPERTY_SCHEMAS, COMMON_PROPS, TEXT_PROPS } from "@src/types/widgetProperties";
+import type { Widget } from "@src/types/widgets";
 import FlakyIcon from "@mui/icons-material/Flaky";
-import type { PVData } from "../../../types/epicsWS";
+import type { PVData } from "@src/types/epicsWS";
 
 const { borderRadius, backgroundColor, ...FILTERED_COMMON_PROPS } = COMMON_PROPS;
 

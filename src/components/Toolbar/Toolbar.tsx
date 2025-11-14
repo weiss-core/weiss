@@ -17,6 +17,8 @@ import DragIndicator from "@mui/icons-material/DragIndicator";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import CustomGroupIcon from "@components/CustomIcons/GroupIcon";
 import CustomUngroupIcon from "@components/CustomIcons/UngroupIcon";
+import KeyboardArrowDown from "@mui/icons-material/KeyboardArrowDown";
+import KeyboardArrowUp from "@mui/icons-material/KeyboardArrowUp";
 import { EDIT_MODE } from "@src/constants/constants";
 import { Rnd } from "react-rnd";
 import { grey } from "@mui/material/colors";
@@ -41,6 +43,8 @@ const ToolbarButtons: React.FC = () => {
     deleteWidget,
     groupSelected,
     ungroupSelected,
+    stepForward,
+    stepBackwards,
   } = useEditorContext();
 
   if (mode !== EDIT_MODE) return null;
@@ -60,7 +64,7 @@ const ToolbarButtons: React.FC = () => {
   return (
     <Rnd
       className="toolBar"
-      default={{ x: 80, y: 15, width: 440, height: 40 }}
+      default={{ x: 80, y: 15, width: 490, height: 40 }}
       bounds="window"
       enableResizing={false}
       dragHandleClassName="dragHandle"
@@ -101,6 +105,22 @@ const ToolbarButtons: React.FC = () => {
           <span>
             <IconButton size="small" onClick={sendToBack} disabled={noneSelected} sx={iconSx}>
               <FlipToBack fontSize="small" />
+            </IconButton>
+          </span>
+        </Tooltip>
+
+        <Tooltip title="Step Forward">
+          <span>
+            <IconButton size="small" onClick={stepForward} disabled={noneSelected} sx={iconSx}>
+              <KeyboardArrowUp fontSize="small" />
+            </IconButton>
+          </span>
+        </Tooltip>
+
+        <Tooltip title="Step Back">
+          <span>
+            <IconButton size="small" onClick={stepBackwards} disabled={noneSelected} sx={iconSx}>
+              <KeyboardArrowDown fontSize="small" />
             </IconButton>
           </span>
         </Tooltip>

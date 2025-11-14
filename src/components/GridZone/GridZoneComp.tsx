@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import type { GridPosition, Widget, WidgetUpdate } from "@src/types/widgets";
 import WidgetRegistry from "@components/WidgetRegistry/WidgetRegistry";
 import { useEditorContext } from "@src/context/useEditorContext.tsx";
-import { GRID_ID, MAX_ZOOM, MIN_ZOOM } from "@src/constants/constants.ts";
+import { GRID_ID, MAX_ZOOM, MIN_ZOOM } from "@src/constants/constants";
 import ContextMenu from "@components/ContextMenu/ContextMenu";
 import "./GridZone.css";
 import WidgetRenderer from "@components/WidgetRenderer/WidgetRenderer.tsx";

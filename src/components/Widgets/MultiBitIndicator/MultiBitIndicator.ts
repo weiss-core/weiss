@@ -1,7 +1,7 @@
 import { MultiBitIndicatorComp } from "./MultiBitIndicatorComp";
-import { PROPERTY_SCHEMAS, COMMON_PROPS, TEXT_PROPS } from "../../../types/widgetProperties";
-import type { Widget } from "../../../types/widgets";
-import type { PVData } from "../../../types/epicsWS";
+import { PROPERTY_SCHEMAS, COMMON_PROPS, TEXT_PROPS } from "@src/types/widgetProperties";
+import type { Widget } from "@src/types/widgets";
+import type { PVData } from "@src/types/epicsWS";
 import CustomMultiBitIcon from "@src/components/CustomIcons/MultiBitIcon";
 
 const { borderRadius, backgroundColor, ...FILTERED_COMMON_PROPS } = COMMON_PROPS;
@@ -22,7 +22,7 @@ export const MultiBitIndicator: Widget = {
     offColor: PROPERTY_SCHEMAS.offColor,
     nBits: PROPERTY_SCHEMAS.nBits,
     square: PROPERTY_SCHEMAS.square,
-    orientation: PROPERTY_SCHEMAS.orientation,
+    horizontal: PROPERTY_SCHEMAS.horizontal,
     invertBitOrder: PROPERTY_SCHEMAS.invertBitOrder,
     spacing: PROPERTY_SCHEMAS.spacing,
     pvName: PROPERTY_SCHEMAS.pvName,

@@ -4,10 +4,10 @@ import {
   PLOT_PROPS,
   PROPERTY_SCHEMAS,
   TEXT_PROPS,
-} from "../../../types/widgetProperties";
-import type { Widget } from "../../../types/widgets";
+} from "@src/types/widgetProperties";
+import type { Widget } from "@src/types/widgets";
 import StackedLineChartIcon from "@mui/icons-material/StackedLineChart";
-import type { MultiPvData } from "../../../types/epicsWS";
+import type { MultiPvData } from "@src/types/epicsWS";
 
 export const GraphY: Widget = {
   id: "__GraphYComp__",

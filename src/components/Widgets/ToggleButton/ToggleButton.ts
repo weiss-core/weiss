@@ -1,9 +1,9 @@
 import { ToggleButtonComp } from "./ToggleButtonComp";
-import { COMMON_PROPS, PROPERTY_SCHEMAS, TEXT_PROPS } from "../../../types/widgetProperties";
-import type { Widget } from "../../../types/widgets";
+import { COMMON_PROPS, PROPERTY_SCHEMAS, TEXT_PROPS } from "@src/types/widgetProperties";
+import type { Widget } from "@src/types/widgets";
 import PowerSettingsNewIcon from "@mui/icons-material/PowerSettingsNew";
-import { COLORS } from "../../../constants/constants";
-import type { PVData } from "../../../types/epicsWS";
+import { COLORS } from "@src/constants/constants";
+import type { PVData } from "@src/types/epicsWS";
 
 export const ToggleButton: Widget = {
   id: "__ToggleButton__",

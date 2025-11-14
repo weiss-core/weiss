@@ -644,8 +644,6 @@ export function useWidgetManager() {
             instance.children = raw.children
               .map((child) => restoreWidget(child))
               .filter((c): c is Widget => c !== null);
-          } else {
-            instance.children = [];
           }
 
           // Overlay properties

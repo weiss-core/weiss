@@ -3,14 +3,14 @@
 This is a no-code drag and drop tool for EPICS web operation interfaces.
 
 Follow the app development and mapped improvements on
-[WEISS Project Dashboard](https://github.com/users/AndreFavotto/projects/2)
+[WEISS Project Dashboard](https://github.com/orgs/weiss-core/projects/1/)
 
 ## Dependencies
 
 - Docker (tested with 28.1.1)
 - Docker Compose (tested with v2.35.1)
 
-## Launch development version
+## Getting started
 
 1. Clone this repo
 
@@ -21,34 +21,31 @@ Follow the app development and mapped improvements on
 cp .env.example .env
 ```
 
-3. Launch the app: `docker compose -f docker-compose-dev.yml up`. The application should be
-   available in `localhost:5173`.
+> You can use your `.env` file for tailoring the EPICS communication configurations (default
+> protocol (ca|pva), CA_ADDR_LIST, PVA_ADDR_LIST, etc).
 
-> If launched via the compose file provided, no further configuration is needed. Tailoring of the
-> EPICS communication configurations (default protocol (ca|pva), CA_ADDR_LIST, PVA_ADDR_LIST, etc)
-> can be made in your `.env` file.
+1. Launch the app:
 
-## Examples
+### Development version
 
-In the [examples folder](./examples/) you will find an EPICS IOC and one OPI ready for you to try
-the app.
+For accessing the development version (source code mounted + demoioc), run
+`docker compose -f docker-compose-dev.yml up`. After build, three services will start:
 
-1. In a machine with EPICS installed, run [exampleIOC](exampleIOC).
+- weiss-demoioc: EPICS demonstration IOC for dev / testing purposes (see
+  [examples/exampleIOC](examples/exampleIOC)).
+- weiss-epicsws: EPICS WebSocket and PV communication layer;
+- weiss-dev: The WEISS front-end application. It should be accessible in `localhost:5173`.
 
-   - It is a standard EPICS IOC, so edit the RELEASE file with the path to your BASE and build it.
-     Then, run the st.cmd in `iocBoot/iocexample`.
-   - Alternatively, just run [example.db](./exampleIOC/exampleApp/Db/example.db) directly with
-     softIocPVA: `softIocPVA -d example.db`.
-   - Run `dbl` to see the available PVs.
-
-> If you are running the IOC in a different machine than the web app, make sure to edit
-> `EPICS_PVA_ADDR_LIST`/`EPICS_CA_ADDR_LIST` with the host address (see [.env](.env.example))
-
-2. Launch WEISS and click in the upload but ton (up arrow in the nav bar). Select the file
-   [example-opi.json](./examples/example-opi.json). Edit it as you will. Whenever you are ready,
-   clik the "Preview" button to start communication. You should see something similar to this:
+**Extra: ** The file [example-opi.json](./examples/example-opi.json) provides a ready-to-test OPI
+linked to the Demo IOC. You can upload it by clicking on the "upload file" button on the navbar.
+Edit it as you will. Whenever you are ready, click the "Preview" button to start communication. You
+should see something similar to this:
 
 ![Example image](./public/example.png)
+
+### Production version
+
+- WIP
 
 ## Notes
 

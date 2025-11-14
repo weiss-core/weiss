@@ -20,8 +20,7 @@ import useEpicsWS from "./useEpicsWS";
  * @returns An object containing UI state, setters, and mode updater.
  */
 export default function useUIManager(
-  ws: ReturnType<typeof useEpicsWS>["ws"],
-  startNewSession: ReturnType<typeof useEpicsWS>["startNewSession"],
+  ws: ReturnType<typeof useEpicsWS>,
   editorWidgets: ReturnType<typeof useWidgetManager>["editorWidgets"],
   setSelectedWidgetIDs: ReturnType<typeof useWidgetManager>["setSelectedWidgetIDs"],
   loadWidgets: ReturnType<typeof useWidgetManager>["loadWidgets"],
@@ -35,6 +34,7 @@ export default function useUIManager(
   const [isPanning, setIsPanning] = useState(false);
   const loadedRef = useRef(false);
   const inEditMode = mode === EDIT_MODE;
+  const RECONNECT_TIMEOUT = 3000;
 
   /**
    * Switch between edit and runtime modes.
@@ -55,17 +55,39 @@ export default function useUIManager(
     (newMode: Mode) => {
       const isEdit = newMode == EDIT_MODE;
       if (isEdit) {
-        ws.current?.close();
-        ws.current = null;
+        ws.stopSession();
       } else {
         setSelectedWidgetIDs([]);
         setWdgPickerOpen(false);
-        startNewSession();
+        ws.startNewSession();
       }
       setMode(newMode);
     },
-    [setSelectedWidgetIDs, startNewSession, ws]
+    [setSelectedWidgetIDs, ws.startNewSession, ws.stopSession]
   );
+  /**
+   * Handle reconnection when needed
+   */
+  useEffect(() => {
+    if (inEditMode || ws.wsConnected) return;
+
+    let triedReconnect = false;
+
+    const intervalId = setInterval(() => {
+      if (!inEditMode && !ws.wsConnected) {
+        triedReconnect = true;
+        console.warn("Socket disconnected. Attempting reconnection...");
+        ws.startNewSession();
+      }
+    }, RECONNECT_TIMEOUT);
+
+    return () => {
+      clearInterval(intervalId);
+      if (triedReconnect) {
+        console.log("Reconnected.");
+      }
+    };
+  }, [inEditMode, ws.wsConnected]);
 
   /**
    * Load widgets from localStorage on component mount.

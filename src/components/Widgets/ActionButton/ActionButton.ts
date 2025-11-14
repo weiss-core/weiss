@@ -1,9 +1,9 @@
 import { ActionButtonComp } from "./ActionButtonComp";
-import { COMMON_PROPS, PROPERTY_SCHEMAS, TEXT_PROPS } from "../../../types/widgetProperties";
-import type { Widget } from "../../../types/widgets";
+import { COMMON_PROPS, PROPERTY_SCHEMAS, TEXT_PROPS } from "@src/types/widgetProperties";
+import type { Widget } from "@src/types/widgets";
 import SendIcon from "@mui/icons-material/Send";
-import { COLORS } from "../../../constants/constants";
-import type { PVData } from "../../../types/epicsWS";
+import { COLORS } from "@src/constants/constants";
+import type { PVData } from "@src/types/epicsWS";
 
 export const ActionButton: Widget = {
   id: "__ActionButton__",

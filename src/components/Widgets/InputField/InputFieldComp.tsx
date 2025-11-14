@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
-import type { WidgetUpdate } from "../../../types/widgets";
-import { useEditorContext } from "../../../context/useEditorContext";
-import { EDIT_MODE, RUNTIME_MODE } from "../../../constants/constants";
-import AlarmBorder from "../../AlarmBorder/AlarmBorder";
+import type { WidgetUpdate } from "@src/types/widgets";
+import { useEditorContext } from "@src/context/useEditorContext";
+import { EDIT_MODE, RUNTIME_MODE } from "@src/constants/constants";
+import AlarmBorder from "@components/AlarmBorder/AlarmBorder";
 
 const InputFieldComp: React.FC<WidgetUpdate> = ({ data }) => {
   const { mode, writePVValue } = useEditorContext();
@@ -10,7 +10,8 @@ const InputFieldComp: React.FC<WidgetUpdate> = ({ data }) => {
 
   const p = data.editableProperties;
   const pvData = data.pvData;
-  const units = p.unitsFromPV?.value && pvData?.display?.units ? pvData.display.units : p.units?.value;
+  const units =
+    p.unitsFromPV?.value && pvData?.display?.units ? pvData.display.units : p.units?.value;
   const isEditMode = mode === EDIT_MODE;
 
   useEffect(() => {

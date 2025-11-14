@@ -1,9 +1,9 @@
 import React from "react";
 import { Button } from "@mui/material";
-import { useEditorContext } from "../../../context/useEditorContext";
-import type { WidgetUpdate } from "../../../types/widgets";
-import { FLEX_ALIGN_MAP } from "../../../constants/constants";
-import AlarmBorder from "../../AlarmBorder/AlarmBorder";
+import { useEditorContext } from "@src/context/useEditorContext";
+import type { WidgetUpdate } from "@src/types/widgets";
+import { FLEX_ALIGN_MAP } from "@src/constants/constants";
+import AlarmBorder from "@components/AlarmBorder/AlarmBorder";
 
 const ActionButtonComp: React.FC<WidgetUpdate> = ({ data }) => {
   const { inEditMode, writePVValue } = useEditorContext();
@@ -13,7 +13,13 @@ const ActionButtonComp: React.FC<WidgetUpdate> = ({ data }) => {
   const handleClick = (_e: React.MouseEvent) => {
     if (!inEditMode) {
       if (p.pvName?.value && p.actionValue?.value !== undefined) {
-        writePVValue(p.pvName.value, p.actionValue.value);
+        const actionValue = p.actionValue.value;
+        // convert to number if is number as string
+        const value =
+          typeof actionValue === "string" && !isNaN(Number(actionValue))
+            ? Number(actionValue)
+            : actionValue;
+        writePVValue(p.pvName.value, value);
       }
     }
   };
