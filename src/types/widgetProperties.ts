@@ -19,15 +19,15 @@ function defineProp<T extends PropertyValue>(prop: WidgetProperty<T>): WidgetPro
 /* prettier-ignore */
 export const PROPERTY_SCHEMAS = {
   // Shared Properties
-  disabled:        defineProp({ selType: "boolean", label: "Disabled", value: false as boolean, category: "Other" }),
+  disabled:        defineProp({ selType: "boolean", label: "Disabled", value: false as boolean, category: "EPICS" }),
   macros:          defineProp({ selType: "strRecord", label: "Macro", value: {} as Record<string, string>, category: "EPICS" }),
   // Layout
   x:               defineProp({ selType: "number", label: "X", value: 100 as number, category: "Layout" }),
   y:               defineProp({ selType: "number", label: "Y", value: 100 as number, category: "Layout" }),
   width:           defineProp({ selType: "number", label: "Width", value: 100 as number, limits: { min: 1 }, category: "Layout" }),
   height:          defineProp({ selType: "number", label: "Height", value: 40 as number, limits: { min: 1 }, category: "Layout" }),
-  label:           defineProp({ selType: "text", label: "Label", value: "" as string, category: "Layout" }),
-  tooltip:         defineProp({ selType: "text", label: "Tooltip", value: "" as string, category: "Layout" }),
+  label:           defineProp({ selType: "text", label: "Label", value: "" as string, category: "Text" }),
+  tooltip:         defineProp({ selType: "text", label: "Tooltip", value: "" as string, category: "Text" }),
   visible:         defineProp({ selType: "boolean", label: "Visible", value: true as boolean, category: "Layout" }),
   // Style
   backgroundColor: defineProp({ selType: "colorSel", label: "Background Color", value: COLORS.backgroundColor, category: "Style" }),
@@ -36,17 +36,18 @@ export const PROPERTY_SCHEMAS = {
   borderRadius:    defineProp({ selType: "number", label: "Border Radius", value: 2 as number, limits: { min: 0 }, category: "Style" }),
   borderStyle:     defineProp({ selType: "select", label: "Border Style", value: "none" as string, options: ["solid", "dashed", "dotted", "none"], category: "Style" }),
   // Font
-  textColor:       defineProp({ selType: "colorSel", label: "Text Color", value: COLORS.textColor, category: "Font" }),
-  fontSize:        defineProp({ selType: "number", label: "Font Size", value: 14 as number, limits: { min: 1 }, category: "Font" }),
-  fontFamily:      defineProp({ selType: "select", label: "Font Family", value: "sans-serif" as string, options: ["serif", "sans-serif", "monospace", "fantasy", "cursive"], category: "Font" }),
-  fontBold:        defineProp({ selType: "boolean", label: "Bold text", value: false as boolean, category: "Font" }),
-  fontItalic:      defineProp({ selType: "boolean", label: "Italic text", value: false as boolean, category: "Font" }),
-  textHAlign:      defineProp({ selType: "select", label: "Text Horiz. Align", value: "left" as string, options: ["left", "center", "right"], category: "Font" }),
-  textVAlign:      defineProp({ selType: "select", label: "Text Vert. Align", value: "middle" as string, options: ["top", "middle", "bottom"], category: "Font" }),
+  textColor:       defineProp({ selType: "colorSel", label: "Text Color", value: COLORS.textColor, category: "Text" }),
+  fontSize:        defineProp({ selType: "number", label: "Font Size", value: 14 as number, limits: { min: 1 }, category: "Text" }),
+  fontFamily:      defineProp({ selType: "select", label: "Font Family", value: "sans-serif" as string, options: ["serif", "sans-serif", "monospace", "fantasy", "cursive"], category: "Text" }),
+  fontBold:        defineProp({ selType: "boolean", label: "Bold text", value: false as boolean, category: "Text" }),
+  fontItalic:      defineProp({ selType: "boolean", label: "Italic text", value: false as boolean, category: "Text" }),
+  fontUnderlined:  defineProp({ selType: "boolean", label: "Underlined text", value: false as boolean, category: "Text" }),
+  textHAlign:      defineProp({ selType: "select", label: "Horizontal Align", value: "left" as string, options: ["left", "center", "right"], category: "Text" }),
+  textVAlign:      defineProp({ selType: "select", label: "Vert. Align", value: "middle" as string, options: ["top", "middle", "bottom"], category: "Text" }),
   // Grid options
   gridLineColor:   defineProp({ selType: "colorSel", label: "Grid Line Color", value: COLORS.gridLineColor, category: "Style" }),
   gridLineVisible: defineProp({ selType: "boolean", label: "Grid Visible", value: true as boolean, category: "Grid" }),
-  gridSize:        defineProp({ selType: "number", label: "Grid Size", value: 20 as number, limits: { min: 1 }, category: "Grid" }),
+  gridSize:        defineProp({ selType: "number", label: "Grid Size", value: 10 as number, limits: { min: 1 }, category: "Grid" }),
   snapToGrid:      defineProp({ selType: "boolean", label: "Snap items", value: true as boolean, category: "Grid" }),
   centerVisible:   defineProp({ selType: "boolean", label: "Center mark visible", value: true as boolean, category: "Grid" }),
   // EPICS
@@ -67,10 +68,10 @@ export const PROPERTY_SCHEMAS = {
   onColor:         defineProp({ selType: "colorSel", label: "On Color", value: COLORS.onColor, category: "Style" }),
   offColor:        defineProp({ selType: "colorSel", label: "Off Color", value: COLORS.offColor, category: "Style" }),
   spacing:         defineProp({ selType: "number", label: "Spacing", value: 1 as number, limits: { min: 0 }, category: "Style" }),
-  square:          defineProp({ selType: "boolean", label: "Square", value: false as boolean, category: "Style" }),
+  square:          defineProp({ selType: "boolean", label: "Square", value: false as boolean, category: "Layout" }),
   useStringVal:    defineProp({ selType: "boolean", label: "Use string value", value: true as boolean, category: "Layout" }),
-  offLabel:        defineProp({ selType: "text", label: "Off Label", value: "" as string, category: "Layout" }),
-  onLabel:         defineProp({ selType: "text", label: "On Label", value: "" as string, category: "Layout" }),
+  offLabel:        defineProp({ selType: "text", label: "Off Label", value: "" as string, category: "Text" }),
+  onLabel:         defineProp({ selType: "text", label: "On Label", value: "" as string, category: "Text" }),
   // Graph
   lineColors:      defineProp({ selType: "colorSelList", label: "Line Color", value: [COLORS.graphLineColor] as string[], category: "Style" }),
   plotTitle:       defineProp({ selType: "text", label: "Title", value: "Title" as string, category: "Layout" }),
@@ -82,7 +83,7 @@ export const PROPERTY_SCHEMAS = {
   plotBufferSize:  defineProp({ selType: "number", label: "Buffer size (if scalar PVs)", value: 80 as number, limits: { min: 1 }, category: "Layout" }),
   plotLineStyle:   defineProp({ selType: "select", label: "Line style", value: "lines" as "lines+markers"|"lines"|"markers", options: ["lines+markers", "lines", "markers"], category: "Style" }),
   // Selector
-  enumChoices:     defineProp({ selType: "strList", label: "Enum Choices", value: [""] as string[], category: "Other" }),
+  enumChoices:     defineProp({ selType: "strList", label: "Enum Choices", value: [""] as string[], category: "EPICS" }),
   // Slider
   stepSize:        defineProp({ selType: "number", label: "Step Size", value: 0 as number, limits: { min: 1 }, category: "Layout" }),
   //Other
@@ -101,8 +102,8 @@ export const CATEGORY_DISPLAY_ORDER = [
   "EPICS",
   "Grid",
   "Layout",
+  "Text",
   "Style",
-  "Font",
   "General",
   "Window",
   "Other",
@@ -129,13 +130,14 @@ export const COMMON_PROPS: WidgetProperties = {
  * Common text-related properties for widgets displaying text.
  */
 export const TEXT_PROPS: WidgetProperties = {
-  fontSize: PROPERTY_SCHEMAS.fontSize,
   fontFamily: PROPERTY_SCHEMAS.fontFamily,
-  fontBold: PROPERTY_SCHEMAS.fontBold,
-  fontItalic: PROPERTY_SCHEMAS.fontItalic,
-  textColor: PROPERTY_SCHEMAS.textColor,
-  textVAlign: PROPERTY_SCHEMAS.textVAlign,
+  fontSize: PROPERTY_SCHEMAS.fontSize,
   textHAlign: PROPERTY_SCHEMAS.textHAlign,
+  textVAlign: PROPERTY_SCHEMAS.textVAlign,
+  fontBold: PROPERTY_SCHEMAS.fontBold,
+  textColor: PROPERTY_SCHEMAS.textColor,
+  fontItalic: PROPERTY_SCHEMAS.fontItalic,
+  fontUnderlined: PROPERTY_SCHEMAS.fontUnderlined,
 };
 
 /**

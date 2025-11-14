@@ -14,10 +14,10 @@ export const ActionButton: Widget = {
   category: "Controls",
   pvData: {} as PVData,
   editableProperties: {
-    ...COMMON_PROPS,
-    ...TEXT_PROPS,
     label: { ...PROPERTY_SCHEMAS.label, value: "Action Button" },
     backgroundColor: { ...PROPERTY_SCHEMAS.backgroundColor, value: COLORS.buttonColor },
+    ...COMMON_PROPS,
+    ...TEXT_PROPS,
     pvName: PROPERTY_SCHEMAS.pvName,
     actionValue: PROPERTY_SCHEMAS.actionValue,
     disabled: PROPERTY_SCHEMAS.disabled,

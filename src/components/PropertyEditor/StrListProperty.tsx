@@ -11,6 +11,7 @@ interface StrListPropertyProps {
   propName: PropertyKey;
   label: string;
   value: PropertyValue;
+  category: string;
   onChange: (propName: PropertyKey, newValue: PropertyValue) => void;
 }
 
