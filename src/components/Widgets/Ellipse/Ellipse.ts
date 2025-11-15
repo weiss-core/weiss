@@ -4,7 +4,7 @@ import { COMMON_PROPS, PROPERTY_SCHEMAS } from "@src/types/widgetProperties";
 import { EllipseComp } from "./EllipseComp";
 import CircleIcon from "@mui/icons-material/Circle";
 
-const { borderRadius, ...FILTERED_COMMON_PROPS } = COMMON_PROPS;
+const { borderRadius, alarmBorder, ...FILTERED_COMMON_PROPS } = COMMON_PROPS;
 
 export const Ellipse: Widget = {
   id: "__Ellipse__",

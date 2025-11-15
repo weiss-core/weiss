@@ -13,9 +13,9 @@ export const SelectionBox: Widget = {
   category: "Controls",
   pvData: {} as PVData,
   editableProperties: {
+    label: { ...PROPERTY_SCHEMAS.label, value: "Selection Box" },
     ...COMMON_PROPS,
     ...TEXT_PROPS,
-    label: { ...PROPERTY_SCHEMAS.label, value: "Selection Box" },
     backgroundColor: { ...PROPERTY_SCHEMAS.backgroundColor, value: "transparent" },
     pvName: PROPERTY_SCHEMAS.pvName,
     disabled: PROPERTY_SCHEMAS.disabled,

@@ -24,7 +24,6 @@ export const BitIndicator: Widget = {
     pvName: PROPERTY_SCHEMAS.pvName,
     alarmBorder: PROPERTY_SCHEMAS.alarmBorder,
     labelFromPV: PROPERTY_SCHEMAS.labelFromPV,
-    labelPlcmnt: PROPERTY_SCHEMAS.labelPlcmnt,
     useStringVal: PROPERTY_SCHEMAS.useStringVal,
     offLabel: PROPERTY_SCHEMAS.offLabel,
     onLabel: PROPERTY_SCHEMAS.onLabel,

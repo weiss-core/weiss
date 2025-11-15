@@ -15,7 +15,6 @@ export const ToggleButton: Widget = {
   pvData: {} as PVData,
   editableProperties: {
     ...COMMON_PROPS,
-    ...TEXT_PROPS,
     backgroundColor: { ...PROPERTY_SCHEMAS.backgroundColor, value: COLORS.buttonColor },
     pvName: PROPERTY_SCHEMAS.pvName,
     disabled: PROPERTY_SCHEMAS.disabled,
@@ -26,5 +25,6 @@ export const ToggleButton: Widget = {
     onLabel: PROPERTY_SCHEMAS.onLabel,
     onColor: PROPERTY_SCHEMAS.onColor,
     offColor: PROPERTY_SCHEMAS.offColor,
+    ...TEXT_PROPS,
   },
 } as const;

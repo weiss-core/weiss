@@ -54,10 +54,10 @@ export const PROPERTY_SCHEMAS = {
   pvName:          defineProp({ selType: "text", label: "PV Name", value: "" as string, category: "EPICS" }),
   pvNames:         defineProp({ selType: "strList", label: "PV Name", value: [] as string[], category: "EPICS" }),
   precisionFromPV: defineProp({ selType: "boolean", label: "Precision from PV", value: true as boolean, category: "EPICS" }),
-  precision:       defineProp({ selType: "number", label: "Precision", value: -1 as number, category: "EPICS" }),
+  precision:       defineProp({ selType: "number", label: "Precision", value: -1 as number, limits: { min: -1 }, category: "EPICS" }),
   unitsFromPV:     defineProp({ selType: "boolean", label: "Units from PV", value: true as boolean, category: "EPICS" }),
   units:           defineProp({ selType: "text", label: "Units", value: "" as string, category: "EPICS" }),
-  alarmBorder:     defineProp({ selType: "boolean", label: "Alarm Border", value: true as boolean, category: "EPICS" }),
+  alarmBorder:     defineProp({ selType: "boolean", label: "Alarm border", value: true as boolean, category: "EPICS" }),
   labelFromPV:     defineProp({ selType: "boolean", label: "Label(s) from PV", value: true as boolean, category: "EPICS" }),
   actionValue:     defineProp({ selType: "text", label: "Action Value", value: 1 as number | string, category: "EPICS" }),
   // Specific Properties
@@ -68,22 +68,22 @@ export const PROPERTY_SCHEMAS = {
   onColor:         defineProp({ selType: "colorSel", label: "On Color", value: COLORS.onColor, category: "Style" }),
   offColor:        defineProp({ selType: "colorSel", label: "Off Color", value: COLORS.offColor, category: "Style" }),
   spacing:         defineProp({ selType: "number", label: "Spacing", value: 1 as number, limits: { min: 0 }, category: "Style" }),
-  square:          defineProp({ selType: "boolean", label: "Square", value: false as boolean, category: "Layout" }),
-  useStringVal:    defineProp({ selType: "boolean", label: "Use string value", value: true as boolean, category: "Layout" }),
-  offLabel:        defineProp({ selType: "text", label: "Off Label", value: "" as string, category: "Text" }),
-  onLabel:         defineProp({ selType: "text", label: "On Label", value: "" as string, category: "Text" }),
+  square:          defineProp({ selType: "boolean", label: "Square", value: false as boolean, category: "Style" }),
+  useStringVal:    defineProp({ selType: "boolean", label: "Use string value", value: true as boolean, category: "EPICS" }),
+  offLabel:        defineProp({ selType: "text", label: "Off label", value: "" as string, category: "Text" }),
+  onLabel:         defineProp({ selType: "text", label: "On label", value: "" as string, category: "Text" }),
   // Graph
   lineColors:      defineProp({ selType: "colorSelList", label: "Line Color", value: [COLORS.graphLineColor] as string[], category: "Style" }),
-  plotTitle:       defineProp({ selType: "text", label: "Title", value: "Title" as string, category: "Layout" }),
-  xAxisTitle:      defineProp({ selType: "text", label: "X axis title", value: "X axis" as string, category: "Layout" }),
-  yAxisTitle:      defineProp({ selType: "text", label: "Y axis title", value: "Y axis" as string, category: "Layout" }),
+  plotTitle:       defineProp({ selType: "text", label: "Title", value: "Title" as string, category: "Text" }),
+  xAxisTitle:      defineProp({ selType: "text", label: "X axis title", value: "X axis" as string, category: "Text" }),
+  yAxisTitle:      defineProp({ selType: "text", label: "Y axis title", value: "Y axis" as string, category: "Text" }),
   logscaleY:       defineProp({ selType: "boolean", label: "Apply log to Y", value: false as boolean, category: "Layout" }),
   showLegend:      defineProp({ selType: "boolean", label: "Show legend", value: true as boolean, category: "Layout" }),
   useTimestamp:    defineProp({ selType: "boolean", label: "Use timestamp", value: false as boolean, category: "Layout" }),
-  plotBufferSize:  defineProp({ selType: "number", label: "Buffer size (if scalar PVs)", value: 80 as number, limits: { min: 1 }, category: "Layout" }),
+  plotBufferSize:  defineProp({ selType: "number", label: "Buffer size (non-array PVs)", value: 80 as number, limits: { min: 1 }, category: "Layout" }),
   plotLineStyle:   defineProp({ selType: "select", label: "Line style", value: "lines" as "lines+markers"|"lines"|"markers", options: ["lines+markers", "lines", "markers"], category: "Style" }),
   // Selector
-  enumChoices:     defineProp({ selType: "strList", label: "Enum Choices", value: [""] as string[], category: "EPICS" }),
+  enumChoices:     defineProp({ selType: "strList", label: "Option label", value: [""] as string[], category: "EPICS" }),
   // Slider
   stepSize:        defineProp({ selType: "number", label: "Step Size", value: 0 as number, limits: { min: 1 }, category: "Layout" }),
   //Other
@@ -124,6 +124,7 @@ export const COMMON_PROPS: WidgetProperties = {
   borderRadius: PROPERTY_SCHEMAS.borderRadius,
   visible: PROPERTY_SCHEMAS.visible,
   tooltip: PROPERTY_SCHEMAS.tooltip,
+  alarmBorder: PROPERTY_SCHEMAS.alarmBorder,
 };
 
 /**
@@ -144,6 +145,7 @@ export const TEXT_PROPS: WidgetProperties = {
  * Properties commonly used for plot widgets.
  */
 export const PLOT_PROPS: WidgetProperties = {
+  pvNames: PROPERTY_SCHEMAS.pvNames,
   backgroundColor: { ...PROPERTY_SCHEMAS.backgroundColor, value: "white" },
   lineColors: PROPERTY_SCHEMAS.lineColors,
   plotTitle: PROPERTY_SCHEMAS.plotTitle,

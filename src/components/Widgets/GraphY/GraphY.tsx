@@ -21,8 +21,7 @@ export const GraphY: Widget = {
     ...COMMON_PROPS,
     width: { ...PROPERTY_SCHEMAS.width, value: 480 },
     height: { ...PROPERTY_SCHEMAS.height, value: 260 },
-    ...TEXT_PROPS,
-    pvNames: { ...PROPERTY_SCHEMAS.pvNames },
     ...PLOT_PROPS,
+    ...TEXT_PROPS,
   },
 } as const;

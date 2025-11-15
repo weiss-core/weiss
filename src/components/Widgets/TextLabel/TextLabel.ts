@@ -11,9 +11,9 @@ export const TextLabel: Widget = {
   widgetLabel: "Text Label",
   category: "Basic",
   editableProperties: {
-    ...COMMON_PROPS,
-    ...TEXT_PROPS,
     label: { ...PROPERTY_SCHEMAS.label, value: "Text Label" },
     backgroundColor: { ...PROPERTY_SCHEMAS.backgroundColor, value: "transparent" },
+    ...COMMON_PROPS,
+    ...TEXT_PROPS,
   },
 } as const;
