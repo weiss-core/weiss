@@ -449,6 +449,26 @@ export function useWidgetManager() {
   }, [selectedWidgets, batchWidgetUpdate]);
 
   /**
+   * Move all selected widgets by dx, dy.
+   */
+  const moveSelected = useCallback(
+    (dx: number, dy: number) => {
+      if (selectedWidgets.length === 0) return;
+      const updates: MultiWidgetPropertyUpdates = {};
+      for (const w of selectedWidgets) {
+        const { x, y } = w.editableProperties;
+        if (!x || !y) continue;
+        updates[w.id] = {
+          x: x.value + dx,
+          y: y.value + dy,
+        };
+      }
+      batchWidgetUpdate(updates);
+    },
+    [selectedWidgets, batchWidgetUpdate]
+  );
+
+  /**
    * Undo the last editor state change.
    */
   const handleUndo = useCallback(() => {
@@ -761,6 +781,7 @@ export function useWidgetManager() {
     alignVerticalCenter,
     distributeHorizontal,
     distributeVertical,
+    moveSelected,
     downloadWidgets,
     loadWidgets,
     PVMap,
