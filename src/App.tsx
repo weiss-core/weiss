@@ -6,6 +6,7 @@ import PropertyEditor from "./components/PropertyEditor/PropertyEditor";
 import NavBar from "./components/NavBar/NavBar";
 import { useEditorContext } from "./context/useEditorContext";
 import { GRID_ID } from "./constants/constants";
+import { ScreenGuard } from "./components/ScreenGuard/ScreenGuard";
 
 const App: React.FC = () => {
   const { editorWidgets } = useEditorContext();
@@ -15,6 +16,7 @@ const App: React.FC = () => {
   );
   return (
     <div className="app">
+      <ScreenGuard />
       <div className="appBar">
         <NavBar />
       </div>

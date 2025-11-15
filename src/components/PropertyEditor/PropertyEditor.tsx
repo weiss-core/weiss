@@ -154,8 +154,10 @@ const PropertyEditor: React.FC = () => {
   } = useEditorContext();
   const isOnlyGridSelected = selectedWidgetIDs.length === 0;
   const singleWidget = editingWidgets.length === 1;
-  const [open, setOpen] = useState(true);
-  const [pinned, setPinned] = useState(true);
+  // do not start with editor open for smaller screens
+  const isSmallScreen = window.innerWidth < 1024;
+  const [open, setOpen] = useState(!isSmallScreen);
+  const [pinned, setPinned] = useState(!isSmallScreen);
   const [collapsedGroups, setCollapsedGroups] = useState<Record<string, boolean>>({});
   const properties: WidgetProperties = useMemo(() => {
     if (editingWidgets.length === 0) return {};
