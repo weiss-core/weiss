@@ -63,8 +63,11 @@ const BitIndicatorComp: React.FC<WidgetUpdate> = ({ data }) => {
     alignItems: "center",
     justifyContent: "center",
     boxSizing: "border-box",
-    fontSize: p.fontSize?.value ?? 12,
-    color: p.textColor?.value ?? "inherit",
+    fontSize: p.fontSize?.value,
+    fontFamily: p.fontFamily?.value,
+    fontWeight: p.fontBold?.value ? "bold" : "normal",
+    fontStyle: p.fontItalic?.value ? "italic" : "normal",
+    textDecoration: p.fontUnderlined?.value ? "underline" : "none",
     textAlign: "center",
   };
 

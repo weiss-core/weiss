@@ -36,6 +36,11 @@ const SliderComp: React.FC<WidgetUpdate> = ({ data }) => {
           justifyContent: "center",
           alignItems: "center",
           boxSizing: "border-box",
+          borderRadius: p.borderRadius?.value,
+          borderStyle: p.borderStyle?.value,
+          borderWidth: p.borderWidth?.value,
+          borderColor: p.borderColor?.value,
+          pointerEvents: inEditMode ? "none" : "auto",
         }}
       >
         <Slider

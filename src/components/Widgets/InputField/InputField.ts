@@ -5,6 +5,8 @@ import InputIcon from "@mui/icons-material/Input";
 import { PROPERTY_SCHEMAS, COMMON_PROPS, TEXT_PROPS } from "@src/types/widgetProperties";
 import type { PVData } from "@src/types/epicsWS";
 
+const { textVAlign, textHAlign, ...FILTERED_TEXT_PROPS } = TEXT_PROPS;
+
 export const InputField: Widget = {
   id: "__InputField__",
   component: InputFieldComp,
@@ -20,6 +22,6 @@ export const InputField: Widget = {
     units: PROPERTY_SCHEMAS.units,
     disabled: PROPERTY_SCHEMAS.disabled,
     ...COMMON_PROPS,
-    ...TEXT_PROPS,
+    ...FILTERED_TEXT_PROPS,
   },
 } as const;

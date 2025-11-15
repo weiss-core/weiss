@@ -112,7 +112,11 @@ const getGroupedProperties = (properties: WidgetProperties) => {
     const entries = Object.entries(groups[category]);
 
     const sorted = [
-      ...entries.filter(([, p]) => p.selType !== "boolean" && p.selType !== "colorSel"),
+      ...entries.filter(
+        ([, p]) =>
+          p.selType !== "boolean" && p.selType !== "colorSel" && p.selType !== "colorSelList"
+      ),
+      ...entries.filter(([, p]) => p.selType === "colorSelList"),
       ...entries.filter(([, p]) => p.selType === "colorSel"),
       ...entries.filter(([, p]) => p.selType === "boolean"),
     ];

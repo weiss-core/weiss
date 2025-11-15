@@ -57,6 +57,7 @@ const TextLabelComp: React.FC<WidgetUpdate> = ({ data }) => {
           fontFamily: p.fontFamily?.value,
           fontWeight: p.fontBold?.value ? "bold" : "normal",
           fontStyle: p.fontItalic?.value ? "italic" : "normal",
+          textDecoration: p.fontUnderlined?.value ? "underline" : "none",
           color: p.textColor?.value,
           padding: 0,
           outline: "none",

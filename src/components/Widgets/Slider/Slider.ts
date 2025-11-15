@@ -21,8 +21,6 @@ export const Slider: Widget = {
     pvName: PROPERTY_SCHEMAS.pvName,
     disabled: PROPERTY_SCHEMAS.disabled,
     alarmBorder: PROPERTY_SCHEMAS.alarmBorder,
-    units: PROPERTY_SCHEMAS.units,
-    unitsFromPV: PROPERTY_SCHEMAS.unitsFromPV,
     min: PROPERTY_SCHEMAS.min,
     max: PROPERTY_SCHEMAS.max,
     limitsFromPV: PROPERTY_SCHEMAS.limitsFromPV,
