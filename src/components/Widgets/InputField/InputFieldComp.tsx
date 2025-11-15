@@ -1,27 +1,25 @@
 import React, { useState, useEffect } from "react";
 import type { WidgetUpdate } from "@src/types/widgets";
 import { useEditorContext } from "@src/context/useEditorContext";
-import { EDIT_MODE, RUNTIME_MODE } from "@src/constants/constants";
 import AlarmBorder from "@components/AlarmBorder/AlarmBorder";
 
 const InputFieldComp: React.FC<WidgetUpdate> = ({ data }) => {
-  const { mode, writePVValue } = useEditorContext();
+  const { inEditMode, writePVValue } = useEditorContext();
   const [inputValue, setInputValue] = useState<string>("");
 
   const p = data.editableProperties;
   const pvData = data.pvData;
   const units =
     p.unitsFromPV?.value && pvData?.display?.units ? pvData.display.units : p.units?.value;
-  const isEditMode = mode === EDIT_MODE;
 
   useEffect(() => {
-    if (isEditMode) setInputValue("");
-  }, [isEditMode]);
+    if (inEditMode) setInputValue("");
+  }, [inEditMode]);
 
   if (!p.visible?.value) return null;
 
   const handleWrite = (value: number | string) => {
-    if (mode !== RUNTIME_MODE) return;
+    if (!inEditMode) return;
     if (p.pvName?.value) {
       writePVValue(p.pvName.value, value);
     }
@@ -32,7 +30,7 @@ const InputFieldComp: React.FC<WidgetUpdate> = ({ data }) => {
       <div style={{ position: "relative", width: "100%", height: "100%" }}>
         <input
           title={p.tooltip?.value ?? ""}
-          readOnly={isEditMode}
+          readOnly={inEditMode}
           style={{
             width: "100%",
             height: "100%",
@@ -42,6 +40,7 @@ const InputFieldComp: React.FC<WidgetUpdate> = ({ data }) => {
             fontFamily: p.fontFamily?.value,
             fontWeight: p.fontBold?.value ? "bold" : "normal",
             fontStyle: p.fontItalic?.value ? "italic" : "normal",
+            textDecoration: p.fontUnderlined?.value ? "underline" : "none",
             color: p.textColor?.value,
             borderRadius: p.borderRadius?.value,
             borderStyle: p.borderStyle?.value,
@@ -50,10 +49,10 @@ const InputFieldComp: React.FC<WidgetUpdate> = ({ data }) => {
             boxSizing: "border-box",
             padding: "4px 8px",
             paddingRight: units ? "2em" : "8px",
-            pointerEvents: isEditMode ? "none" : "auto",
+            pointerEvents: inEditMode ? "none" : "auto",
           }}
           disabled={p.disabled?.value}
-          placeholder={isEditMode ? p.pvName?.value : p.label?.value}
+          placeholder={inEditMode ? p.pvName?.value : p.label?.value}
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}
           onKeyDown={(e) => {

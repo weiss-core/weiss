@@ -41,12 +41,14 @@ const ActionButtonComp: React.FC<WidgetUpdate> = ({ data }) => {
           fontFamily: p.fontFamily?.value,
           fontWeight: p.fontBold?.value ? "bold" : "normal",
           fontStyle: p.fontItalic?.value ? "italic" : "normal",
+          textDecoration: p.fontUnderlined?.value ? "underline" : "none",
           color: p.textColor?.value,
           borderRadius: p.borderRadius?.value,
           borderStyle: p.borderStyle?.value,
           borderWidth: p.borderWidth?.value,
           borderColor: p.borderColor?.value,
           textTransform: "none",
+          pointerEvents: inEditMode ? "none" : "auto",
         }}
         disableRipple={inEditMode}
         disabled={p.disabled!.value}

@@ -1,5 +1,5 @@
 import * as React from "react";
-import { WIDGET_SELECTOR_WIDTH, EDIT_MODE } from "@src/constants/constants";
+import { WIDGET_SELECTOR_WIDTH } from "@src/constants/constants";
 import type { Widget } from "@src/types/widgets";
 import WidgetRegistry from "@components/WidgetRegistry/WidgetRegistry";
 import { useEditorContext } from "@src/context/useEditorContext";
@@ -124,7 +124,7 @@ const DraggableItem: React.FC<DraggableItemProps> = ({ item, open }) => {
  * - Uses WidgetRegistry to dynamically fetch all available widget definitions
  */
 const WidgetPicker: React.FC = () => {
-  const { mode, wdgPickerOpen, setWdgPickerOpen } = useEditorContext();
+  const { inEditMode, wdgPickerOpen, setWdgPickerOpen } = useEditorContext();
   const palette: Record<string, Widget> = React.useMemo(
     () =>
       Object.fromEntries(Object.values(WidgetRegistry).map((w) => [w.widgetName, w])) as Record<
@@ -143,7 +143,7 @@ const WidgetPicker: React.FC = () => {
     }
     return grouped;
   }, [palette]);
-  if (mode !== EDIT_MODE) return;
+  if (!inEditMode) return;
   return (
     <Box sx={{ display: "flex" }}>
       <Drawer variant="permanent" open={wdgPickerOpen} onClick={(e) => e.stopPropagation()}>

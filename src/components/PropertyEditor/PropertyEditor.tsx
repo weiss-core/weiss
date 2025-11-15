@@ -21,7 +21,7 @@ import type {
   WidgetProperty,
   MultiWidgetPropertyUpdates,
 } from "@src/types/widgets";
-import { PROPERTY_EDITOR_WIDTH, EDIT_MODE, FRONT_UI_ZIDX } from "@src/constants/constants";
+import { PROPERTY_EDITOR_WIDTH, FRONT_UI_ZIDX } from "@src/constants/constants";
 import TextFieldProperty from "./TextFieldProperty";
 import BooleanProperty from "./BooleanProperty";
 import ColorProperty from "./ColorProperty";
@@ -95,7 +95,7 @@ const getGroupedProperties = (properties: WidgetProperties) => {
   CATEGORY_DISPLAY_ORDER.filter((cat) => presentCategories.has(cat)).forEach((cat) => {
     groups[cat] = {};
   });
-  // Add any other categories not in CATEGORY_DISPLAY_ORDER
+
   Array.from(presentCategories)
     .filter((cat) => !CATEGORY_DISPLAY_ORDER.includes(cat))
     .forEach((cat) => {
@@ -105,6 +105,23 @@ const getGroupedProperties = (properties: WidgetProperties) => {
   for (const [propName, prop] of Object.entries(properties)) {
     const category = prop.category ?? "Other";
     groups[category][propName] = prop;
+  }
+
+  // put booleans and colors last
+  for (const category of Object.keys(groups)) {
+    const entries = Object.entries(groups[category]);
+
+    const sorted = [
+      ...entries.filter(
+        ([, p]) =>
+          p.selType !== "boolean" && p.selType !== "colorSel" && p.selType !== "colorSelList"
+      ),
+      ...entries.filter(([, p]) => p.selType === "colorSelList"),
+      ...entries.filter(([, p]) => p.selType === "colorSel"),
+      ...entries.filter(([, p]) => p.selType === "boolean"),
+    ];
+
+    groups[category] = Object.fromEntries(sorted);
   }
 
   return groups;
@@ -128,12 +145,19 @@ const getGroupedProperties = (properties: WidgetProperties) => {
  * - Focus state is managed to coordinate with the editor context.
  */
 const PropertyEditor: React.FC = () => {
-  const { mode, selectedWidgetIDs, editingWidgets, batchWidgetUpdate, setPropertyEditorFocused } =
-    useEditorContext();
+  const {
+    inEditMode,
+    selectedWidgetIDs,
+    editingWidgets,
+    batchWidgetUpdate,
+    setPropertyEditorFocused,
+  } = useEditorContext();
   const isOnlyGridSelected = selectedWidgetIDs.length === 0;
   const singleWidget = editingWidgets.length === 1;
-  const [open, setOpen] = useState(false);
-  const [pinned, setPinned] = useState(false);
+  // do not start with editor open for smaller screens
+  const isSmallScreen = window.innerWidth < 1024;
+  const [open, setOpen] = useState(!isSmallScreen);
+  const [pinned, setPinned] = useState(!isSmallScreen);
   const [collapsedGroups, setCollapsedGroups] = useState<Record<string, boolean>>({});
   const properties: WidgetProperties = useMemo(() => {
     if (editingWidgets.length === 0) return {};
@@ -191,7 +215,7 @@ const PropertyEditor: React.FC = () => {
 
   const renderGroupedPropertyFields = () =>
     Object.entries(groupedProperties).map(([category, props]) => {
-      const collapsed = collapsedGroups[category] ?? true;
+      const collapsed = collapsedGroups[category] ?? false;
       return (
         <React.Fragment key={category}>
           <Divider />
@@ -216,40 +240,54 @@ const PropertyEditor: React.FC = () => {
             </IconButton>
             {category}
           </ListSubheader>
-          {!collapsed &&
-            Object.entries(props).map(([propName, prop]) => {
-              const { selType, label, value, options, limits } = prop;
-              const commonProps = {
-                propName: propName as PropertyKey,
-                label,
-                value,
-                limits,
-                onChange: handlePropChange,
-              };
-              switch (selType) {
-                case "text":
-                case "number":
-                  return <TextFieldProperty key={propName} {...commonProps} selType={selType} />;
-                case "strList":
-                  return <StrListProperty key={propName} {...commonProps} />;
-                case "strRecord":
-                  return <StrRecordProperty key={propName} {...commonProps} />;
-                case "boolean":
-                  return <BooleanProperty key={propName} {...commonProps} />;
-                case "colorSel":
-                  return <ColorProperty key={propName} {...commonProps} />;
-                case "colorSelList":
-                  return <ColorListProperty key={propName} {...commonProps} />;
-                case "select":
-                  return <SelectProperty key={propName} {...commonProps} options={options ?? []} />;
-                default:
-                  return null;
-              }
-            })}
+          {!collapsed && (
+            <List
+              disablePadding
+              sx={{
+                display: "flex",
+                flexWrap: "wrap",
+                width: "100%",
+                justifyContent: "center",
+              }}
+            >
+              {Object.entries(props).map(([propName, prop]) => {
+                const { selType, label, value, options, limits } = prop;
+                const commonProps = {
+                  propName: propName as PropertyKey,
+                  label,
+                  value,
+                  limits,
+                  category,
+                  onChange: handlePropChange,
+                };
+                switch (selType) {
+                  case "text":
+                  case "number":
+                    return <TextFieldProperty key={propName} {...commonProps} selType={selType} />;
+                  case "strList":
+                    return <StrListProperty key={propName} {...commonProps} />;
+                  case "strRecord":
+                    return <StrRecordProperty key={propName} {...commonProps} />;
+                  case "boolean":
+                    return <BooleanProperty key={propName} {...commonProps} />;
+                  case "colorSel":
+                    return <ColorProperty key={propName} {...commonProps} />;
+                  case "colorSelList":
+                    return <ColorListProperty key={propName} {...commonProps} />;
+                  case "select":
+                    return (
+                      <SelectProperty key={propName} {...commonProps} options={options ?? []} />
+                    );
+                  default:
+                    return null;
+                }
+              })}
+            </List>
+          )}
         </React.Fragment>
       );
     });
-  if (mode !== EDIT_MODE) return null;
+  if (!inEditMode) return null;
   return (
     <>
       {!open && (

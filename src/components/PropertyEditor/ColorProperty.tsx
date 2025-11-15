@@ -1,6 +1,8 @@
+// src/components/PropertyFields/ColorProperty.tsx
 import React, { useState, useEffect } from "react";
-import { Box, Typography, ListItem, Popover } from "@mui/material";
+import { Box, Typography, ListItem, Popover, IconButton } from "@mui/material";
 import { Sketch } from "@uiw/react-color";
+import { FormatColorText } from "@mui/icons-material";
 import type { PropertyKey, PropertyValue } from "@src/types/widgets";
 import { COLORS } from "@src/constants/constants";
 
@@ -8,11 +10,11 @@ interface ColorPropertyProps {
   propName: PropertyKey;
   label: string;
   value: PropertyValue;
+  category: string;
   onChange: (propName: PropertyKey, newValue: PropertyValue) => void;
 }
 
-const ColorProperty: React.FC<ColorPropertyProps> = (props) => {
-  const { propName, label, value, onChange } = props;
+const ColorProperty: React.FC<ColorPropertyProps> = ({ propName, label, value, onChange }) => {
   const [localVal, setLocalVal] = useState(value as string);
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
 
@@ -32,43 +34,70 @@ const ColorProperty: React.FC<ColorPropertyProps> = (props) => {
   };
 
   const open = Boolean(anchorEl);
+  const isFontColor = propName === "textColor";
 
   return (
-    <ListItem key={propName} disablePadding sx={{ px: 2, py: 1 }}>
-      <Box sx={{ display: "flex", alignItems: "center", gap: 2, width: "100%" }}>
-        <Typography variant="body2">{label}</Typography>
-        <Box
+    <ListItem
+      key={propName}
+      disablePadding
+      sx={{
+        px: 2,
+        py: 1,
+        display: "flex",
+        flexBasis: isFontColor ? "25%" : "100%",
+        flexGrow: 1,
+        justifyContent: isFontColor ? "center" : "flex-start",
+      }}
+    >
+      {isFontColor ? (
+        <IconButton
           onClick={handleClick}
+          size="small"
           sx={{
-            width: 40,
-            height: 20,
-            border: `2px solid ${COLORS.lightGray}`,
-            borderRadius: "4px",
-            backgroundColor: localVal,
-            cursor: "pointer",
-          }}
-        />
-        <Popover
-          open={open}
-          anchorEl={anchorEl}
-          onClose={handleClose}
-          anchorOrigin={{
-            vertical: "bottom",
-            horizontal: "left",
+            color: localVal,
+            width: "25%",
           }}
         >
-          <Sketch
-            color={localVal}
-            presetColors={Object.values(COLORS)}
-            onChange={(color) => {
-              const { r, g, b, a } = color.rgba;
-              const rgbaString = `rgba(${r}, ${g}, ${b}, ${a})`;
-              setLocalVal(rgbaString);
-              onChange(propName, rgbaString);
+          <FormatColorText />
+        </IconButton>
+      ) : (
+        <Box sx={{ display: "flex", alignItems: "center", gap: 2, width: "100%" }}>
+          <Typography variant="body2" sx={{ width: "60%" }}>
+            {label}
+          </Typography>
+          <Box
+            onClick={handleClick}
+            sx={{
+              width: "35%",
+              height: 20,
+              border: `1px solid ${COLORS.lightGray}`,
+              borderRadius: "4px",
+              backgroundColor: localVal,
+              cursor: "pointer",
             }}
           />
-        </Popover>
-      </Box>
+        </Box>
+      )}
+      <Popover
+        open={open}
+        anchorEl={anchorEl}
+        onClose={handleClose}
+        anchorOrigin={{
+          vertical: "bottom",
+          horizontal: "left",
+        }}
+      >
+        <Sketch
+          color={localVal}
+          presetColors={Object.values(COLORS)}
+          onChange={(color) => {
+            const { r, g, b, a } = color.rgba;
+            const rgbaString = `rgba(${r}, ${g}, ${b}, ${a})`;
+            setLocalVal(rgbaString);
+            onChange(propName, rgbaString);
+          }}
+        />
+      </Popover>
     </ListItem>
   );
 };

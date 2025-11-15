@@ -1,5 +1,5 @@
 import { MultiBitIndicatorComp } from "./MultiBitIndicatorComp";
-import { PROPERTY_SCHEMAS, COMMON_PROPS, TEXT_PROPS } from "@src/types/widgetProperties";
+import { PROPERTY_SCHEMAS, COMMON_PROPS } from "@src/types/widgetProperties";
 import type { Widget } from "@src/types/widgets";
 import type { PVData } from "@src/types/epicsWS";
 import CustomMultiBitIcon from "@src/components/CustomIcons/MultiBitIcon";
@@ -27,6 +27,5 @@ export const MultiBitIndicator: Widget = {
     spacing: PROPERTY_SCHEMAS.spacing,
     pvName: PROPERTY_SCHEMAS.pvName,
     alarmBorder: PROPERTY_SCHEMAS.alarmBorder,
-    ...TEXT_PROPS,
   },
 } as const;

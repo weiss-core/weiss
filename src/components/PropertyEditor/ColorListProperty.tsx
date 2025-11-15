@@ -82,11 +82,13 @@ const ColorSelListProperty: React.FC<ColorSelListPropertyProps> = ({
           <Typography variant="body2">{label}</Typography>
           {colors.map((color, index) => (
             <Box key={index} sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-              <Typography variant="body2">Line {index}:</Typography>
+              <Typography variant="body2" sx={{ width: "60%" }}>
+                Line {index}:
+              </Typography>
               <Box
                 onClick={(e) => handleClick(e, index)}
                 sx={{
-                  width: 40,
+                  width: "35%",
                   height: 20,
                   border: `2px solid ${COLORS.lightGray}`,
                   borderRadius: "4px",
@@ -94,11 +96,9 @@ const ColorSelListProperty: React.FC<ColorSelListPropertyProps> = ({
                   cursor: "pointer",
                 }}
               />
-              {index === colors.length - 1 && (
-                <IconButton color="primary" onClick={handleAdd}>
-                  <AddIcon />
-                </IconButton>
-              )}
+              <IconButton color="primary" onClick={handleAdd}>
+                <AddIcon />
+              </IconButton>
               <IconButton
                 color="error"
                 onClick={() => handleRemove(index)}

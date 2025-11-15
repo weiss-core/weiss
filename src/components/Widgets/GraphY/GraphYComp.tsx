@@ -4,15 +4,24 @@ import Plot from "react-plotly.js";
 import { useEditorContext } from "@src/context/useEditorContext";
 import { COLORS } from "@src/constants/constants";
 import type { TimeStamp } from "@src/types/epicsWS";
+import AlarmBorder from "@src/components/AlarmBorder/AlarmBorder";
 
 const GraphYComp: React.FC<WidgetUpdate> = ({ data }) => {
   const { inEditMode } = useEditorContext();
   const p = data.editableProperties;
+  const pvData = data.multiPvData ?? {};
+  const alarmData = Object.values(pvData)
+    .map((p) => p.alarm)
+    .filter((a) => a !== undefined);
   const lineColors = p.lineColors?.value;
   const pvNames = p.pvNames?.value;
   const bufferSize = p.plotBufferSize?.value ?? 50;
   const multiPvData = data.multiPvData;
   const plotLineStyle = p.plotLineStyle?.value ?? "lines";
+  const textHAlign = p.textHAlign?.value;
+  const textVAlign = p.textVAlign?.value;
+  const titleXpos = textHAlign == "left" ? 0.05 : textHAlign == "right" ? 0.95 : 0.5;
+  const titleYpos = textVAlign == "bottom" ? 0.05 : textVAlign == "middle" ? 0.5 : 0.95;
 
   const valueBuffers = useRef<Record<string, number[]>>({});
   const [plotData, setPlotData] = useState<Plotly.Data[]>([]);
@@ -45,11 +54,10 @@ const GraphYComp: React.FC<WidgetUpdate> = ({ data }) => {
     for (const [pvName, pv] of Object.entries(multiPvData)) {
       const newValTs = pv.timeStamp;
       const oldValTs = prevPvTimestamps.current[pvName];
-      if (newValTs === oldValTs) continue; // avoid re-render if no update
-      const newVal = pv.value;
+      if (newValTs === oldValTs) continue;
       prevPvTimestamps.current[pvName] = newValTs;
       updated = true;
-
+      const newVal = pv.value;
       if (typeof newVal === "number") {
         if (!valueBuffers.current[pvName]) valueBuffers.current[pvName] = [];
         const buf = valueBuffers.current[pvName];
@@ -65,12 +73,12 @@ const GraphYComp: React.FC<WidgetUpdate> = ({ data }) => {
         const pvIdx = pvNames?.indexOf(pvName) ?? -1;
         if (pvIdx === -1) return null;
 
-        const value = pv.value;
+        const v = pv.value;
         const y =
-          typeof value === "number"
+          typeof v === "number"
             ? [...(valueBuffers.current[pvName] ?? [])]
-            : Array.isArray(value)
-            ? [...value]
+            : Array.isArray(v)
+            ? [...v]
             : null;
 
         if (!y) return null;
@@ -88,10 +96,8 @@ const GraphYComp: React.FC<WidgetUpdate> = ({ data }) => {
     setPlotData(traces);
   }, [inEditMode, multiPvData, bufferSize, plotLineStyle, lineColors, pvNames]);
 
-  // build layout
   useEffect(() => {
-    setLayout((prev) => ({
-      ...prev,
+    setLayout({
       title: {
         text: p.plotTitle?.value,
         font: {
@@ -99,10 +105,13 @@ const GraphYComp: React.FC<WidgetUpdate> = ({ data }) => {
           size: p.fontSize?.value,
           weight: p.fontBold?.value ? 800 : 0,
           style: p.fontItalic?.value ? "italic" : "normal",
+          lineposition: p.fontUnderlined?.value ? "under" : "none",
+          color: p.textColor?.value,
         },
+        x: titleXpos,
+        y: titleYpos,
       },
       xaxis: {
-        ...prev.xaxis, // keep previous range if any
         title: {
           text: p.xAxisTitle?.value,
           font: {
@@ -113,7 +122,6 @@ const GraphYComp: React.FC<WidgetUpdate> = ({ data }) => {
         },
       },
       yaxis: {
-        ...prev.yaxis,
         type: p.logscaleY?.value ? "log" : "linear",
         title: {
           text: p.yAxisTitle?.value,
@@ -129,6 +137,7 @@ const GraphYComp: React.FC<WidgetUpdate> = ({ data }) => {
       margin: { b: 35, l: 35, t: 50, r: 30 },
       width: p.width?.value,
       height: p.height?.value,
+      showlegend: p.showLegend?.value,
       legend: {
         orientation: "h",
         x: 1,
@@ -136,57 +145,43 @@ const GraphYComp: React.FC<WidgetUpdate> = ({ data }) => {
         y: 0.975,
         bgcolor: "00000000",
       },
-    }));
-  }, [p]);
+
+      uirevision: String(inEditMode),
+    });
+  }, [p, pvNames, inEditMode, titleXpos, titleYpos]);
 
   return (
-    <div
-      style={{
-        width: p.width?.value,
-        height: p.height?.value,
-        borderRadius: p.borderRadius?.value,
-        borderStyle: p.borderStyle?.value,
-        borderWidth: p.borderWidth?.value,
-        borderColor: p.borderColor?.value,
-        display: "flex",
-      }}
-    >
-      <Plot
-        data={plotData}
-        layout={layout}
-        onRelayout={(eventData) => {
-          const x0 = eventData["xaxis.range[0]"];
-          const x1 = eventData["xaxis.range[1]"];
-          const y0 = eventData["yaxis.range[0]"];
-          const y1 = eventData["yaxis.range[1]"];
-
-          setLayout((prev) => ({
-            ...prev,
-            xaxis:
-              x0 !== undefined && x1 !== undefined
-                ? { ...prev.xaxis, range: [x0, x1] }
-                : { ...prev.xaxis, range: undefined },
-            yaxis:
-              y0 !== undefined && y1 !== undefined
-                ? { ...prev.yaxis, range: [y0, y1] }
-                : { ...prev.yaxis, range: undefined },
-          }));
+    <AlarmBorder alarmData={alarmData} enable={p.alarmBorder?.value}>
+      <div
+        style={{
+          width: p.width?.value,
+          height: p.height?.value,
+          borderRadius: p.borderRadius?.value,
+          borderStyle: p.borderStyle?.value,
+          borderWidth: p.borderWidth?.value,
+          borderColor: p.borderColor?.value,
+          display: "flex",
         }}
-        config={{
-          responsive: true,
-          modeBarButtonsToRemove: [
-            "zoom2d",
-            "lasso2d",
-            "zoomIn2d",
-            "zoomOut2d",
-            "select2d",
-            "autoScale2d",
-          ],
-          displaylogo: false,
-          staticPlot: inEditMode,
-        }}
-      />
-    </div>
+      >
+        <Plot
+          data={plotData}
+          layout={layout}
+          config={{
+            responsive: true,
+            modeBarButtonsToRemove: [
+              "zoom2d",
+              "lasso2d",
+              "zoomIn2d",
+              "zoomOut2d",
+              "select2d",
+              "autoScale2d",
+            ],
+            displaylogo: false,
+            staticPlot: inEditMode,
+          }}
+        />
+      </div>
+    </AlarmBorder>
   );
 };
 

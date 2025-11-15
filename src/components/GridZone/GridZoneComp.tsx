@@ -44,6 +44,7 @@ const GridZoneComp: React.FC<WidgetUpdate> = ({ data }) => {
     pickedWidget,
     groupSelected,
     ungroupSelected,
+    moveSelected,
     isPanning,
     setIsPanning,
     inEditMode,
@@ -240,6 +241,7 @@ const GridZoneComp: React.FC<WidgetUpdate> = ({ data }) => {
     };
   }, [gridGrabbed, isPanning, setIsPanning, ensureGridCoordinate, pan, zoom, mode]);
 
+  // Shortcuts handler
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (propertyEditorFocused) return;
@@ -299,6 +301,25 @@ const GridZoneComp: React.FC<WidgetUpdate> = ({ data }) => {
       if (e.ctrlKey && e.key.toLowerCase() === "u") {
         e.preventDefault();
         ungroupSelected();
+        return;
+      }
+      if (e.key.toLowerCase() === "arrowleft") {
+        e.preventDefault();
+        moveSelected(-gridSize, 0);
+        return;
+      }
+      if (e.key.toLowerCase() === "arrowright") {
+        e.preventDefault();
+        moveSelected(gridSize, 0);
+      }
+      if (e.key.toLowerCase() === "arrowup") {
+        e.preventDefault();
+        moveSelected(0, -gridSize);
+        return;
+      }
+      if (e.key.toLowerCase() === "arrowdown") {
+        e.preventDefault();
+        moveSelected(0, gridSize);
         return;
       }
     };

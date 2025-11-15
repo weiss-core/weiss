@@ -91,7 +91,7 @@ const StyledAppBar = styled(MuiAppBar, {
 }));
 
 export default function NavBar() {
-  const { mode, updateMode, wdgPickerOpen, setWdgPickerOpen, downloadWidgets, loadWidgets } =
+  const { inEditMode, updateMode, wdgPickerOpen, setWdgPickerOpen, downloadWidgets, loadWidgets } =
     useEditorContext();
   const drawerWidth = WIDGET_SELECTOR_WIDTH;
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -150,7 +150,7 @@ export default function NavBar() {
             sx={{
               mr: 2,
               size: "small",
-              visibility: mode === EDIT_MODE ? "visible" : "hidden",
+              visibility: inEditMode ? "visible" : "hidden",
             }}
           >
             <MenuIcon />
@@ -175,8 +175,8 @@ export default function NavBar() {
           <FormControlLabel
             control={
               <ModeSwitch
-                checked={mode === RUNTIME_MODE}
-                onChange={() => updateMode(mode === RUNTIME_MODE ? EDIT_MODE : RUNTIME_MODE)}
+                checked={!inEditMode}
+                onChange={() => updateMode(inEditMode ? RUNTIME_MODE : EDIT_MODE)}
                 color="default"
                 sx={{ mr: 1 }}
               />

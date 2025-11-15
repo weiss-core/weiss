@@ -19,14 +19,13 @@ import CustomGroupIcon from "@components/CustomIcons/GroupIcon";
 import CustomUngroupIcon from "@components/CustomIcons/UngroupIcon";
 import KeyboardArrowDown from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUp from "@mui/icons-material/KeyboardArrowUp";
-import { EDIT_MODE } from "@src/constants/constants";
 import { Rnd } from "react-rnd";
 import { grey } from "@mui/material/colors";
 import "./Toolbar.css";
 
 const ToolbarButtons: React.FC = () => {
   const {
-    mode,
+    inEditMode,
     selectedWidgetIDs,
     handleUndo,
     undoStack,
@@ -47,7 +46,7 @@ const ToolbarButtons: React.FC = () => {
     stepBackwards,
   } = useEditorContext();
 
-  if (mode !== EDIT_MODE) return null;
+  if (!inEditMode) return null;
 
   const noneSelected = selectedWidgetIDs.length === 0;
   const lessThanTwoSelected = selectedWidgetIDs.length < 2;

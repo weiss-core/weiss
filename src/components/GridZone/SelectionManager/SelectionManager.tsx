@@ -12,7 +12,7 @@ interface SelectionManagerProps {
 const CLICK_THRESHOLD = 3;
 
 const SelectionManager: React.FC<SelectionManagerProps> = ({ gridRef, zoom, pan }) => {
-  const { editorWidgets, setSelectedWidgetIDs, isDragging } = useEditorContext();
+  const { editorWidgets, setSelectedWidgetIDs, selectedWidgetIDs, isDragging } = useEditorContext();
   const [selectionArea, setSelectionArea] = useState<{
     start?: { x: number; y: number };
     end?: { x: number; y: number };
@@ -25,11 +25,19 @@ const SelectionManager: React.FC<SelectionManagerProps> = ({ gridRef, zoom, pan 
     const grid = gridRef.current;
     if (!grid) return;
 
+    const disableTxtSelection = () => {
+      document.body.style.userSelect = "none";
+    };
+
+    const enableTxtSelection = () => {
+      document.body.style.userSelect = "";
+    };
+
     const handleMouseDown = (e: MouseEvent) => {
       if (e.button !== 0 || e.altKey || isDragging) return;
       const id = (e.target as HTMLElement).getAttribute("id");
       if (id !== GRID_ID) return;
-
+      disableTxtSelection();
       const rect = grid.getBoundingClientRect();
       const x = (e.clientX - rect.left - pan.x) / zoom;
       const y = (e.clientY - rect.top - pan.y) / zoom;
@@ -46,11 +54,12 @@ const SelectionManager: React.FC<SelectionManagerProps> = ({ gridRef, zoom, pan 
     };
 
     const handleMouseUp = (e: MouseEvent) => {
+      enableTxtSelection();
       const target = e.target as HTMLElement;
       const id = target.getAttribute("id");
       const widgetEl = target.closest(".selectable");
-      if (id !== GRID_ID && !widgetEl) return;
-      // --- Ignore mouse up if dragging widgets
+      if ((id !== GRID_ID && !widgetEl) || id === "selectionGroup") return;
+      // Ignore mouse up if dragging widgets
       if (isDragging) {
         setSelectionArea({});
         return;
@@ -60,7 +69,7 @@ const SelectionManager: React.FC<SelectionManagerProps> = ({ gridRef, zoom, pan 
       const xEnd = (e.clientX - rect.left - pan.x) / zoom;
       const yEnd = (e.clientY - rect.top - pan.y) / zoom;
 
-      // --- No active selection: interpret as click
+      // No active selection: interpret as click
       if (!selectionArea.start) {
         const wId = widgetEl?.getAttribute("id");
         if (!wId) {
@@ -71,13 +80,13 @@ const SelectionManager: React.FC<SelectionManagerProps> = ({ gridRef, zoom, pan 
           setSelectedWidgetIDs((prev) =>
             prev.includes(wId) ? prev.filter((pid) => pid !== wId) : [...prev, wId]
           );
-        } else {
+        } else if (selectedWidgetIDs.length == 0) {
           setSelectedWidgetIDs([wId]);
         }
         return;
       }
 
-      // --- Finish area selection
+      // Finish area selection
       const { start } = selectionArea;
       const dx = Math.abs(xEnd - start.x);
       const dy = Math.abs(yEnd - start.y);
@@ -119,7 +128,16 @@ const SelectionManager: React.FC<SelectionManagerProps> = ({ gridRef, zoom, pan 
       window.removeEventListener("mousemove", handleMouseMove);
       window.removeEventListener("mouseup", handleMouseUp);
     };
-  }, [zoom, pan, gridRef, editorWidgets, setSelectedWidgetIDs, selectionArea, isDragging]);
+  }, [
+    zoom,
+    pan,
+    gridRef,
+    editorWidgets,
+    setSelectedWidgetIDs,
+    selectionArea,
+    isDragging,
+    selectedWidgetIDs,
+  ]);
 
   if (!isSelecting || !selectionArea.end) return null;
   const x = Math.min(selectionArea.start!.x, selectionArea.end.x) * zoom + pan.x;

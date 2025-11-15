@@ -14,10 +14,10 @@ export const TextUpdate: Widget = {
   category: "Monitoring",
   pvData: {} as PVData,
   editableProperties: {
-    ...COMMON_PROPS,
-    ...TEXT_PROPS,
     label: { ...PROPERTY_SCHEMAS.label, value: "Text Update" },
     backgroundColor: { ...PROPERTY_SCHEMAS.backgroundColor, value: COLORS.readColor },
+    ...COMMON_PROPS,
+    ...TEXT_PROPS,
     pvName: PROPERTY_SCHEMAS.pvName,
     alarmBorder: PROPERTY_SCHEMAS.alarmBorder,
     unitsFromPV: PROPERTY_SCHEMAS.unitsFromPV,

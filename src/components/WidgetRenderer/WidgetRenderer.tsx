@@ -187,6 +187,7 @@ const WidgetRenderer: React.FC<RendererProps> = ({ scale, ensureGridCoordinate }
       return (
         <div
           key={w.id}
+          id={w.id}
           className={`selectable ${isGroup ? "groupBox" : ""}`}
           style={{ position: "absolute", left: x, top: y, width, height }}
         >
@@ -205,7 +206,8 @@ const WidgetRenderer: React.FC<RendererProps> = ({ scale, ensureGridCoordinate }
     return (
       <Rnd
         bounds="window"
-        className="selectionGroup"
+        className="selectionGroup selectable"
+        id="selectionGroup"
         scale={scale}
         size={{ width: selectionBounds.width, height: selectionBounds.height }}
         position={{ x: selectionBounds.x, y: selectionBounds.y }}

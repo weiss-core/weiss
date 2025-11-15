@@ -5,6 +5,7 @@ import FlakyIcon from "@mui/icons-material/Flaky";
 import type { PVData } from "@src/types/epicsWS";
 
 const { borderRadius, backgroundColor, ...FILTERED_COMMON_PROPS } = COMMON_PROPS;
+const { textVAlign, textHAlign, ...FILTERED_TEXT_PROPS } = TEXT_PROPS;
 
 export const BitIndicator: Widget = {
   id: "__BitIndicator__",
@@ -24,10 +25,9 @@ export const BitIndicator: Widget = {
     pvName: PROPERTY_SCHEMAS.pvName,
     alarmBorder: PROPERTY_SCHEMAS.alarmBorder,
     labelFromPV: PROPERTY_SCHEMAS.labelFromPV,
-    labelPlcmnt: PROPERTY_SCHEMAS.labelPlcmnt,
     useStringVal: PROPERTY_SCHEMAS.useStringVal,
     offLabel: PROPERTY_SCHEMAS.offLabel,
     onLabel: PROPERTY_SCHEMAS.onLabel,
-    ...TEXT_PROPS,
+    ...FILTERED_TEXT_PROPS,
   },
 } as const;

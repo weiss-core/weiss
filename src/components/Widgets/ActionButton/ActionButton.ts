@@ -14,13 +14,12 @@ export const ActionButton: Widget = {
   category: "Controls",
   pvData: {} as PVData,
   editableProperties: {
+    label: { ...PROPERTY_SCHEMAS.label, value: "Action Button" },
     ...COMMON_PROPS,
     ...TEXT_PROPS,
-    label: { ...PROPERTY_SCHEMAS.label, value: "Action Button" },
     backgroundColor: { ...PROPERTY_SCHEMAS.backgroundColor, value: COLORS.buttonColor },
     pvName: PROPERTY_SCHEMAS.pvName,
     actionValue: PROPERTY_SCHEMAS.actionValue,
     disabled: PROPERTY_SCHEMAS.disabled,
-    alarmBorder: PROPERTY_SCHEMAS.alarmBorder,
   },
 } as const;

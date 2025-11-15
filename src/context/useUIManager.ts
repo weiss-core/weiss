@@ -63,7 +63,7 @@ export default function useUIManager(
       }
       setMode(newMode);
     },
-    [setSelectedWidgetIDs, ws.startNewSession, ws.stopSession]
+    [setSelectedWidgetIDs, ws]
   );
   /**
    * Handle reconnection when needed
@@ -87,7 +87,7 @@ export default function useUIManager(
         console.log("Reconnected.");
       }
     };
-  }, [inEditMode, ws.wsConnected]);
+  }, [inEditMode, ws]);
 
   /**
    * Load widgets from localStorage on component mount.

@@ -4,6 +4,8 @@ import type { Widget } from "@src/types/widgets";
 import CustomDropdownIcon from "@src/components/CustomIcons/DropDownIcon";
 import type { PVData } from "@src/types/epicsWS";
 
+const { textVAlign, textHAlign, ...FILTERED_TEXT_PROPS } = TEXT_PROPS;
+
 export const SelectionBox: Widget = {
   id: "__SelectionBox__",
   component: SelectionBoxComp,
@@ -13,9 +15,9 @@ export const SelectionBox: Widget = {
   category: "Controls",
   pvData: {} as PVData,
   editableProperties: {
-    ...COMMON_PROPS,
-    ...TEXT_PROPS,
     label: { ...PROPERTY_SCHEMAS.label, value: "Selection Box" },
+    ...COMMON_PROPS,
+    ...FILTERED_TEXT_PROPS,
     backgroundColor: { ...PROPERTY_SCHEMAS.backgroundColor, value: "transparent" },
     pvName: PROPERTY_SCHEMAS.pvName,
     disabled: PROPERTY_SCHEMAS.disabled,

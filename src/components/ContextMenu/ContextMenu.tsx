@@ -6,7 +6,7 @@ import ListItemText from "@mui/material/ListItemText";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import Typography from "@mui/material/Typography";
 import { useEditorContext } from "@src/context/useEditorContext";
-import { EDIT_MODE, FRONT_UI_ZIDX } from "@src/constants/constants";
+import { FRONT_UI_ZIDX } from "@src/constants/constants";
 import type { GridPosition } from "@src/types/widgets";
 
 import AlignVerticalTop from "@mui/icons-material/AlignVerticalTop";
@@ -34,7 +34,7 @@ export interface ContextMenuProps {
 
 const ContextMenu: React.FC<ContextMenuProps> = ({ pos, mousePos, visible, onClose }) => {
   const {
-    mode,
+    inEditMode,
     selectedWidgetIDs,
     bringToFront,
     sendToBack,
@@ -54,7 +54,7 @@ const ContextMenu: React.FC<ContextMenuProps> = ({ pos, mousePos, visible, onClo
   } = useEditorContext();
 
   if (!visible) return null;
-  if (mode !== EDIT_MODE) return null;
+  if (!inEditMode) return null; //TODO: add context menu for runtime
 
   const noneSelected = selectedWidgetIDs.length === 0;
   const lessThanTwoSelected = selectedWidgetIDs.length < 2;

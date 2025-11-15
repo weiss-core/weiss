@@ -8,7 +8,7 @@ export const GridZone: Widget = {
   id: GRID_ID,
   component: GridZoneComp,
   widgetName: "GridZone",
-  widgetLabel: "GridZone",
+  widgetLabel: "Editor",
   category: "Grid",
   editableProperties: {
     backgroundColor: PROPERTY_SCHEMAS.backgroundColor,

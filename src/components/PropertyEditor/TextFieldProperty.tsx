@@ -10,13 +10,24 @@ interface TextFieldPropertyProps {
   value: PropertyValue;
   selType: "text" | "number";
   limits?: PropertyLimits;
+  category: string;
   onChange: (propName: PropertyKey, newValue: PropertyValue) => void;
 }
 
 const TextFieldProperty: React.FC<TextFieldPropertyProps> = (props) => {
   const { propName, label, value, selType, limits, onChange } = props;
   return (
-    <ListItem key={propName} disablePadding sx={{ px: 2, py: 1 }}>
+    <ListItem
+      key={propName}
+      disablePadding
+      sx={{
+        px: 2,
+        py: 1,
+        display: "flex",
+        flexBasis: selType === "number" ? "50%" : "100%",
+        flexGrow: 1,
+      }}
+    >
       <LocalValueWrapper
         initial={value}
         render={(localVal, setLocalVal) => (
